@@ -25,6 +25,21 @@ If sources disagree, stop and report the contradiction rather than silently choo
 - Never include secrets in code, logs, websocket payloads, service worker caches or test fixtures.
 - Do not add AI co-author attribution. Do not merge PRs, deploy or push to `main` without explicit owner approval.
 
+## Engineering decision policy: security, performance and usability
+
+For every implementation decision, the agent MUST seek the best justified balance of **security, performance, usability, maintainability and operational reliability**, with correctness as a prerequisite. Never optimize one dimension by silently compromising another.
+
+1. **Security by design:** default-deny authorization, least privilege, server-side validation, secure secret handling, safe dependencies, explicit trust boundaries, minimal data exposure, auditability and protection against common web/mobile threats. Never bypass a security control for convenience or speed.
+2. **Measured performance:** choose efficient algorithms, bounded resource consumption, appropriate indexing and query patterns, pagination, batching and caching only where safe. Avoid N+1 queries, unnecessary polling, redundant network calls and premature optimization. Define measurable performance budgets where feasible and benchmark consequential changes.
+3. **Usability and accessibility:** favor predictable workflows, clear feedback and error recovery, responsive interfaces, keyboard and assistive-technology support, reduced motion and consistent Android/PWA behavior. Keep game-master interactions fast during live sessions.
+4. **Reliability and data integrity:** prefer atomic operations, idempotency, concurrency guards, recoverable events, safe retries, observability and graceful degradation. A realtime outage must not silently corrupt official game state.
+5. **Maintainability:** prefer the simplest design that meets proven requirements. Preserve module boundaries and contracts; avoid speculative abstractions, unnecessary dependencies and cleverness that obscures behavior.
+6. **Evidence-based trade-offs:** before choosing between materially different approaches, compare security risks, latency/resource costs, user impact, complexity and operational burden. Document significant choices and rejected alternatives in an ADR.
+7. **Escalation:** if the safer or faster approach changes an accepted requirement, contract, infrastructure cost or product scope, propose it with rationale and request owner approval. Do not unilaterally override an accepted decision.
+8. **Verification:** tests MUST cover success, failure, authorization and edge cases. For performance-sensitive paths, include profiling or reproducible benchmarks where practical; for security-sensitive paths, include threat-focused tests and dependency checks. Never claim performance or security properties without evidence.
+
+When two options satisfy the requirements, prefer the one with lower security risk and operational complexity, then the one with better measured performance and usability. Security, correctness and data integrity are not negotiable.
+
 ## Workflow for each task
 
 1. Read the relevant ADRs, specifications, contracts and tests before editing.
