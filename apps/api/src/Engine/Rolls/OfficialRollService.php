@@ -16,41 +16,35 @@ final readonly class OfficialRollService
     }
 
     /**
-     * The caller must authenticate and authorize actor/character/session
-     * membership before calling. Store must enforce these checks again
-     * against locked authoritative state.
+     * Caller authenticates the actor. Store MUST reauthorize actor/character/session
+     * and resolve pinned preset values from locked authoritative state.
      */
-    public function execute(
-        string $actorId,
-        AuthorizedRoll $command,
-        int $faces,
-        int $threshold,
-    ): OfficialRollOutcome {
+    public function execute(string $actorId, AuthorizedRoll $command): OfficialRollOutcome
+    {
         if ($actorId === '') {
             throw new RollPolicyViolation('Missing actor.');
         }
 
-        // Bind the idempotency key to the canonical roll parameters.
+        // The key is scoped to the actor by the store. Dice configuration
+        // is resolved from the pinned preset, never supplied by the client.
         $fingerprint = hash('sha256', json_encode([
             'request_id' => $command->requestId,
             'chosen_dice_count' => $command->chosenDiceCount,
             'expected_revision' => $command->expectedRevision,
-            'faces' => $faces,
-            'threshold' => $threshold,
         ], JSON_THROW_ON_ERROR));
 
         return $this->store->executeAtomically(
             $actorId,
             $command,
             $fingerprint,
-            function (RollAuthorization $authorization) use ($command, $faces, $threshold): OfficialRollOutcome {
+            function (RollAuthorization $authorization) use ($command): OfficialRollOutcome {
                 $this->policy->assertAllowed($authorization, $command);
-
-                // The store must resolve and verify dice configuration from
-                // the pinned preset; these values are not trusted client input.
-                $result = $this->roller->roll(
-                    new DicePool($command->chosenDiceCount, $faces, $threshold)
-                );
+                $result = $this->roller->roll(new DicePool(
+                    $command->chosenDiceCount,
+                    $authorization->faces,
+                    $authorization->threshold,
+                    $authorization->successesPerDie,
+                ));
 
                 return new OfficialRollOutcome(
                     $command->requestId,
