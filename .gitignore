@@ -9,3 +9,4 @@
 **/.gradle/
 **/storage/logs/*.log
 .DS_Store
+**/dist/
