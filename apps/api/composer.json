@@ -3,7 +3,7 @@
   "description": "NOVTT standalone mechanics kernel (Laravel-independent)",
   "type": "library",
   "require": {
-    "php": "^8.2"
+    "php": "^8.5"
   },
   "autoload": {
     "psr-4": {
