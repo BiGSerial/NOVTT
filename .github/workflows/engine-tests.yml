@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: apps/api
+        working-directory: packages/engine
     steps:
       - uses: actions/checkout@v4
       - name: Setup PHP
