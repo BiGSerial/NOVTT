@@ -9,7 +9,17 @@ self.addEventListener('install', event => {
     const cache = await caches.open(CACHE_NAME)
     for (const url of PUBLIC_SHELL) {
       const response = await fetch(new Request(url, { credentials: 'omit', cache: 'reload' }))
-      if (response.ok && response.type === 'basic') await cache.put(url, response)
+      if (response.ok && response.type === 'basic') {
+        if (url === '/') {
+          const shell = await response.clone().text()
+          const assetPaths = [...shell.matchAll(/(?:src|href)="(\/assets\/[a-zA-Z0-9._-]+\.(?:js|css))"/g)].map(match => match[1])
+          for (const assetPath of assetPaths) {
+            const asset = await fetch(new Request(assetPath, { credentials: 'omit', cache: 'reload' }))
+            if (asset.ok && asset.type === 'basic') await cache.put(assetPath, asset)
+          }
+        }
+        await cache.put(url, response)
+      }
     }
     await self.skipWaiting()
   })())
