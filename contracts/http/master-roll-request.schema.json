@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MasterRollRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "character_id",
+    "attributes",
+    "skills",
+    "attempts_allowed",
+    "rule_reference"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "character_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "attributes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "modifiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "value"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "attempts_allowed": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "rule_reference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
