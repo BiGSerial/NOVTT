@@ -20,6 +20,15 @@ MUST / MUST NOT = requirement. SHOULD = preferred with documented reason to devi
 | [SPEC-002](SPEC-002-master-workspace.md) | Master multi-window workspace and realtime | ADR 0003, 0006 |
 | [SPEC-003](SPEC-003-official-rolls.md) | Server-authoritative rolls, attempts, idempotency and events | ADR 0003, 0004 |
 
+## Proposed specifications
+
+These are PROPOSED: they await owner approval and MUST NOT be implemented as assumed requirements.
+
+| Spec | Scope | Authority |
+| --- | --- | --- |
+| [SPEC-004](SPEC-004-ui-localization.md) | Translatable interface, language selection, error codes instead of prose | ADR 0007 (Proposed) |
+| [SPEC-005](SPEC-005-presets-and-character-sheet.md) | Preset editions, campaign overrides, fixed vs editable sheet fields | ADR 0008 (Proposed) |
+
 ## Change control
 
 A change to a published contract MUST update its schema, compatibility notes and tests. New product decisions MUST be recorded in an ADR or approved spec amendment before implementation. Never infer that scaffolding means the feature is complete.
