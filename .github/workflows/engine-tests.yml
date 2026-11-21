@@ -1,13 +1,18 @@
-name: Engine checks
+name: NOVTT checks
 
 on:
   pull_request:
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'chore/**'
 
 jobs:
   engine:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
     steps:
       - uses: actions/checkout@v4
       - name: Setup PHP
@@ -15,8 +20,29 @@ jobs:
         with:
           php-version: '8.5'
           coverage: none
-      - name: Validate syntax
-        run: |
-          find apps/api/src apps/api/tests -name '*.php' -print0 | xargs -0 -n1 php -l
-      - name: Run deterministic checks
-        run: php apps/api/tests/all.php
+          tools: composer:v2
+      - name: Validate PHP syntax
+        run: find src tests -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Run PHPUnit
+        run: composer test
+      - name: Composer audit
+        run: composer audit
+
+  player-pwa:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/player-pwa
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Typecheck
+        run: npx vue-tsc --noEmit
+      - name: Build
+        run: npm run build
