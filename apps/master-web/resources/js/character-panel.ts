@@ -13,16 +13,15 @@ export class CharacterPanel {
   ) {
     this.sync = new WorkspaceSync(workspaceId)
     this.unsubscribe = this.sync.subscribe(message => {
-      if (message.type === 'character.selected' && this.pinnedCharacterId === null) {
+      if (message.type === 'character.selected') {
         this.selectedCharacterId = message.payload.character_id
-        this.render(this.selectedCharacterId)
+        if (this.pinnedCharacterId === null) this.render(this.selectedCharacterId)
       }
     })
   }
 
   select(characterId: string | null): void {
-    this.selectedCharacterId = characterId
-    if (this.pinnedCharacterId === null) this.render(characterId)
+    // WorkspaceSync validates first and dispatches once to local subscribers.
     this.sync.selectCharacter(characterId)
   }
 
