@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "family": "sangue-suga",
+  "edition": "v20",
+  "package_version": "0.1.0",
+  "status": "scaffold",
+  "description": "Mechanical preset scaffold; no third-party narrative content.",
+  "sheet_schema": "sheet.schema.json"
+}
