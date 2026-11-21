@@ -5,7 +5,11 @@
   "additionalProperties": false,
   "required": [
     "idempotency_key",
-    "status"
+    "status",
+    "request_id",
+    "revision",
+    "session_sequence",
+    "successes"
   ],
   "properties": {
     "idempotency_key": {
@@ -32,6 +36,22 @@
     },
     "error_code": {
       "type": "string"
+    },
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "session_sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "successes": {
+      "type": "integer",
+      "minimum": 0
     }
   }
 }
