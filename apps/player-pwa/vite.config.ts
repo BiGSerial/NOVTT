@@ -27,7 +27,7 @@ function serviceWorkerBuildId(): Plugin {
       const buildId = hash.digest('hex').slice(0, 12)
       const source = readFileSync(swPath, 'utf8')
       if (!source.includes('__BUILD_ID__')) throw new Error('sw.js is missing the __BUILD_ID__ placeholder')
-      writeFileSync(swPath, source.replace('__BUILD_ID__', buildId))
+      writeFileSync(swPath, source.replaceAll('__BUILD_ID__', buildId))
     },
   }
 }
