@@ -13,6 +13,7 @@ use Novtt\Engine\Rolls\RollPolicy;
 use Novtt\Engine\Rolls\RollPolicyViolation;
 use Novtt\Engine\Rolls\RollStatus;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class RollPolicyTest extends TestCase
 {
@@ -58,7 +59,7 @@ final class RollPolicyTest extends TestCase
         $policy->assertAllowed($at, $command);
     }
 
-    /** @dataProvider invalidAuthorizations */
+    #[DataProvider('invalidAuthorizations')]
     public function test_invalid_authorization_bounds(int $min, int $max, int $faces, int $threshold, int $weight): void
     {
         $this->expectException(InvalidArgumentException::class);
