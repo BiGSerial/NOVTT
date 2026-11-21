@@ -2,7 +2,7 @@
 
 Data: 2026-11-21
 Status: decisões acordadas; itens explicitamente pendentes não são requisitos aprovados
-Referências: [SPEC-PRESETS-001](SPEC-PRESETS-001.md), [SPEC-AI-001](SPEC-AI-001.md)
+Referências: [SPEC-PRESETS-001](SPEC-PRESETS-001.md), [SPEC-AI-001](SPEC-AI-001.md), [SPEC-MVP-001](SPEC-MVP-001.md), [SPEC-SPRINT-000](SPEC-SPRINT-000.md)
 
 ## Identidade do produto
 NOVTT (Not Other Virtual Table Top) é uma plataforma de apoio a RPG de mesa, sem tabuleiro virtual obrigatório. Prioriza facilidade de uso, autonomia do mestre, interpretação narrativa e suporte a sistemas diversos; não pretende transformar RPG de mesa em videogame.
@@ -47,6 +47,12 @@ NOVTT (Not Other Virtual Table Top) é uma plataforma de apoio a RPG de mesa, se
 - Usuário pode desabilitar novas solicitações a qualquer momento; limites orçamentários, alertas e bloqueio automático.
 - Controlar concorrência/reserva de orçamento; custos de chamadas já iniciadas podem continuar; limites NOVTT não cobrem uso externo da mesma conta.
 
+## MVP aprovado
+- Primeiro marco: **MVP essencial / Primeira Mesa**, conforme SPEC-MVP-001.
+- Inclui autenticação, campanhas, convites, personagens e fichas dinâmicas, aprovação do mestre, sessões, rolagens, sincronização e persistência.
+- IA/RAG, inventário avançado, proximidade e Android nativo completo não bloqueiam a primeira entrega.
+- Sprint 0 documentada em SPEC-SPRINT-000; sua sequência é proposta de execução, não evidência de implementação concluída.
+
 ## Sequência sugerida, não cronograma aprovado
 1. Fundação: autenticação, campanhas, personagens, engine, presets e permissões.
 2. Sessões: rolagens, sincronização, histórico, recuperação.
@@ -59,6 +65,6 @@ NOVTT (Not Other Virtual Table Top) é uma plataforma de apoio a RPG de mesa, se
 - Contratos de rolagens, efeitos, ações, inventário e proximidade.
 - Modelos de dados, eventos em tempo real, concorrência e UX.
 - Política de retenção/privacidade, cotas, preços e acesso a provedores.
-- Planejamento de MVP, critérios de aceite por módulo e estratégia de testes.
+- Detalhamento dos critérios de aceite por módulo e estratégia de testes além do marco inicial aprovado.
 
 Este documento consolida decisões de produto; especificações especializadas prevalecem em detalhes e devem ser atualizadas quando novas decisões forem tomadas.
