@@ -7,9 +7,7 @@
     "idempotency_key",
     "status",
     "request_id",
-    "revision",
-    "session_sequence",
-    "successes"
+    "revision"
   ],
   "properties": {
     "idempotency_key": {
@@ -32,7 +30,8 @@
       "items": {
         "type": "integer",
         "minimum": 1
-      }
+      },
+      "minItems": 1
     },
     "error_code": {
       "type": "string"
@@ -43,15 +42,84 @@
     },
     "revision": {
       "type": "integer",
-      "minimum": 0
+      "minimum": 1
     },
     "session_sequence": {
       "type": "integer",
-      "minimum": 0
+      "minimum": 1
     },
     "successes": {
       "type": "integer",
       "minimum": 0
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "completed"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "roll_id",
+          "dice",
+          "successes",
+          "session_sequence"
+        ],
+        "properties": {
+          "error_code": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "pending"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "roll_id": false,
+          "dice": false,
+          "successes": false,
+          "session_sequence": false,
+          "error_code": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "rejected"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "error_code"
+        ],
+        "properties": {
+          "roll_id": false,
+          "dice": false,
+          "successes": false,
+          "session_sequence": false
+        }
+      }
+    }
+  ]
 }
