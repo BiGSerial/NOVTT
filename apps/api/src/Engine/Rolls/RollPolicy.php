@@ -3,15 +3,24 @@ declare(strict_types=1);
 
 namespace Novtt\Engine\Rolls;
 
-final class RollPolicy
+use Novtt\Engine\Contracts\Clock;
+
+final readonly class RollPolicy
 {
+    public function __construct(private Clock $clock)
+    {
+    }
+
     public function assertAllowed(RollAuthorization $authorization, AuthorizedRoll $command): void
     {
         if ($authorization->requestId !== $command->requestId) {
             throw new RollPolicyViolation('Roll request mismatch.');
         }
-        if ($authorization->status !== 'OPEN') {
+        if ($authorization->status !== RollStatus::OPEN) {
             throw new RollPolicyViolation('Roll request is not open.');
+        }
+        if ($authorization->expiresAt !== null && $this->clock->now() >= $authorization->expiresAt) {
+            throw new RollPolicyViolation('Roll request has expired.');
         }
         if ($authorization->revision !== $command->expectedRevision) {
             throw new RollPolicyViolation('Roll request revision mismatch.');
