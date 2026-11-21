@@ -1,0 +1,13 @@
+{
+  "id": "/",
+  "name": "NOVTT Player",
+  "short_name": "NOVTT",
+  "description": "Dados livres e sessões de RPG de mesa",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#111827",
+  "lang": "pt-BR",
+  "icons": []
+}
