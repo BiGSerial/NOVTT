@@ -8,6 +8,7 @@ use Novtt\Engine\Contracts\RandomSource;
 use Novtt\Engine\Dice\DicePool;
 use Novtt\Engine\Dice\DicePoolRoller;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class DicePoolTest extends TestCase
 {
@@ -25,7 +26,7 @@ final class DicePoolTest extends TestCase
         self::assertSame(4, $result->successes);
     }
 
-    /** @dataProvider invalidPools */
+    #[DataProvider('invalidPools')]
     public function test_invalid_pool_bounds(int $count, int $faces, int $threshold, int $weight): void
     {
         $this->expectException(InvalidArgumentException::class);
