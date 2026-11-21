@@ -2,7 +2,14 @@
 
 ## Product boundary
 
-NOVTT is not a VTT. The backend is authoritative for rules, permissions and persistent session state. Android is the native player client; the web application is the game-master console.
+NOVTT is not a VTT. The backend is authoritative for rules, permissions and persistent session state. Android and the player PWA are parity clients; the web master console supports synchronized multi-window panels.
+
+## Repository boundaries
+
+- `packages/engine`: standalone Composer package for PHP domain logic and PHPUnit tests. It does not depend on Laravel.
+- `apps/api`: reserved for the future Laravel application, which will depend on the engine via a local Composer path repository.
+- `apps/player-pwa`: installable player web app.
+- `apps/master-web`: master console frontend code.
 
 ## Modules
 
