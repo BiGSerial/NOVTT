@@ -49,7 +49,10 @@ export class WorkspaceSync {
     }
     this.channel?.postMessage(message)
     if (!this.channel) {
-      try { localStorage.setItem(this.storageKey, JSON.stringify(message)) } catch { /* unavailable */ }
+      try {
+        localStorage.setItem(this.storageKey, JSON.stringify(message))
+        localStorage.removeItem(this.storageKey)
+      } catch { /* unavailable */ }
     }
     this.dispatch(message)
   }
