@@ -1,0 +1,52 @@
+name: novtt
+services:
+  engine:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /workspace/packages/engine
+    volumes:
+      - ./:/workspace
+      - engine-vendor:/workspace/packages/engine/vendor
+    command: ["sh", "-c", "composer install --no-interaction --prefer-dist && composer test"]
+    profiles: ["test"]
+    security_opt: ["no-new-privileges:true"]
+  player:
+    image: node:22-bookworm-slim
+    working_dir: /workspace/apps/player-pwa
+    volumes:
+      - ./:/workspace
+      - player-modules:/workspace/apps/player-pwa/node_modules
+    ports:
+      - "127.0.0.1:${NOVTT_PLAYER_PORT:-5173}:5173"
+    command: ["sh", "-c", "npm ci && npm run dev -- --host 0.0.0.0"]
+    init: true
+    security_opt: ["no-new-privileges:true"]
+    profiles: ["player"]
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${NOVTT_DB_NAME:-novtt_dev}
+      POSTGRES_USER: ${NOVTT_DB_USER:-novtt}
+      POSTGRES_PASSWORD: ${NOVTT_DB_PASSWORD:?Configure NOVTT_DB_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    profiles: ["infra"]
+    security_opt: ["no-new-privileges:true"]
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    profiles: ["infra"]
+    security_opt: ["no-new-privileges:true"]
+volumes:
+  engine-vendor:
+  player-modules:
+  postgres-data:
+  redis-data:
