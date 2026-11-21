@@ -1,0 +1,19 @@
+{
+  "name": "bigserial/novtt-engine",
+  "description": "NOVTT standalone mechanics kernel (Laravel-independent)",
+  "type": "library",
+  "require": {
+    "php": "^8.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Novtt\\Engine\\": "src/Engine/"
+    }
+  },
+  "scripts": {
+    "test": "php vendor/bin/phpunit --configuration phpunit.xml"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^12.0"
+  }
+}
