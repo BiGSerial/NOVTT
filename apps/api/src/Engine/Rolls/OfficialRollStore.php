@@ -6,11 +6,15 @@ namespace Novtt\Engine\Rolls;
 interface OfficialRollStore
 {
     /**
-     * Implementations MUST serialize concurrent commands for the same request
-     * and commit the outcome and outbox event in the same transaction.
+     * Implementations MUST serialize concurrent commands for the same request,
+     * authorize the actor against locked session/character state, resolve the
+     * pinned preset's dice parameters, and atomically commit the outcome,
+     * consumed attempt and outbox event.
      *
-     * The callback receives current authorization and MUST run only if the
-     * idempotency key has no previously persisted outcome.
+     * Idempotency keys MUST be scoped by actor_id. Repeated requests with the
+     * same actor_id/key and canonical payload return the persisted outcome;
+     * a different payload with the same scoped key MUST fail as a conflict.
+     * The callback runs only if no outcome is persisted for the scoped key.
      *
      * @param callable(RollAuthorization):OfficialRollOutcome $execute
      */
