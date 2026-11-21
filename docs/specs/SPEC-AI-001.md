@@ -6,7 +6,7 @@ Projeto: NOVTT
 Dependência: SPEC-PRESETS-001
 
 ## Visão
-Oferecer integração opcional BYOAI (Bring Your Own AI): o mestre ou usuário conecta seu próprio provedor/modelo por API ou endpoint seguro. NOVTT fornece orquestração, contexto autorizado, ferramentas e validação; a inferência é executada pelo provedor escolhido. NOVTT permanece plenamente funcional sem IA.
+Oferecer integração opcional BYOAI (Bring Your Own AI) exclusivamente por API: o mestre ou usuário fornece credenciais de API de um provedor suportado ou configura endpoint de API compatível e seguro. Não há integração com assinaturas de aplicativos de chat, cookies, sessões de navegador ou reaproveitamento de planos pessoais. NOVTT fornece orquestração, contexto autorizado, ferramentas e validação; a inferência é executada pelo provedor escolhido. NOVTT permanece plenamente funcional sem IA.
 
 ## Capacidades previstas
 - Gerar e auxiliar a narração de cenas, consequências, diálogos e reações de NPCs.
@@ -32,7 +32,11 @@ A escolha do modo padrão ainda não foi decidida. Regras granulares por ação 
 
 ## Arquitetura proposta
 - AI Gateway/Orchestrator com adaptadores de provedores (iniciar por formato de API compatível com OpenAI, expandir por adaptadores específicos).
-- Cofre de credenciais, limites de consumo, timeout, observabilidade e tratamento de falhas.
+- Cofre de credenciais de API, limites de consumo, timeout, observabilidade e tratamento de falhas.
+- Painel de uso e custo estimado por usuário, campanha, modelo e período; registrar tokens, preços e outros itens tarifados (como embeddings e ferramentas), conforme dados disponíveis.
+- Estimar custo antes de solicitar; após resposta, reconciliar com métricas de uso e, quando disponível e autorizado, faturamento oficial do provedor. Diferenciar estimativa de cobrança confirmada.
+- Permitir desligar imediatamente novas solicitações a qualquer momento; cotas, alertas e bloqueio por orçamento. Reservar orçamento para chamadas concorrentes e reconhecer que chamadas já iniciadas podem gerar cobrança.
+- Limites do NOVTT aplicam-se às chamadas feitas pela plataforma, não a toda a conta do provedor.
 - Context Builder + filtro de permissões ANTES de recuperação e envio ao modelo.
 - Knowledge Service/RAG com separação de regras, fatos públicos da campanha, conhecimento de personagens e segredos do mestre.
 - Ferramentas inicialmente de leitura: consultar personagem, histórico, lore, regras, validar ação.
@@ -69,6 +73,6 @@ A escolha do modo padrão ainda não foi decidida. Regras granulares por ação 
 - Política exata de autorização para cada ferramenta e papel.
 - Modo padrão de autonomia e limites por campanha.
 - Contratos de ferramentas, eventos e estados de aprovação.
-- Política de custos, cotas e compartilhamento de provedores por jogador/campanha.
+- Valores padrão de orçamento, cotas, alertas, modelo de preços e compartilhamento de credenciais de API por jogador/campanha.
 - Retenção de conversas, embeddings, dados sensíveis e exclusão.
 - Suporte a servidores locais via conexão segura sem exposição direta.
