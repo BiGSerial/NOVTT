@@ -549,6 +549,7 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: '#/components/schemas/Grant' } }
+                  balances: { type: object, additionalProperties: { type: integer }, description: Remaining balance per budget }
         '404': { $ref: '#/components/responses/NotFound' }
     post:
       tags: [review]
@@ -846,12 +847,17 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationFailed' }
-  /change-requests/{changeRequestId}/rebase-preview:
-    parameters: [{ $ref: '#/components/parameters/ChangeRequestId' }]
+  /campaign-characters/{campaignCharacterId}/draft/rebase-preview:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
     post:
       tags: [review]
-      summary: Three-way comparison of a stale proposal against the current sheet (author). No mutation.
-      operationId: previewRebase
+      summary: Three-way comparison of a stale draft (base snapshot, current sheet, draft operations). No mutation.
+      description: |
+        With at most one active proposal per character, staleness arises in drafts: another
+        proposal was applied after the draft was based. Operations identical to ones rejected in a
+        finalized proposal are reported as `previously_rejected` and never return silently.
+        Values of fields the actor cannot read are null.
+      operationId: previewDraftRebase
       responses:
         '200':
           description: Preview
@@ -859,13 +865,13 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/RebasePreview' }
         '404': { $ref: '#/components/responses/NotFound' }
-  /change-requests/{changeRequestId}/rebase:
-    parameters: [{ $ref: '#/components/parameters/ChangeRequestId' }]
+        '409': { $ref: '#/components/responses/Conflict' }
+  /campaign-characters/{campaignCharacterId}/draft/rebase:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
     post:
       tags: [review]
-      summary: Confirm a rebase (author). Rechecks permissions and revisions at commit; rejected operations never return automatically.
-      operationId: confirmRebase
-      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      summary: Confirm a rebase (author). Every conflict needs an explicit resolution; permissions and revisions are rechecked.
+      operationId: confirmDraftRebase
       requestBody:
         required: true
         content:
@@ -887,11 +893,11 @@ paths:
                       operation_id: { type: string, maxLength: 64 }
                       resolution: { enum: [keep_mine, take_current, drop] }
       responses:
-        '201':
-          description: New proposal created; the old one becomes superseded
+        '200':
+          description: Draft rebased onto the current revision (draft_version incremented)
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ChangeRequest' }
+              schema: { $ref: '#/components/schemas/Draft' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationFailed' }
