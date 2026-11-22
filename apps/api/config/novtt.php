@@ -11,4 +11,7 @@ return [
 
     // Import limits (SPEC-PRESETS-001: bounded size and complexity).
     'preset_import_max_bytes' => 512 * 1024,
+
+    // Local demonstration mode (App\Demo\DemoMode): only honoured in local/testing environments.
+    'demo_mode' => filter_var(env('NOVTT_DEMO_MODE', false), FILTER_VALIDATE_BOOLEAN),
 ];

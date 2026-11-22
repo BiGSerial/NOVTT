@@ -12,9 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function (): void {
+            require __DIR__.'/../routes/dev.php';
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // First-party SPA session cookies for requests from SANCTUM_STATEFUL_DOMAINS (ADR 0009).
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

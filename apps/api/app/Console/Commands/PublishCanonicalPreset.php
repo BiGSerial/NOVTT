@@ -27,18 +27,14 @@ final class PublishCanonicalPreset extends Command
 
             return self::FAILURE;
         }
-        $dir = rtrim((string) $this->argument('directory'), '/');
-        $parts = [];
-        foreach (['manifest' => 'manifest.json', 'sheet_schema' => 'sheet.schema.json', 'sheet_ui' => 'sheet.ui.json', 'rules' => 'rules.json'] as $key => $file) {
-            if (!is_file("{$dir}/{$file}")) {
-                $this->error("Missing {$file}.");
+        [$raw, $missing] = PresetImporter::readDirectory((string) $this->argument('directory'));
+        if ($raw === null) {
+            $this->error("Missing {$missing}.");
 
-                return self::FAILURE;
-            }
-            $parts[] = json_encode($key) . ':' . file_get_contents("{$dir}/{$file}");
+            return self::FAILURE;
         }
         try {
-            [$package, $objects] = $importer->parse('{' . implode(',', $parts) . '}');
+            [$package, $objects] = $importer->parse($raw);
             [$version, $created] = $importer->import($actor, $package, $objects, canonical: true);
         } catch (ApiProblem $problem) {
             $this->error($problem->problemCode);

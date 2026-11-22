@@ -35,6 +35,26 @@ final readonly class PresetImporter
     }
 
     /**
+     * Reads a preset folder (manifest.json, sheet.schema.json, sheet.ui.json, rules.json) into the
+     * raw package body accepted by parse(). Returns null and the missing file name on failure.
+     *
+     * @return array{0: ?string, 1: ?string}
+     */
+    public static function readDirectory(string $directory): array
+    {
+        $dir = rtrim($directory, '/');
+        $parts = [];
+        foreach (['manifest' => 'manifest.json', 'sheet_schema' => 'sheet.schema.json', 'sheet_ui' => 'sheet.ui.json', 'rules' => 'rules.json'] as $key => $file) {
+            if (!is_file("{$dir}/{$file}")) {
+                return [null, $file];
+            }
+            $parts[] = json_encode($key) . ':' . file_get_contents("{$dir}/{$file}");
+        }
+
+        return ['{' . implode(',', $parts) . '}', null];
+    }
+
+    /**
      * Stage 1. Parses the raw body; the result keeps the object/list distinction.
      *
      * @return array{0: array<string, mixed>, 1: object}
