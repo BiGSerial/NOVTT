@@ -3,6 +3,17 @@
 ## Pré-requisitos
 Docker Engine com Compose v2 (ou Docker Desktop), Git e portas locais disponíveis. Não é necessário instalar PHP, Composer ou Node no host.
 
+## Versões suportadas
+| Componente | Versão | Onde é definida |
+|---|---|---|
+| PHP | 8.5 (patches de segurança atuais) | `docker/php/Dockerfile`, `packages/engine/composer.json`, CI |
+| Composer | 2.x | `docker/php/Dockerfile` |
+| Node | 24 LTS | `.nvmrc`, `compose.yaml`, `apps/player-pwa/package.json` (`engines`), CI |
+| PostgreSQL | 18 | `compose.yaml` |
+| Redis | 7 | `compose.yaml` |
+
+Dependências são instaladas a partir dos lockfiles (`composer.lock`, `package-lock.json`) com `composer install` e `npm ci`. Para rodar fora do Docker, use as mesmas versões; o PHP do host precisa ser 8.5.
+
 ## Primeira execução
 ```sh
 git clone https://github.com/BiGSerial/NOVTT.git
@@ -31,6 +42,8 @@ Os comandos devem ser executados na raiz do repositório. No Windows, use WSL2 c
 - O motor requer PHP 8.5 conforme `packages/engine/composer.json`; não reduzir silenciosamente a versão.
 - `npm ci` exige `apps/player-pwa/package-lock.json`. Se o lockfile não existir, gerar e versionar antes de usar o fluxo.
 - Não publicar portas de banco/cache, não versionar `.env` e não usar dados reais de usuários.
+- `sh scripts/dev.sh infra` recusa iniciar enquanto `NOVTT_DB_PASSWORD` estiver vazio ou com o valor de exemplo.
+- PostgreSQL 18 guarda os dados em `/var/lib/postgresql/18/docker`; o volume é montado em `/var/lib/postgresql`. Volumes criados com a versão 17 não são compatíveis: recrie com `docker compose --profile infra down -v` (apaga os dados locais).
 - Volumes preservam dados entre execuções. `docker compose down -v` apaga dados e dependências persistidas; use apenas conscientemente.
 - Imagens de runtime devem ser fixadas por digest após validação e atualizadas por processo controlado.
 
