@@ -21,6 +21,12 @@ NOVTT (Not Other Virtual Table Top) é uma plataforma de apoio a RPG de mesa, se
 - Contratos explícitos e versionados (OpenAPI, AsyncAPI, JSON Schema), validação autoritativa no backend, segurança, desempenho, usabilidade e testes como critérios de decisão.
 - Preferir implementação incremental, commits pequenos e testes; não adicionar atribuição de coautoria de IA.
 
+## Fluxo Git (aprovado)
+- `develop` concentra integração e é a origem das branches de trabalho.
+- Novas funcionalidades, correções e documentação seguem branches curtas `feature/*`, `fix/*`, `docs/*`, com revisão e testes antes de integrar.
+- Releases são preparadas em `release/vX.Y.Z` a partir de `develop`, estabilizadas e integradas à `main` após aprovação.
+- `main` representa versões aprovadas para produção; correções de release retornam a `develop`.
+
 ## Presets (aprovado)
 - Presets oficiais mantidos pela equipe e presets personalizados produzidos pelo usuário fora da plataforma.
 - Importação de JSON declarativo conforme manual e schema oficiais; usuário pode recorrer a qualquer IA externa para elaborar JSON a partir de fichas e mecânicas.
