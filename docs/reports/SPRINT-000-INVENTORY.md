@@ -81,12 +81,18 @@ Cada item em branch curta a partir de `develop`, PR para `develop`, sem coautori
 5. `ci/baseline-checks` — job da API, validação de schemas, PHPStan/ESLint, smoke test do Compose (R2, R4, R7).
 6. `refactor/master-web-package` — manifesto próprio e testes no próprio módulo (R5), se aprovado.
 
-## 7. Decisões para o dono
+## 7. Decisões do dono (2026-11-21)
 
-1. **Node**: padronizar em 24 LTS (ativo) ou manter 22 (manutenção até abr/2027)?
-2. **PostgreSQL**: manter 17 ou adotar 18 para a API nova?
-3. **Laravel**: bootstrap de `apps/api` com Laravel 13 agora, sem Sanctum, deixando a autenticação para ADR próprio (S0-04)?
-4. **master-web**: separar em pacote próprio (R5) nesta sprint ou adiar?
-5. **Ferramentas de qualidade**: aprovar PHPStan (nível a definir), PHP-CS-Fixer (PER-CS) e ESLint + `vue-tsc`?
-6. **PHPUnit 13**: atualizar a engine nesta sprint ou manter 12?
-7. **Preset `sangue-suga/v20`**: manter o nome ou renomear para algo neutro?
+| # | Tema | Decisão |
+|---|---|---|
+| 1 | Node | Padronizar em **Node 24 LTS** (host, Docker e CI). |
+| 2 | PostgreSQL | **PostgreSQL 18** para a `apps/api`. |
+| 3 | Laravel | Bootstrap de `apps/api` com **Laravel 13 sem autenticação**; Sanctum fica para ADR próprio (S0-04). |
+| 4 | Qualidade | Adotar **PHPStan**, **ESLint** e **validação de schemas** na CI. PHP-CS-Fixer não aprovado. |
+
+### Ainda abertas
+
+- **master-web**: separar em pacote próprio (R5) nesta sprint ou adiar?
+- **PHPUnit 13**: atualizar a engine nesta sprint ou manter 12?
+- **Preset `sangue-suga/v20`**: manter o nome ou renomear para algo neutro (R10)?
+- **PHPStan**: nível de rigor (proposta: nível máximo na engine, nível 6+ na API).
