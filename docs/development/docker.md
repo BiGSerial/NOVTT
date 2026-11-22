@@ -16,8 +16,10 @@ sh scripts/dev.sh test
 ## Ciclo por etapa
 ```sh
 sh scripts/dev.sh engine # dependências e testes do motor PHP
+sh scripts/dev.sh api-test # testes da API Laravel
+sh scripts/dev.sh api    # API em http://localhost:8000 (healthcheck em /up)
 sh scripts/dev.sh player # PWA com hot reload: http://localhost:5173
-sh scripts/dev.sh test   # PHPUnit + Vitest + build TypeScript/Vite
+sh scripts/dev.sh test   # engine + API + Vitest + build TypeScript/Vite
 sh scripts/dev.sh infra  # PostgreSQL e Redis, quando necessários
 sh scripts/dev.sh logs
 sh scripts/dev.sh down
@@ -27,7 +29,8 @@ Os comandos devem ser executados na raiz do repositório. No Windows, use WSL2 c
 
 ## Limites atuais
 - `apps/master-web` ainda não tem manifesto de execução independente; não há serviço Docker para ele.
-- `apps/api` ainda não existe; PostgreSQL e Redis ficam opt-in e não são necessários para o motor e PWA.
+- `apps/api` cria `apps/api/.env` a partir de `.env.example` e gera `APP_KEY` na primeira execução. Testes usam SQLite em memória; o `.env` aponta para os serviços `postgres` e `redis` (copie a senha de `NOVTT_DB_PASSWORD` para `DB_PASSWORD`). PostgreSQL e Redis continuam opt-in.
+- A extensão `phpredis` ainda não está na imagem PHP; instalar quando a API passar a usar Redis.
 - O motor requer PHP 8.5 conforme `packages/engine/composer.json`; não reduzir silenciosamente a versão.
 - `npm ci` exige `apps/player-pwa/package-lock.json`. Se o lockfile não existir, gerar e versionar antes de usar o fluxo.
 - Não publicar portas de banco/cache, não versionar `.env` e não usar dados reais de usuários.

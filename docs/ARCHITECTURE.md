@@ -7,7 +7,7 @@ NOVTT is not a VTT. The backend is authoritative for rules, permissions and pers
 ## Repository boundaries
 
 - `packages/engine`: standalone Composer package for PHP domain logic and PHPUnit tests. It does not depend on Laravel.
-- `apps/api`: reserved for the future Laravel application, which will depend on the engine via a local Composer path repository.
+- `apps/api`: Laravel 13 application (authoritative backend). Depends on the engine via a local Composer path repository (`../../packages/engine`); `EngineServiceProvider` binds engine ports to secure adapters. No authentication or domain endpoints yet.
 - `apps/player-pwa`: installable player web app.
 - `apps/master-web`: master console frontend code.
 

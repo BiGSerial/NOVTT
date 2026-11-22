@@ -11,6 +11,31 @@ services:
     command: ["sh", "-c", "composer install --no-interaction --prefer-dist && composer test"]
     profiles: ["test"]
     security_opt: ["no-new-privileges:true"]
+  api:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /workspace/apps/api
+    volumes:
+      - ./:/workspace
+      - api-vendor:/workspace/apps/api/vendor
+    ports:
+      - "127.0.0.1:${NOVTT_API_PORT:-8000}:8000"
+    command: ["sh", "-c", "composer install --no-interaction --prefer-dist && { [ -f .env ] || { cp .env.example .env && chown --reference=.env.example .env && php artisan key:generate; }; } && php artisan serve --host=0.0.0.0 --port=8000"]
+    init: true
+    security_opt: ["no-new-privileges:true"]
+    profiles: ["api"]
+  api-test:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /workspace/apps/api
+    volumes:
+      - ./:/workspace
+      - api-vendor:/workspace/apps/api/vendor
+    command: ["sh", "-c", "composer install --no-interaction --prefer-dist && { [ -f .env ] || { cp .env.example .env && chown --reference=.env.example .env && php artisan key:generate; }; } && composer test && composer audit"]
+    security_opt: ["no-new-privileges:true"]
+    profiles: ["test"]
   player:
     image: node:22-bookworm-slim
     working_dir: /workspace/apps/player-pwa
@@ -46,6 +71,7 @@ services:
     profiles: ["infra"]
     security_opt: ["no-new-privileges:true"]
 volumes:
+  api-vendor:
   engine-vendor:
   player-modules:
   postgres-data:
