@@ -4,7 +4,7 @@ import { add, normalize, randomRotation, randomUnit, rotate, scale, seeded, v, t
 /** Rapier's deterministic build: bit-identical simulation on every platform (same seed ⇒ same throw). */
 export type Rapier = typeof import('@dimforge/rapier3d-deterministic')
 
-/** Fixed physical table shared by every client: same seed ⇒ same throw everywhere. */
+/** Fixed physical table. Same seed ⇒ same throw on this client; other platforms may animate differently, only results must match. */
 export const TABLE = { halfX: 6.6, halfZ: 4.1, wall: 4 } as const
 export const PHYSICS_HZ = 120
 export const RECORD_HZ = 60

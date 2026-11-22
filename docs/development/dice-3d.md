@@ -58,12 +58,20 @@ Medido no Chromium headless com renderização por software (pior caso que um ap
 do clique até os dados se moverem: primeira rolagem 97 ms (era 272 ms sem aquecimento),
 rerrolagem no meio da animação 58 ms, 3d100 47 ms.
 
-## Mesma animação para o mestre
+## Animação para o mestre
 
-Um `RollAnimationRecord` (`novtt.dice-roll-animation/1`: dados, resultados, semente, skin)
-reproduz a mesma animação em qualquer cliente: a variante *deterministic* do Rapier é
-bit-idêntica entre plataformas, e a semeadura não usa trigonometria do JS. Mesmo se uma
-trajetória divergisse, os números mostrados seriam os do registro (troca de rótulos local).
+Decisão do dono (2026-11-22): **o resultado precisa ser fiel em qualquer plataforma; o movimento
+não precisa ser idêntico.** A animação no mestre existe para imersão.
+
+- O que é normativo: os números de um `RollAnimationRecord` (`novtt.dice-roll-animation/1`:
+  dados, resultados, semente, skin) — e, nas rolagens oficiais, os resultados do servidor. Todo
+  cliente MUST mostrar exatamente esses valores na face de cima (troca de rótulos por simetria,
+  `symmetry.ts`), qualquer que seja a trajetória.
+- O que é cosmético: a trajetória. A semente é uma sugestão; outro cliente MAY usar outro motor
+  de física ou outra semente. Na PWA ele hoje coincide (Rapier *deterministic*), mas isso não é
+  requisito nem é testado entre plataformas.
+- Consequência para o Android: qualquer motor de física nativo serve, desde que aplique a mesma
+  troca de rótulos e os mesmos rótulos de face (d4 no vértice, d100 como par dezenas/unidades).
 
 No MVP, a rolagem livre é espelhada só entre janelas do mesmo navegador (`BroadcastChannel`,
 seção "Dados do jogador" em `demo.html`), continua LOCAL · NÃO OFICIAL e não vai ao servidor.
@@ -89,9 +97,11 @@ fileira. `prefers-reduced-motion` mostra direto a posição final; botão "Pular
 
 ## Pendências
 
-- **Rolagens oficiais**: para o mestre e o jogador verem a mesma animação, o evento
-  `dice.roll.resolved` precisa carregar a semente de animação (nova versão de contrato; exige
-  aprovação do dono). Hoje só o espelho local existe.
-- **Android** (ADR 0005/SPEC-001 PC-11): renderer equivalente ainda não existe.
+- **Rolagens oficiais**: como o movimento não precisa coincidir, cada cliente pode animar com
+  a própria semente e assentar nos resultados de `dice.roll.resolved`; a semente de animação no
+  evento deixa de ser necessária. Hoje só o espelho local existe.
+- **Android** (ADR 0005/SPEC-001 PC-11): renderer equivalente ainda não existe. O teste de
+  paridade é de resultado (face de cima = valor do registro para todo dado e face), com fixtures
+  compartilhadas, não de trajetória.
 - Limite de 6 dados na mesa (antes os dados livres aceitavam até 100); aprovado pelo dono.
 - Validação visual em aparelhos reais (iOS Safari, Android Chrome) e leitores de tela.
