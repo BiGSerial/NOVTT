@@ -10,7 +10,7 @@ Status legend: PLANNED, IMPLEMENTED, VERIFIED.
 | Inventory | PLANNED | PLANNED | Same authorized actions |
 | Master-requested rolls | PLANNED | PLANNED | Same dice limits, attempts and official results |
 | Free dice without login | PLANNED | PLANNED | Offline, secure randomness, unofficial provenance |
-| Dice animations | PLANNED | PLANNED | Same outcomes, reduced-motion and instant-result modes |
+| Dice animations | PLANNED | IMPLEMENTED for free dice only (3D d6–d20, ≤ 6 dice; official rolls pending; docs/development/dice-3d.md) | Same outcomes, reduced-motion and instant-result modes |
 | Reconnection and event replay | PLANNED | PLANNED | Idempotent recovery and gap reconciliation |
 | Accessibility | PLANNED | PLANNED | Screen reader, touch targets, contrast and motion settings |
 | Installable experience | PLANNED | PLANNED | Native installation / PWA Add to Home Screen |
