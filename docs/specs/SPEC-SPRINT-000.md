@@ -8,7 +8,7 @@ Referências: SPEC-MVP-001, SPEC-PRESETS-001, SPEC-AI-001, DECISIONS-2026-11-21
 Deixar o monorepo reproduzível, testável, seguro e preparado para implementar o fluxo da Primeira Mesa. Sprint 0 NÃO entrega toda a aplicação, nem funcionalidades de IA.
 
 ## Inventário antes de alterar
-1. Verificar árvore real, branches, histórico e diferenças entre main, architecture-foundation, docker-dev-environment e specs-i18n-presets; não assumir que todas as mudanças foram integradas.
+1. Verificar árvore real, histórico e diferenças entre `develop` e `main`. `develop` é a branch consolidada de integração; não assumir que branches antigas continuam disponíveis.
 2. Identificar linguagem, versões, dependências, testes e CI existentes. Verificar estado de packages/engine, apps/player-pwa e apps/master-web.
 3. Confirmar se apps/api existe na branch de trabalho antes de criar; não sobrescrever código.
 4. Executar testes e linters existentes; registrar baseline, comandos, falhas e limitações. Nunca declarar testes executados sem evidência.
@@ -46,6 +46,13 @@ Deixar o monorepo reproduzível, testável, seguro e preparado para implementar 
 - Pipeline CI mínimo para engine, API (se criada), PWA e validação de contratos conforme módulos existentes.
 - Documentar comandos de setup/teste e critérios de pronto; criar ADRs para decisões de arquitetura.
 - Nenhum componente de IA, RAG, credenciais de provedores ou custo de tokens nesta sprint.
+
+## Fluxo Git aprovado
+- `develop`: branch central de integração e ponto de partida das novas tarefas.
+- `feature/*`, `fix/*` e `docs/*`: branches curtas derivadas de `develop`, integradas após revisão e testes.
+- `release/vX.Y.Z`: criada a partir de `develop` para estabilização e validação de release.
+- `main`: recebe somente releases aprovadas; correções feitas durante a release devem retornar a `develop`.
+- Não realizar commits diretos em `main`; não assumir deploy automático nem política de proteção de branch sem verificar configuração.
 
 ## Ordem sugerida de commits pequenos
 1. docs: inventory and baseline
