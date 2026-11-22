@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { arrange } from '../src/dice/arrange'
 import { dieDef } from '../src/dice/geometry'
 import { randomRotation, rotate, seeded, v } from '../src/dice/math'
-import { createLocalRoll, MAX_DICE, parseRecord } from '../src/dice/record'
+import { TABLE } from '../src/dice/sim'
+import { createLocalRoll, labelText, MAX_DICE, maxCount, parseRecord, physicalDice } from '../src/dice/record'
 import { contrast, DEFAULT_SKIN, parseSkin, PRESET_SKINS } from '../src/dice/skins'
 
 describe('roll record', () => {
@@ -45,14 +46,14 @@ describe('skins', () => {
 describe('arrangement', () => {
   it('rows dice at the player edge, flat on the result with the number upright, without crossing', () => {
     const rng = seeded(9)
-    const dice = [{ type: 'd20' as const, result: 17 }, { type: 'd6' as const, result: 2 }, { type: 'd10' as const, result: 9 }]
+    const dice = [{ shape: 'd20' as const, face: 17, group: 0 }, { shape: 'd6' as const, face: 2, group: 1 }, { shape: 'd4' as const, face: 3, group: 2 }]
     const finals = [{ p: v(3, 1, 0), q: randomRotation(rng) }, { p: v(-4, 1, 2), q: randomRotation(rng) }, { p: v(0, 1, -3), q: randomRotation(rng) }]
     const { targets, order } = arrange(dice, finals)
     expect(order).toEqual([1, 2, 0])
     const xs = order.map(i => targets[i].p.x)
     expect([...xs].sort((a, b) => a - b)).toEqual(xs)
     dice.forEach((d, i) => {
-      const face = dieDef(d.type).faces.find(f => f.number === d.result)!
+      const face = dieDef(d.shape).faces.find(f => f.number === d.face)!
       expect(rotate(targets[i].q, face.normal).y).toBeGreaterThan(0.9999)
       const up = rotate(targets[i].q, face.up)
       expect(up.z).toBeLessThan(-0.9999) // reads upright on the top-down camera
@@ -66,5 +67,33 @@ describe('record with a reactive skin', () => {
     const { reactive } = await import('vue')
     const r = createLocalRoll('d6', 2, reactive({ ...DEFAULT_SKIN }))
     expect(() => structuredClone(r)).not.toThrow()
+  })
+})
+
+describe('d100', () => {
+  it('is a tens and a units d10 kept side by side, 100 shown as 00 + 0', () => {
+    expect(physicalDice([{ type: 'd100', result: 100 }]).map(d => [labelText(d.labels, d.face)])).toEqual([['00'], ['0']])
+    expect(physicalDice([{ type: 'd100', result: 7 }]).map(d => labelText(d.labels, d.face))).toEqual(['00', '7'])
+    expect(physicalDice([{ type: 'd100', result: 58 }]).map(d => labelText(d.labels, d.face))).toEqual(['50', '8'])
+    expect(maxCount('d100')).toBe(3)
+    expect(() => createLocalRoll('d100', 4)).toThrow(RangeError)
+    const r = createLocalRoll('d100', 3)
+    expect(physicalDice(r.dice)).toHaveLength(6)
+    expect(parseRecord({ ...r, dice: [...r.dice, { type: 'd4', result: 1 }] })).toBeNull()
+
+    const rng = seeded(3)
+    const pair = physicalDice([{ type: 'd6', result: 1 }, { type: 'd100', result: 42 }])
+    const finals = [{ p: v(0, 1, 0), q: randomRotation(rng) }, { p: v(-5, 1, 0), q: randomRotation(rng) }, { p: v(5, 1, 0), q: randomRotation(rng) }]
+    const { targets, order } = arrange(pair, finals)
+    expect(order).toEqual([0, 1])
+    expect(targets[2].p.x - targets[1].p.x).toBeCloseTo(2.15)
+  })
+
+  it('a full row of six large dice stays on the table', () => {
+    const rng = seeded(4)
+    const six = Array.from({ length: 6 }, (_, i) => ({ shape: 'd20' as const, face: 1, group: i }))
+    const { targets } = arrange(six, six.map((_, i) => ({ p: v(i, 1, 0), q: randomRotation(rng) })))
+    const r = dieDef('d20').radius
+    for (const t of targets) expect(Math.abs(t.p.x) + r).toBeLessThanOrEqual(TABLE.halfX)
   })
 })
