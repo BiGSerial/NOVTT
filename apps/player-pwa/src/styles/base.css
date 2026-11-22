@@ -27,7 +27,9 @@ legend { font-weight: 800; padding: 0 6px; }
 .dot-rating [role=radiogroup] { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .dot { width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; border: 2px solid #a5b4fc; background: transparent; }
 .dot.filled { background: #a5b4fc; }
-.dot.zero { border-style: dashed; }
+.dot.zero { width: 36px; height: 36px; min-height: 44px; border-width: 1px; color: #a5b4fc; font-weight: 700; background-clip: content-box; }
+.dot.zero.selected { background: #a5b4fc; color: #0f172a; }
+.approval-note { margin-top: 0; }
 .dot-value { margin-left: 8px; font-weight: 700; }
 .readonly { margin: 0; } .readonly dt { font-weight: 600; } .readonly dd { margin: 4px 0 0; }
 .collection ul { padding-left: 18px; } .item-field { margin-right: 12px; }

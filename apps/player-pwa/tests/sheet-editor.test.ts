@@ -10,10 +10,12 @@ const ui = fixture<SheetUi>('sheet.ui.json')
 const schema = fixture<Record<string, unknown>>('sheet.schema.json')
 let app: App | null = null
 
+const budgetLabels = { attribute_points: 'Pontos de atributo', xp: 'Experiência' }
+
 function mount(draft: DraftModel, issues: ValidationIssue[] = [], readonly = false): HTMLElement {
   const root = document.createElement('div')
   document.body.append(root)
-  app = createApp({ render: () => h('main', [h(SheetEditor, { ui, schema, draft, issues, revision: 1, readonly })]) })
+  app = createApp({ render: () => h('main', [h(SheetEditor, { ui, schema, draft, issues, revision: 1, readonly, budgetLabels })]) })
   app.mount(root)
   return root
 }
@@ -63,10 +65,39 @@ describe('SheetEditor', () => {
 
     expect(summary.getAttribute('role')).toBe('alert')
     expect(summary.querySelector('a')!.getAttribute('href')).toBe('#f-attributes-might')
-    expect(summary.textContent).toContain('precisa de 8, há 2')
+    expect(summary.textContent).toContain('Saldo insuficiente em Experiência: precisa de 8, restam 2.')
+    expect(root.textContent).not.toMatch(/\bxp\b/)
     const group = root.querySelector('#f-attributes-might')!
     expect(group.getAttribute('aria-invalid')).toBe('true')
-    expect(root.querySelector(`#${group.getAttribute('aria-describedby')}`)!.textContent).toContain('Pontos insuficientes')
+    expect(root.querySelector(`#${group.getAttribute('aria-describedby')}`)!.textContent).toContain('Saldo insuficiente em Experiência')
+  })
+
+  it('never shows a raw budget id, even without a label', () => {
+    const root = mount(new DraftModel({}, 1), [
+      { rule_id: 'budget.insufficient', severity: 'error', operation_ids: [], paths: ['/skills/climb'], params: { budget: 'skill_points', required: 1, available: 1 } },
+    ])
+    expect(root.textContent).toContain('Saldo insuficiente: precisa de 1, resta 1.')
+    expect(root.textContent).not.toContain('skill_points')
+  })
+
+  it('says once per section that changes need approval, and does not repeat the section title', () => {
+    const root = mount(new DraftModel({}, 1))
+    const notes = [...root.querySelectorAll('.help')].filter(p => p.textContent!.includes('aprovação do mestre'))
+    expect(notes).toHaveLength(3) // Atributos, Perícias, Qualidades — not one per field
+    const heading = [...root.querySelectorAll('.collection h3')].find(h => h.textContent === 'Qualidades')!
+    expect(heading.classList.contains('sr-only')).toBe(true)
+  })
+
+  it('keeps keyboard focus on the rating after a change (no remount)', async () => {
+    const root = mount(new DraftModel({ attributes: { might: 2 } }, 1))
+    const radios = () => [...root.querySelectorAll<HTMLButtonElement>('[id="f-attributes-might"] [role=radio]')]
+    const before = radios()
+    before[1].focus()
+    before[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+    await nextTick()
+    expect(radios()[2]).toBe(before[2]) // same DOM node
+    expect(document.activeElement).toBe(before[2])
+    expect(before[2].getAttribute('aria-checked')).toBe('true')
   })
 
   it('read-only mode shows values without inputs', () => {
