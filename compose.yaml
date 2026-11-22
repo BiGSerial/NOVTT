@@ -37,7 +37,7 @@ services:
     security_opt: ["no-new-privileges:true"]
     profiles: ["test"]
   player:
-    image: node:22-bookworm-slim
+    image: node:24-bookworm-slim
     working_dir: /workspace/apps/player-pwa
     volumes:
       - ./:/workspace
@@ -49,13 +49,13 @@ services:
     security_opt: ["no-new-privileges:true"]
     profiles: ["player"]
   postgres:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: ${NOVTT_DB_NAME:-novtt_dev}
       POSTGRES_USER: ${NOVTT_DB_USER:-novtt}
       POSTGRES_PASSWORD: ${NOVTT_DB_PASSWORD:?Configure NOVTT_DB_PASSWORD in .env}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
@@ -66,6 +66,11 @@ services:
   redis:
     image: redis:7-alpine
     command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     volumes:
       - redis-data:/data
     profiles: ["infra"]
