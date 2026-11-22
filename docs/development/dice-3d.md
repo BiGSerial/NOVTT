@@ -40,6 +40,20 @@ A velocidade inicial fica em no máximo 46 rad/s (≈ 44° por quadro a 60 Hz). 
 parece girar para trás (efeito roda de carroça), porque a animação não tem desfoque de movimento.
 - Chromium headless com SwiftShader (render por software): 6–16 ms com o chunk já carregado.
 
+## Dados sobre a página (overlay)
+
+Decisão do dono (2026-11-22): os dados rolam sobre a própria tela, não numa bandeja.
+
+- `DiceTray surface="overlay"`: canvas transparente fixo sobre a página (`pointer-events: none`,
+  a página continua utilizável), só os dados e uma sombra suave são desenhados.
+- A mesa física é a tela: `overlayTable(largura, altura)` (sim.ts) usa 60 px por unidade no lado
+  curto (dados grandes no celular), limitado a 12 unidades em telas grandes. Os dados saem da
+  borda de baixo (lado do jogador), em duas fileiras em telas estreitas, quicam nas bordas e se
+  alinham perto da borda de baixo.
+- Depois de parar, ficam 3,5 s e somem (0,45 s); tocar na tela ou Esc dispensa antes. O resultado
+  em texto continua na página e é anunciado como antes.
+- O painel do mestre (demo) continua com a bandeja; a trajetória pode diferir, o resultado não.
+
 ## Experiência do usuário
 
 - **Primeira rolagem sem espera**: o 3D é baixado e aquecido (shaders compilados, física e

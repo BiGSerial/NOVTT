@@ -4,7 +4,7 @@ import { DIE_TYPES, dieDef, type DieType } from './geometry'
 import { add, cross, qmul, scale, slerp, sub, v, type Quat } from './math'
 import { detectImpacts } from './impacts'
 import { labelText, physicalDice, type LabelSet, type RollAnimationRecord } from './record'
-import { RECORD_HZ, simulateRoll, TABLE, type Rapier } from './sim'
+import { overlayTable, RECORD_HZ, simulateRoll, TABLE, type Rapier, type Table } from './sim'
 import type { DiceSkin } from './skins'
 import { playImpacts } from './sound'
 import { relabel, symmetryTable } from './symmetry'
@@ -17,12 +17,17 @@ export interface DiceAnimator {
   warmUp(skin: DiceSkin): void
   play(record: RollAnimationRecord, mode: AnimationMode): Promise<PlayStats>
   skip(): void
+  /** Removes the dice (overlay: leaves the page uncovered). */
+  clear(): void
   resize(width: number, height: number): void
   dispose(): void
 }
 export interface PlayStats { simulationMs: number; animationS: number; attempt: number; order: number[] }
 
 const ARRANGE_S = 0.55
+
+/** 'tray': boxed felt table. 'overlay': transparent, the dice roll over the page itself. */
+export type Surface = 'tray' | 'overlay'
 const smoother = (s: number) => s * s * s * (s * (s * 6 - 15) + 10)
 
 const FINISH: Record<DiceSkin['finish'], { roughness: number; metalness: number }> = {
@@ -45,11 +50,15 @@ export class DiceStage implements DiceAnimator {
   private frame = 0
   private finish: (() => void) | null = null
   private lost = false
+  private table: Table = { ...TABLE }
+  private floor: THREE.Mesh | null = null
+  private sun: THREE.DirectionalLight | null = null
   /** Sound and vibration preferences (presentation only). */
   feedback = { sound: true, haptics: true }
 
-  constructor(private readonly canvas: HTMLCanvasElement, private readonly rapier: Rapier) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' })
+  constructor(private readonly canvas: HTMLCanvasElement, private readonly rapier: Rapier, private readonly surface: Surface = 'tray') {
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: surface === 'overlay', powerPreference: 'high-performance' })
+    if (surface === 'overlay') this.renderer.setClearColor(0x000000, 0)
     this.renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio || 1, 2))
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
@@ -67,16 +76,29 @@ export class DiceStage implements DiceAnimator {
 
   private buildTable(): void {
     const { halfX, halfZ } = TABLE
-    this.scene.background = new THREE.Color('#0b1411')
     this.scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x1a1410, 1.1))
     const sun = new THREE.DirectionalLight(0xffffff, 2.2)
     sun.position.set(-4, 16, 7)
     sun.castShadow = true
     sun.shadow.mapSize.set(1024, 1024)
-    Object.assign(sun.shadow.camera, { left: -halfX - 1, right: halfX + 1, top: halfZ + 1, bottom: -halfZ - 1, near: 1, far: 40 })
     sun.shadow.bias = -0.0005
     sun.shadow.normalBias = 0.02
+    this.sun = sun
     this.scene.add(sun)
+    this.fitShadow()
+    if (this.surface === 'overlay') {
+      // Only the dice and their soft shadow are drawn: the page stays visible underneath.
+      const geo = new THREE.PlaneGeometry(1, 1)
+      const mat = new THREE.ShadowMaterial({ opacity: 0.22 })
+      this.floor = new THREE.Mesh(geo, mat)
+      this.floor.rotation.x = -Math.PI / 2
+      this.floor.receiveShadow = true
+      this.scene.add(this.floor)
+      this.disposables.push(geo, mat)
+      this.fitShadow()
+      return
+    }
+    this.scene.background = new THREE.Color('#0b1411')
     const feltGeo = new THREE.PlaneGeometry(halfX * 2, halfZ * 2)
     const felt = new THREE.MeshStandardMaterial({ color: '#1f4a3c', roughness: 1 })
     const table = new THREE.Mesh(feltGeo, felt)
@@ -95,12 +117,28 @@ export class DiceStage implements DiceAnimator {
     this.disposables.push(feltGeo, felt, rimGeo, wood)
   }
 
+  private fitShadow(): void {
+    if (!this.sun) return
+    const { halfX, halfZ } = this.table
+    Object.assign(this.sun.shadow.camera, { left: -halfX - 1, right: halfX + 1, top: halfZ + 1, bottom: -halfZ - 1, near: 1, far: 40 })
+    this.sun.shadow.camera.updateProjectionMatrix()
+    this.floor?.scale.set(halfX * 2 + 2, halfZ * 2 + 2, 1)
+  }
+
   resize(width: number, height: number): void {
     const w = Math.max(1, Math.round(width)), h = Math.max(1, Math.round(height))
     this.renderer.setSize(w, h, false)
     const aspect = w / h, tan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2))
-    // Fixed top-down view that always shows the whole physical table.
-    const height3d = Math.max((TABLE.halfZ + 0.45) / tan, (TABLE.halfX + 0.45) / (tan * aspect)) + 1.2
+    let height3d: number
+    if (this.surface === 'overlay') {
+      // The floor is the screen: the table's edges are the viewport's edges. A resize during a
+      // throw only changes the next one (the current recording keeps its table).
+      if (!this.finish) { this.table = overlayTable(w, h); this.fitShadow() }
+      height3d = Math.max(this.table.halfZ / tan, this.table.halfX / (tan * aspect))
+    } else {
+      // Fixed top-down view that always shows the whole physical table.
+      height3d = Math.max((TABLE.halfZ + 0.45) / tan, (TABLE.halfX + 0.45) / (tan * aspect)) + 1.2
+    }
     this.camera.aspect = aspect
     this.camera.position.set(0, height3d, 0.001)
     this.camera.up.set(0, 0, -1)
@@ -214,6 +252,13 @@ export class DiceStage implements DiceAnimator {
     this.render()
   }
 
+  clear(): void {
+    this.skip()
+    cancelAnimationFrame(this.frame)
+    this.clearDice()
+    this.render()
+  }
+
   skip(): void {
     const done = this.finish
     this.finish = null
@@ -226,7 +271,8 @@ export class DiceStage implements DiceAnimator {
     this.clearDice()
     const physical = physicalDice(record.dice)
     const t0 = performance.now()
-    const rec = simulateRoll(this.rapier, physical.map(d => d.shape), record.seed)
+    const table = this.table
+    const rec = simulateRoll(this.rapier, physical.map(d => d.shape), record.seed, table)
     const simulationMs = performance.now() - t0
     const n = physical.length
 
@@ -246,7 +292,9 @@ export class DiceStage implements DiceAnimator {
       return { p: v(P[o], P[o + 1], P[o + 2]), q: qmul({ x: P[o + 3], y: P[o + 4], z: P[o + 5], w: P[o + 6] }, this.dice[i].relabel) }
     }
     const finals = physical.map((_, i) => pose(rec.frames - 1, i))
-    const { targets, order } = arrange(physical, finals)
+    // Overlay: the screen edge is the table edge and dice nearer the camera look bigger, so the
+    // row sits higher to stay whole on screen.
+    const { targets, order } = arrange(physical, finals, table, this.surface === 'overlay' ? 2.1 : undefined)
     const physicsS = (rec.frames - 1) / RECORD_HZ
     const stats: PlayStats = { simulationMs, animationS: mode === 'animated' ? physicsS + ARRANGE_S : 0, attempt: rec.attempt, order }
     const showFinal = () => { this.dice.forEach((d, i) => this.place(d, targets[i])); this.render() }

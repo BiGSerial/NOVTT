@@ -15,7 +15,7 @@ function fakeLoader(played: RollAnimationRecord[]) {
     feedback: { sound: true, haptics: true },
     warmUp: vi.fn(),
     play: vi.fn(async (record: RollAnimationRecord) => { played.push(record); return { simulationMs: 5, animationS: 1.5, attempt: 0, order: [...record.dice.keys()].reverse() } }),
-    skip: vi.fn(), resize: vi.fn(), dispose: vi.fn(),
+    skip: vi.fn(), clear: vi.fn(), resize: vi.fn(), dispose: vi.fn(),
   }
   return { loader: vi.fn(async () => ({ create: () => animator })), animator }
 }
@@ -48,6 +48,25 @@ describe('free dice with 3D tray', () => {
     expect(root.querySelector('[role=status]')!.textContent).toContain('Resultado: 3d20')
     expect(root.querySelector('canvas')!.getAttribute('aria-hidden')).toBe('true')
     expect(await axeViolations(root)).toEqual([])
+  })
+
+  it('rolls over the page: overlay ignores pointer input, then leaves on tap without blocking the page', async () => {
+    const { loader, animator } = fakeLoader([])
+    const root = mount(loader)
+    const overlay = root.querySelector<HTMLElement>('.dice-overlay')!
+    expect(overlay.classList.contains('covering')).toBe(false)
+    root.querySelector<HTMLButtonElement>('.roll')!.click()
+    await flush()
+    expect(overlay.classList.contains('covering')).toBe(true)
+    expect(root.querySelector('.dice-results')).not.toBeNull() // text result stays in the page
+
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+    await flush()
+    expect(overlay.classList.contains('fading')).toBe(true)
+    await new Promise(r => setTimeout(r, 500))
+    expect(overlay.classList.contains('covering')).toBe(false)
+    expect(animator.clear).toHaveBeenCalled()
+    expect(root.querySelector('.dice-results')).not.toBeNull()
   })
 
   it('limits d100 to three rolls (six dice on the table) and keeps the count valid', async () => {

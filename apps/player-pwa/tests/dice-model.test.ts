@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { arrange } from '../src/dice/arrange'
 import { dieDef } from '../src/dice/geometry'
 import { randomRotation, rotate, seeded, v } from '../src/dice/math'
-import { TABLE } from '../src/dice/sim'
+import { overlayTable, TABLE } from '../src/dice/sim'
 import { createLocalRoll, labelText, MAX_DICE, maxCount, parseRecord, physicalDice } from '../src/dice/record'
 import { contrast, DEFAULT_SKIN, parseSkin, PRESET_SKINS } from '../src/dice/skins'
 
@@ -87,6 +87,21 @@ describe('d100', () => {
     const { targets, order } = arrange(pair, finals)
     expect(order).toEqual([0, 1])
     expect(targets[2].p.x - targets[1].p.x).toBeCloseTo(2.15)
+  })
+
+  it('overlay tables follow the screen and keep dice large on phones', () => {
+    const phone = overlayTable(390, 844), desktop = overlayTable(2560, 1280)
+    expect(phone.halfX * 2).toBeCloseTo(6.5) // 390 px / 60 px per unit
+    expect(phone.halfZ / phone.halfX).toBeCloseTo(844 / 390)
+    expect(desktop.halfZ * 2).toBe(12) // capped: dice do not shrink to dots on large screens
+    expect(desktop.halfX / desktop.halfZ).toBeCloseTo(2)
+  })
+
+  it('six large dice fit a portrait phone row', () => {
+    const rng = seeded(5), table = overlayTable(360, 740)
+    const six = Array.from({ length: 6 }, (_, i) => ({ shape: 'd20' as const, face: 1, group: i }))
+    const { targets } = arrange(six, six.map((_, i) => ({ p: v(i, 1, 0), q: randomRotation(rng) })), table)
+    for (const t of targets) expect(Math.abs(t.p.x) + dieDef('d20').radius).toBeLessThanOrEqual(table.halfX)
   })
 
   it('a full row of six large dice stays on the table', () => {

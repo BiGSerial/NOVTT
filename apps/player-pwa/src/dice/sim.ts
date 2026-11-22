@@ -4,8 +4,25 @@ import { add, normalize, randomRotation, randomUnit, rotate, scale, seeded, v, t
 /** Rapier's deterministic build: bit-identical simulation on every platform (same seed ⇒ same throw). */
 export type Rapier = typeof import('@dimforge/rapier3d-deterministic')
 
-/** Fixed physical table. Same seed ⇒ same throw on this client; other platforms may animate differently, only results must match. */
-export const TABLE = { halfX: 6.6, halfZ: 4.1, wall: 4 } as const
+/** Physical table: half extents on the floor (x right, z towards the player) and wall height. */
+export interface Table { halfX: number; halfZ: number; wall: number }
+/** Default boxed tray. Same seed + table ⇒ same throw on this client; other platforms or screen
+ *  sizes may animate differently — only the results must match (docs/development/dice-3d.md). */
+export const TABLE: Table = { halfX: 6.6, halfZ: 4.1, wall: 4 }
+const SPAWN_SPACING = 2.05, SPAWN_ROW = 1.7
+
+/** Overlay scale: world units across the screen's short side (die ≈ 1.2 units). */
+const OVERLAY_PX_PER_UNIT = 60
+const OVERLAY_SHORT_MIN = 6.4, OVERLAY_SHORT_MAX = 12
+
+/** Overlay table matching the viewport: phones get big dice, large screens are capped. */
+export function overlayTable(widthPx: number, heightPx: number): Table {
+  const w = Math.max(1, widthPx), h = Math.max(1, heightPx)
+  const short = Math.min(OVERLAY_SHORT_MAX, Math.max(OVERLAY_SHORT_MIN, Math.min(w, h) / OVERLAY_PX_PER_UNIT))
+  const perUnit = Math.min(w, h) / short
+  return { halfX: w / perUnit / 2, halfZ: h / perUnit / 2, wall: 4 }
+}
+
 export const PHYSICS_HZ = 120
 export const RECORD_HZ = 60
 const GRAVITY = 60
@@ -50,14 +67,14 @@ function topFace(type: DieType, q: Quat): { index: number; cos: number } {
   return { index, cos }
 }
 
-function simulateOnce(R: Rapier, dice: readonly DieType[], seed: number): Omit<Recording, 'attempt'> & { flat: boolean } {
+function simulateOnce(R: Rapier, dice: readonly DieType[], seed: number, table: Table): Omit<Recording, 'attempt'> & { flat: boolean } {
   const rng = seeded(seed)
   const world = new R.World({ x: 0, y: -GRAVITY, z: 0 })
   world.timestep = 1 / PHYSICS_HZ
   try {
     const box = (hx: number, hy: number, hz: number, x: number, y: number, z: number) =>
       world.createCollider(R.ColliderDesc.cuboid(hx, hy, hz).setTranslation(x, y, z).setFriction(0.6).setRestitution(0.3))
-    const { halfX, halfZ, wall } = TABLE
+    const { halfX, halfZ, wall } = table
     box(halfX + 1, 0.5, halfZ + 1, 0, -0.5, 0)
     box(0.5, wall, halfZ + 1, -halfX - 0.5, wall, 0)
     box(0.5, wall, halfZ + 1, halfX + 0.5, wall, 0)
@@ -66,13 +83,17 @@ function simulateOnce(R: Rapier, dice: readonly DieType[], seed: number): Omit<R
     box(halfX + 1, 0.5, halfZ + 1, 0, wall * 2 + 0.5, 0)
 
     // Thrown from the player's edge (+z, bottom of the screen) towards the far wall.
-    const spacing = 2.05, x0 = -((dice.length - 1) * spacing) / 2
+    // On a narrow (portrait) table the dice leave the hand in two staggered rows.
+    const perRow = Math.max(1, Math.min(dice.length, Math.floor((2 * halfX - 1.4) / SPAWN_SPACING) + 1))
     const bodies = dice.map((type, i) => {
       const def = dieDef(type)
+      const row = Math.floor(i / perRow), inRow = Math.min(perRow, dice.length - row * perRow)
+      const sx = -((inRow - 1) * SPAWN_SPACING) / 2 + (i % perRow) * SPAWN_SPACING + (row % 2) * 0.5
+      const sz = halfZ - 1.2 - row * SPAWN_ROW
       const q = randomRotation(rng)
       const spin = normalize(add(v(-1, 0, 0), scale(randomUnit(rng), SPIN_WOBBLE))), w = SPIN_MIN + rng() * SPIN_RANGE
       const body = world.createRigidBody(R.RigidBodyDesc.dynamic()
-        .setTranslation(x0 + i * spacing + (rng() - 0.5) * 0.3, 1.4 + rng() * 0.9, halfZ - 1.2 + (rng() - 0.5) * 0.3)
+        .setTranslation(sx + (rng() - 0.5) * 0.3, 1.4 + rng() * 0.9, sz + (rng() - 0.5) * 0.3)
         .setRotation(q)
         .setLinvel((rng() - 0.5) * 4, 5.5 + rng() * 2.5, -(8 + rng() * 5))
         .setAngvel({ x: spin.x * w, y: spin.y * w, z: spin.z * w })
@@ -129,10 +150,10 @@ function simulateOnce(R: Rapier, dice: readonly DieType[], seed: number): Omit<R
  * against a wall or another die; the outcome face is irrelevant because results are applied by
  * relabelling (symmetry.ts), so there is never a search for a "matching" throw.
  */
-export function simulateRoll(R: Rapier, dice: readonly DieType[], seed: number): Recording {
+export function simulateRoll(R: Rapier, dice: readonly DieType[], seed: number, table: Table = TABLE): Recording {
   let last: (Omit<Recording, 'attempt'> & { flat: boolean }) | null = null
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    last = simulateOnce(R, dice, mix(seed, attempt))
+    last = simulateOnce(R, dice, mix(seed, attempt), table)
     if (last.flat) return { frames: last.frames, poses: last.poses, landed: last.landed, steps: last.steps, attempt }
   }
   const r = last!
