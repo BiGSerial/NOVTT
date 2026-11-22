@@ -1,7 +1,7 @@
 # Sprint 0 — Inventário e baseline
 
 Data: 2026-11-21
-Branch: `docs/sprint-0-inventory` (a partir de `develop` em `8709e4b`)
+Branch: `docs/sprint-0-inventory` (a partir de `develop` em `9197df1`)
 Referência: [SPEC-SPRINT-000](../specs/SPEC-SPRINT-000.md)
 
 Este relatório registra o estado real do repositório antes das alterações da Sprint 0. Nada aqui é decisão aprovada; os itens em "Decisões para o dono" aguardam validação.
@@ -49,7 +49,7 @@ Comando: `sh scripts/dev.sh test` (Docker), em 2026-11-21, duração ~43 s com i
 | PWA — `npm ci` | 73 pacotes, 0 vulnerabilidades |
 | PWA — Vitest 5.1.1 | 1 arquivo, 4 testes passando |
 | PWA — `vue-tsc --noEmit && vite build` | OK, JS 70,67 kB (28,15 kB gzip) |
-| CI GitHub em `develop` (`8709e4b`) | `success` |
+| CI GitHub em `develop` (`9197df1`) | `success` |
 
 Não executado: lint/análise estática (não há ferramenta configurada), validação dos JSON Schemas, testes de `apps/master-web` fora do PWA, serviços `infra` (PostgreSQL/Redis), testes em navegador real.
 
