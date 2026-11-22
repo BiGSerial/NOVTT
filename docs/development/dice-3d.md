@@ -25,6 +25,24 @@ Repetição só ocorre se um dado parar inclinado (até 4 vezes, semente derivad
 - Animação: 1,3–2,1 s de física + 0,55 s de organização.
 - Chromium headless com SwiftShader (render por software): 6–16 ms com o chunk já carregado.
 
+## Experiência do usuário
+
+- **Primeira rolagem sem espera**: o 3D é baixado e aquecido (shaders compilados, física e
+  tabelas de simetria prontas) enquanto a pessoa escolhe os dados, em tempo ocioso. Com
+  "economia de dados" do navegador ativa, só carrega na primeira rolagem.
+- **Rolar de novo a qualquer momento**: um novo lançamento substitui o atual na hora.
+- **Som e vibração**: impactos inferidos da trajetória gravada (determinísticos, iguais para o
+  mestre), som sintetizado com Web Audio (sem arquivos), vibração curta onde o aparelho suporta.
+  Botão "Som ligado/desligado" ao lado de "Rolar", lembrado no dispositivo.
+- **d4**: resultado no vértice de cima; cada face traz três números, um por canto.
+- **d100**: par de d10 (dezenas 00–90 e unidades 0–9; 00 + 0 = 100) lado a lado; até 3 por
+  rolagem para respeitar o limite de 6 dados na mesa.
+- A fileira final se ajusta à largura da mesa.
+
+Medido no Chromium headless com renderização por software (pior caso que um aparelho real),
+do clique até os dados se moverem: primeira rolagem 97 ms (era 272 ms sem aquecimento),
+rerrolagem no meio da animação 58 ms, 3d100 47 ms.
+
 ## Mesma animação para o mestre
 
 Um `RollAnimationRecord` (`novtt.dice-roll-animation/1`: dados, resultados, semente, skin)
@@ -60,6 +78,5 @@ fileira. `prefers-reduced-motion` mostra direto a posição final; botão "Pular
   `dice.roll.resolved` precisa carregar a semente de animação (nova versão de contrato; exige
   aprovação do dono). Hoje só o espelho local existe.
 - **Android** (ADR 0005/SPEC-001 PC-11): renderer equivalente ainda não existe.
-- **d4 e d100** saíram dos dados livres (antes ofereciam d4–d100 até 100 dados); voltam quando
-  houver leitura por vértice (d4) e par percentil (d100). Limite atual: 6 dados.
+- Limite de 6 dados na mesa (antes os dados livres aceitavam até 100); aprovado pelo dono.
 - Validação visual em aparelhos reais (iOS Safari, Android Chrome) e leitores de tela.
