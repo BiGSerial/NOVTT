@@ -60,6 +60,30 @@ jobs:
       - name: Composer audit
         run: composer audit
 
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+          tools: composer:v2
+      - name: Validate PHP syntax
+        run: find app bootstrap config database routes tests -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Prepare environment
+        run: cp .env.example .env && php artisan key:generate
+      - name: Run tests
+        run: composer test
+      - name: Composer audit
+        run: composer audit
+
   player-pwa:
     runs-on: ubuntu-latest
     defaults:

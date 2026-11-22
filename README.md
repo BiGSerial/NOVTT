@@ -23,7 +23,7 @@ NOVTT é uma plataforma de suporte a RPG de mesa, sem tabuleiro virtual obrigat�
 
 ## Estado
 
-Fundação em desenvolvimento: biblioteca independente em `packages/engine`, com testes PHPUnit; PWA inicial de dados livres em `apps/player-pwa`; sincronização inicial de janelas do mestre em `apps/master-web`. A aplicação Laravel em `apps/api` ainda não foi criada.
+Fundação em desenvolvimento: biblioteca independente em `packages/engine`, com testes PHPUnit; PWA inicial de dados livres em `apps/player-pwa`; sincronização inicial de janelas do mestre em `apps/master-web`. API Laravel 13 inicial em `apps/api`, consumindo a engine via repositório Composer local; ainda sem autenticação nem endpoints de domínio.
 
 ## Fluxo de branches
 
