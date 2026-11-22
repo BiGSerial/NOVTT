@@ -35,3 +35,27 @@ legend { font-weight: 800; padding: 0 6px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 .dice { overflow-wrap: anywhere; line-height: 1.8; font-size: 20px; }
 .footnote { font-size: 13px; }
+.dice-page { width: min(100%, 960px); }
+.choice { border: 0; padding: 0; margin: 16px 0; }
+.choice legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
+.segmented { display: flex; flex-wrap: wrap; gap: 6px; }
+.segmented label { margin: 0; position: relative; display: block; }
+.segmented input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.segmented span { display: block; min-width: 52px; min-height: 44px; padding: 10px 12px; text-align: center; border: 1px solid #6b7280; border-radius: 10px; font-weight: 700; }
+.segmented input:checked + span { background: #a5b4fc; color: #111827; border-color: #a5b4fc; }
+.segmented input:focus-visible + span { outline: 3px solid #fbbf24; outline-offset: 2px; }
+.dice-tray { margin-top: 24px; }
+.dice-stage { position: relative; width: 100%; aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden; background: #0b1411; }
+.dice-stage canvas { display: block; width: 100%; height: 100%; }
+.dice-stage .skip { position: absolute; right: 12px; top: 12px; width: auto; padding: 8px 14px; min-height: 40px; font-size: 15px; background: rgba(17, 24, 39, .85); color: #f9fafb; border: 1px solid #a5b4fc; }
+.dice-stage .stage-note { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: #cbd5e1; }
+.dice-results { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; margin: 16px 0 4px; }
+.dice-results li { min-width: 52px; padding: 10px 14px; text-align: center; font-size: 24px; font-weight: 800; border: 1px solid #374151; border-radius: 12px; background: #1f2937; }
+.dice-total { font-size: 18px; margin: 8px 0; }
+.stats { font-size: 13px; }
+.skin-picker { margin-top: 24px; padding: 16px; border: 1px solid #374151; border-radius: 14px; }
+.skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+.skin { display: flex; align-items: center; gap: 10px; text-align: left; background: #1f2937; color: #f9fafb; border: 1px solid #374151; font-size: 15px; padding: 8px 10px; }
+.skin[aria-checked=true] { border-color: #a5b4fc; box-shadow: inset 0 0 0 2px #a5b4fc; }
+.swatch { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; font-weight: 800; font-size: 14px; flex: none; }
+.skin-picker input[type=color] { min-height: 44px; padding: 4px; }
