@@ -33,7 +33,34 @@ services:
     volumes:
       - ./:/workspace
       - api-vendor:/workspace/apps/api/vendor
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres-test
+      DB_PORT: "5432"
+      DB_DATABASE: novtt_test
+      DB_USERNAME: novtt_test
+      DB_PASSWORD: novtt_test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
     command: ["sh", "-c", "composer install --no-interaction --prefer-dist && { [ -f .env ] || { cp .env.example .env && chown --reference=.env.example .env && php artisan key:generate; }; } && composer test && composer audit"]
+    security_opt: ["no-new-privileges:true"]
+    profiles: ["test"]
+  postgres-test:
+    # Ephemeral, unpublished database used only by automated tests. The fixed
+    # credentials are not secrets: the service has no host port and no volume.
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: novtt_test
+      POSTGRES_USER: novtt_test
+      POSTGRES_PASSWORD: novtt_test
+    tmpfs:
+      - /var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novtt_test -d novtt_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
     security_opt: ["no-new-privileges:true"]
     profiles: ["test"]
   player:
