@@ -1,8 +1,14 @@
 # SPEC-SPRINT-000 — Fundação técnica e preparação da IA local
 
-Status: plano de execução proposto, alinhado ao MVP essencial aprovado
+Status: concluída conforme declaração do responsável em 2026-11-21; evidências técnicas e execução de testes não verificadas nesta atualização
 Data: 2026-11-21
 Referências: SPEC-MVP-001, SPEC-PRESETS-001, SPEC-AI-001, DECISIONS-2026-11-21
+
+## Registro de encerramento
+- Responsável informou a conclusão da Sprint 000 em 2026-11-21.
+- Este registro não equivale a auditoria independente de entregas, testes, CI ou critérios de pronto.
+- Antes da Sprint 001, consultar código e relatórios existentes em `develop` para identificar pendências técnicas efetivas.
+- Próxima etapa planejada: Sprint 001, campanhas, participantes e personagens do MVP essencial.
 
 ## Objetivo
 Deixar o monorepo reproduzível, testável, seguro e preparado para implementar o fluxo da Primeira Mesa. Sprint 0 NÃO entrega toda a aplicação, nem funcionalidades de IA.
