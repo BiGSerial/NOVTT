@@ -114,6 +114,18 @@ fileira. `prefers-reduced-motion` mostra direto a posição final; botão "Pular
 - **Rolagens oficiais**: como o movimento não precisa coincidir, cada cliente pode animar com
   a própria semente e assentar nos resultados de `dice.roll.resolved`; a semente de animação no
   evento deixa de ser necessária. Hoje só o espelho local existe.
+- **Android: chacoalhar para rolar** (direção do dono, 2026-11-22; ainda sem ADR). O jogador
+  segura/chacoalha o aparelho e os dados giram com o sensor de movimento; ao parar, são lançados.
+  Regras propostas para não abrir brecha:
+  - O resultado é pedido ao servidor **quando o jogador começa** a chacoalhar (rolagem oficial
+    exige conexão), não no fim: ao soltar não há espera de rede.
+  - Pedir o resultado já **compromete** a rolagem: ela fica registrada no servidor e não pode ser
+    descartada nem refeita cancelando o gesto (senão o jogador veria o número e desistiria).
+    O cliente não mostra o valor antes de os dados pararem.
+  - O giro do sensor é só visual; a física assenta no resultado já recebido (troca de rótulos).
+  - Sem conexão, o gesto só faz rolagem livre LOCAL · NÃO OFICIAL.
+  - Acessibilidade: o botão continua existindo; o gesto é opcional e pode ser desligado.
+  - A PWA pode oferecer o mesmo gesto (DeviceMotion; no iOS exige permissão do usuário).
 - **Android** (ADR 0005/SPEC-001 PC-11): renderer equivalente ainda não existe. O teste de
   paridade é de resultado (face de cima = valor do registro para todo dado e face), com fixtures
   compartilhadas, não de trajetória.

@@ -53,7 +53,7 @@ final readonly class ReviewWorkflow
 
     /**
      * @param array<string, mixed> $changeSet novtt.sheet-change-set/1
-     * @return array{0: CharacterDraft, 1: ValidationResult}
+     * @return array{0: CharacterDraft, 1: DraftPreview}
      */
     public function saveDraft(User $actor, string $characterId, int $draftVersion, array $changeSet): array
     {
@@ -75,16 +75,21 @@ final readonly class ReviewWorkflow
         });
     }
 
-    /** Validation of a draft against the current official sheet, filtered for the author. */
-    public function preview(User $actor, CampaignCharacter $character, ChangeSet $set): ValidationResult
+    /**
+     * Validation of a draft against the current official sheet, filtered for the author, with the
+     * balance left per budget. Balances are already visible to anyone who can see the character
+     * (GET …/grants); budgets are not sheet fields, so no private field is revealed.
+     */
+    public function preview(User $actor, CampaignCharacter $character, ChangeSet $set): DraftPreview
     {
         $role = $this->changes->actorFor($actor, $character);
-        $result = $this->changes->evaluate($character, $set->operations, $role)->result;
+        $outcome = $this->changes->evaluate($character, $set->operations, $role);
+        $result = $outcome->result;
         if ($set->baseSheetRevision !== $character->sheet_revision) {
             $result = $result->merge(new ValidationResult([new ValidationIssue('draft.stale', Severity::Warning, [], [], ['current_revision' => $character->sheet_revision])]));
         }
 
-        return $this->changes->filterFor($result, $character, $role);
+        return new DraftPreview($this->changes->filterFor($result, $character, $role), $outcome->balances);
     }
 
     public function submit(User $actor, string $characterId, int $draftVersion): ChangeRequest
@@ -292,7 +297,7 @@ final readonly class ReviewWorkflow
 
     /**
      * @param list<array{operation_id: string, resolution: string}> $resolutions
-     * @return array{0: CharacterDraft, 1: ValidationResult}
+     * @return array{0: CharacterDraft, 1: DraftPreview}
      */
     public function rebaseConfirm(User $actor, string $characterId, string $token, array $resolutions): array
     {

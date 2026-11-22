@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Application\DraftPreview;
 use App\Application\Idempotency;
 use App\Application\ReviewWorkflow;
 use App\Application\SheetChanges;
@@ -51,9 +52,9 @@ final class ReviewController extends ApiController
     {
         $this->visibleCharacter($request, $campaignCharacterId);
         $data = $this->input($request, ['draft_version' => ['required', 'integer', 'min:0'], 'change_set' => ['required', 'array']]);
-        [$draft, $validation] = $this->workflow->saveDraft($this->actor($request), $campaignCharacterId, (int) $data['draft_version'], $this->rawObjectField($request, 'change_set'));
+        [$draft, $preview] = $this->workflow->saveDraft($this->actor($request), $campaignCharacterId, (int) $data['draft_version'], $this->rawObjectField($request, 'change_set'));
 
-        return new JsonResponse($this->draftView($draft, $validation));
+        return new JsonResponse($this->draftView($draft, $preview));
     }
 
     public function rebasePreview(Request $request, string $campaignCharacterId): JsonResponse
@@ -72,9 +73,9 @@ final class ReviewController extends ApiController
             'resolutions.*.operation_id' => ['required', 'string', 'max:64'],
             'resolutions.*.resolution' => ['required', 'in:keep_mine,take_current,drop'],
         ]);
-        [$draft, $validation] = $this->workflow->rebaseConfirm($this->actor($request), $campaignCharacterId, (string) $data['preview_token'], array_values($data['resolutions']));
+        [$draft, $preview] = $this->workflow->rebaseConfirm($this->actor($request), $campaignCharacterId, (string) $data['preview_token'], array_values($data['resolutions']));
 
-        return new JsonResponse($this->draftView($draft, $validation));
+        return new JsonResponse($this->draftView($draft, $preview));
     }
 
     public function index(Request $request, string $campaignCharacterId): JsonResponse
@@ -209,14 +210,15 @@ final class ReviewController extends ApiController
     }
 
     /** @return array<string, mixed> */
-    private function draftView(CharacterDraft $draft, ValidationResult $validation): array
+    private function draftView(CharacterDraft $draft, DraftPreview $preview): array
     {
         return [
             'campaign_character_id' => $draft->campaign_character_id,
             'draft_version' => $draft->draft_version,
             'base_sheet_revision' => $draft->base_sheet_revision,
             'change_set' => json_decode((string) $draft->getRawOriginal('change_set'), false, 64, JSON_THROW_ON_ERROR),
-            'validation' => $validation->toArray(),
+            'validation' => $preview->validation->toArray(),
+            'balances' => (object) $preview->balances,
         ];
     }
 

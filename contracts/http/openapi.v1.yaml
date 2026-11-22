@@ -1088,13 +1088,19 @@ components:
         sheet: { type: object }
     Draft:
       type: object
-      required: [campaign_character_id, draft_version, base_sheet_revision, change_set, validation]
+      required: [campaign_character_id, draft_version, base_sheet_revision, change_set, validation, balances]
       properties:
         campaign_character_id: { type: string, format: uuid }
         draft_version: { type: integer }
         base_sheet_revision: { type: integer }
         change_set: { $ref: '../sheets/sheet-change-set.v1.schema.json' }
         validation: { $ref: '../sheets/validation-result.v1.schema.json' }
+        balances:
+          type: object
+          additionalProperties: { type: integer }
+          description: >-
+            Remaining balance per budget id if this draft were applied (additive since 2026-11-22).
+            Same values the actor can already read via the grants endpoint.
     OperationView:
       type: object
       required: [id, type, path, section_id]

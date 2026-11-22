@@ -334,6 +334,24 @@ final class ReviewWorkflowApiTest extends TestCase
             ->assertJsonPath('conflicts.0.kind', 'previously_rejected');
     }
 
+    public function test_draft_reports_remaining_balance_per_budget(): void
+    {
+        $this->actingAs($this->player)->getJson($this->url('/grants'))->assertOk()->assertJsonPath('balances.attribute_points', 4);
+
+        // Vigor 3 and Agilidade 2 (first dot free): 3 of 4 attribute points; Escalar 2: 2 of 3.
+        $saved = $this->draft(self::creationOps())->assertOk()->assertJsonPath('validation.valid', true);
+        $saved->assertJsonPath('balances.attribute_points', 1)->assertJsonPath('balances.skill_points', 1)->assertJsonPath('balances.bonus', 5);
+        $this->actingAs($this->player)->getJson($this->url('/draft'))->assertOk()->assertJsonPath('balances.attribute_points', 1);
+
+        // Over budget: the draft is invalid and the balance never goes below zero.
+        $over = $this->draft([...self::creationOps(), ['id' => 'wits', 'type' => 'set_field', 'path' => '/attributes/wits', 'value' => 5]], 1)->assertOk();
+        $over->assertJsonPath('validation.valid', false);
+        foreach ((array) $over->json('balances') as $budget => $left) {
+            $this->assertGreaterThanOrEqual(0, $left, $budget);
+        }
+        $this->assertSame(0, $this->character->refresh()->sheet_revision); // still only a draft
+    }
+
     public function test_draft_versions_conflict_and_drafts_never_touch_the_official_sheet(): void
     {
         $this->draft(self::creationOps())->assertOk()->assertJsonPath('draft_version', 1);
