@@ -22,6 +22,7 @@ final class HealthCheckTest extends TestCase
     {
         $this->getJson('/api/v1/does-not-exist')
             ->assertNotFound()
-            ->assertHeader('Content-Type', 'application/json');
+            ->assertHeader('Content-Type', 'application/problem+json')
+            ->assertJsonPath('code', 'resource.not_found');
     }
 }
