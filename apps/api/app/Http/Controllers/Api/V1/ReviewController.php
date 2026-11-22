@@ -26,7 +26,6 @@ use Novtt\Engine\Sheets\Actor;
 use Novtt\Engine\Sheets\CanonicalJson;
 use Novtt\Engine\Sheets\ChangeOperation as EngineOperation;
 use Novtt\Engine\Sheets\ChangeSet;
-use Novtt\Engine\Validation\ValidationResult;
 
 /** Drafts, proposals, master review, finalization, rebase, character approval and grants (S001-05). */
 final class ReviewController extends ApiController
