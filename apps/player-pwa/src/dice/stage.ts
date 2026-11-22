@@ -1,15 +1,20 @@
 import * as THREE from 'three'
 import { arrange, type Pose } from './arrange'
-import { dieDef, type DieType } from './geometry'
+import { DIE_TYPES, dieDef, type DieType } from './geometry'
 import { add, cross, qmul, scale, slerp, sub, v, type Quat } from './math'
-import type { RollAnimationRecord } from './record'
+import { detectImpacts } from './impacts'
+import { labelText, physicalDice, type LabelSet, type RollAnimationRecord } from './record'
 import { RECORD_HZ, simulateRoll, TABLE, type Rapier } from './sim'
 import type { DiceSkin } from './skins'
-import { relabel } from './symmetry'
+import { playImpacts } from './sound'
+import { relabel, symmetryTable } from './symmetry'
 
 /** Client-side DiceAnimator (ADR 0002): presentation only, never changes results. */
 export type AnimationMode = 'animated' | 'reduced' | 'instant'
 export interface DiceAnimator {
+  feedback: { sound: boolean; haptics: boolean }
+  /** Pre-compiles shaders, geometry and physics so the first roll starts without a hitch. */
+  warmUp(skin: DiceSkin): void
   play(record: RollAnimationRecord, mode: AnimationMode): Promise<PlayStats>
   skip(): void
   resize(width: number, height: number): void
@@ -40,6 +45,8 @@ export class DiceStage implements DiceAnimator {
   private frame = 0
   private finish: (() => void) | null = null
   private lost = false
+  /** Sound and vibration preferences (presentation only). */
+  feedback = { sound: true, haptics: true }
 
   constructor(private readonly canvas: HTMLCanvasElement, private readonly rapier: Rapier) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' })
@@ -112,20 +119,22 @@ export class DiceStage implements DiceAnimator {
     const def = dieDef(type)
     const cols = 5, rows = Math.ceil(def.sides / cols)
     const pos: number[] = [], nor: number[] = [], lp: number[] = [], ln: number[] = [], luv: number[] = []
-    for (const f of def.faces) {
-      for (let k = 1; k < f.verts.length - 1; k++) {
-        for (const p of [f.verts[0], f.verts[k], f.verts[k + 1]]) { pos.push(p.x, p.y, p.z); nor.push(f.normal.x, f.normal.y, f.normal.z) }
+    for (const poly of def.polygons) {
+      for (let k = 1; k < poly.verts.length - 1; k++) {
+        for (const p of [poly.verts[0], poly.verts[k], poly.verts[k + 1]]) { pos.push(p.x, p.y, p.z); nor.push(poly.normal.x, poly.normal.y, poly.normal.z) }
       }
-      const x = cross(f.up, f.normal), h = f.labelSize / 2
-      const c = add(f.center, scale(f.normal, 0.003))
-      const corner = (sx: number, sy: number) => add(c, add(scale(x, sx * h), scale(f.up, sy * h)))
-      const cell = f.number - 1, u0 = (cell % cols) / cols, v1 = 1 - Math.floor(cell / cols) / rows
+    }
+    for (const label of def.labels) {
+      const x = cross(label.up, label.normal), h = label.size / 2
+      const c = add(label.center, scale(label.normal, 0.003))
+      const corner = (sx: number, sy: number) => add(c, add(scale(x, sx * h), scale(label.up, sy * h)))
+      const cell = label.number - 1, u0 = (cell % cols) / cols, v1 = 1 - Math.floor(cell / cols) / rows
       const u1 = u0 + 1 / cols, v0 = v1 - 1 / rows
       const quad: [ReturnType<typeof corner>, number, number][] = [
         [corner(-1, -1), u0, v0], [corner(1, -1), u1, v0], [corner(1, 1), u1, v1],
         [corner(-1, -1), u0, v0], [corner(1, 1), u1, v1], [corner(-1, 1), u0, v1],
       ]
-      for (const [p, u, w] of quad) { lp.push(p.x, p.y, p.z); ln.push(f.normal.x, f.normal.y, f.normal.z); luv.push(u, w) }
+      for (const [p, u, w] of quad) { lp.push(p.x, p.y, p.z); ln.push(label.normal.x, label.normal.y, label.normal.z); luv.push(u, w) }
     }
     const body = new THREE.BufferGeometry()
     body.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
@@ -146,8 +155,8 @@ export class DiceStage implements DiceAnimator {
   }
 
   /** One texture atlas per (sides, ink): a die costs two draw calls whatever its face count. */
-  private labelMaterial(sides: number, ink: string): THREE.Material {
-    return this.material(`label:${sides}:${ink}`, () => {
+  private labelMaterial(sides: number, set: LabelSet, ink: string): THREE.Material {
+    return this.material(`label:${sides}:${set}:${ink}`, () => {
       const cols = 5, rows = Math.ceil(sides / cols), cell = 128
       const canvas = document.createElement('canvas')
       canvas.width = cols * cell
@@ -158,11 +167,11 @@ export class DiceStage implements DiceAnimator {
       g.textAlign = 'center'
       g.textBaseline = 'middle'
       for (let n = 1; n <= sides; n++) {
-        const text = String(n), size = text.length > 1 ? 74 : 92
+        const text = labelText(set, n), size = sides === 4 ? 104 : text.length > 1 ? 74 : 92
         g.font = `800 ${size}px system-ui, "Segoe UI", Arial, sans-serif`
         const cx = ((n - 1) % cols) * cell + cell / 2, cy = Math.floor((n - 1) / cols) * cell + cell / 2
         g.fillText(text, cx, cy)
-        if (sides >= 9 && (n === 6 || n === 9)) { const w = g.measureText(text).width; g.fillRect(cx - w / 2, cy + size * 0.42, w, 7) }
+        if (sides >= 9 && (text === '6' || text === '9')) { const w = g.measureText(text).width; g.fillRect(cx - w / 2, cy + size * 0.42, w, 7) }
       }
       const texture = new THREE.CanvasTexture(canvas)
       texture.colorSpace = THREE.SRGBColorSpace
@@ -186,6 +195,25 @@ export class DiceStage implements DiceAnimator {
     die.group.quaternion.set(pose.q.x, pose.q.y, pose.q.z, pose.q.w)
   }
 
+  warmUp(skin: DiceSkin): void {
+    // Physics: JIT the WebAssembly paths and symmetry tables with a tiny throw.
+    simulateRoll(this.rapier, ['d6'], 1)
+    for (const type of DIE_TYPES) symmetryTable(type)
+    // Rendering: build every die once (off-table) and compile their shader programs.
+    const staging = new THREE.Group()
+    staging.position.set(0, -50, 0)
+    for (const type of DIE_TYPES) {
+      const geo = this.geometry(type)
+      for (const set of type === 'd10' ? (['standard', 'tens', 'units'] as const) : (['standard'] as const)) {
+        staging.add(new THREE.Mesh(geo.body, this.bodyMaterial(skin)), new THREE.Mesh(geo.labels, this.labelMaterial(dieDef(type).sides, set, skin.ink)))
+      }
+    }
+    this.scene.add(staging)
+    this.renderer.compile(this.scene, this.camera)
+    this.scene.remove(staging)
+    this.render()
+  }
+
   skip(): void {
     const done = this.finish
     this.finish = null
@@ -196,37 +224,38 @@ export class DiceStage implements DiceAnimator {
     this.skip()
     cancelAnimationFrame(this.frame)
     this.clearDice()
-    const types = record.dice.map(d => d.type)
+    const physical = physicalDice(record.dice)
     const t0 = performance.now()
-    const rec = simulateRoll(this.rapier, types, record.seed)
+    const rec = simulateRoll(this.rapier, physical.map(d => d.shape), record.seed)
     const simulationMs = performance.now() - t0
-    const n = types.length
+    const n = physical.length
 
-    this.dice = record.dice.map((d, i) => {
-      const geo = this.geometry(d.type)
+    this.dice = physical.map((d, i) => {
+      const geo = this.geometry(d.shape)
       const body = new THREE.Mesh(geo.body, this.bodyMaterial(record.skin))
       body.castShadow = true
-      const labels = new THREE.Mesh(geo.labels, this.labelMaterial(dieDef(d.type).sides, record.skin.ink))
+      const labels = new THREE.Mesh(geo.labels, this.labelMaterial(dieDef(d.shape).sides, d.labels, record.skin.ink))
       const group = new THREE.Group()
       group.add(body, labels)
       this.scene.add(group)
-      return { group, relabel: relabel(d.type, d.result, rec.landed[i]) }
+      return { group, relabel: relabel(d.shape, d.face, rec.landed[i]) }
     })
 
     const pose = (frame: number, i: number): Pose => {
       const o = (frame * n + i) * 7, P = rec.poses
       return { p: v(P[o], P[o + 1], P[o + 2]), q: qmul({ x: P[o + 3], y: P[o + 4], z: P[o + 5], w: P[o + 6] }, this.dice[i].relabel) }
     }
-    const finals = record.dice.map((_, i) => pose(rec.frames - 1, i))
-    const { targets, order } = arrange(record.dice, finals)
+    const finals = physical.map((_, i) => pose(rec.frames - 1, i))
+    const { targets, order } = arrange(physical, finals)
     const physicsS = (rec.frames - 1) / RECORD_HZ
     const stats: PlayStats = { simulationMs, animationS: mode === 'animated' ? physicsS + ARRANGE_S : 0, attempt: rec.attempt, order }
     const showFinal = () => { this.dice.forEach((d, i) => this.place(d, targets[i])); this.render() }
 
     if (mode !== 'animated' || this.lost) { showFinal(); return stats }
 
+    const stopSound = playImpacts(detectImpacts(rec, n), this.feedback)
     await new Promise<void>(resolve => {
-      this.finish = () => { cancelAnimationFrame(this.frame); showFinal(); resolve() }
+      this.finish = () => { cancelAnimationFrame(this.frame); stopSound(); showFinal(); resolve() }
       const start = performance.now()
       const tick = (now: number) => {
         const t = (now - start) / 1000
