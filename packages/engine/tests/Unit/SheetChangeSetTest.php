@@ -92,6 +92,9 @@ final class SheetChangeSetTest extends TestCase
         yield 'unset with value' => [['id' => 'o', 'type' => 'unset_field', 'path' => '/a', 'value' => 1], 'operation.unexpected_value'];
         yield 'reorder duplicates' => [['id' => 'o', 'type' => 'reorder_items', 'path' => '/m', 'order' => ['a', 'a']], 'operation.order_duplicates'];
         yield 'set_item_field without field' => [['id' => 'o', 'type' => 'set_item_field', 'path' => '/m', 'item_id' => 'i', 'value' => 1], 'operation.field_mismatch'];
+        yield 'add_item list value' => [['id' => 'o', 'type' => 'add_item', 'path' => '/m', 'item_id' => 'i', 'value' => [1, 2]], 'operation.item_must_be_object'];
+        yield 'add_item id inside value' => [['id' => 'o', 'type' => 'add_item', 'path' => '/m', 'item_id' => 'i', 'value' => ['id' => 'x']], 'operation.item_id_in_value'];
+        yield 'set_item_field on id' => [['id' => 'o', 'type' => 'set_item_field', 'path' => '/m', 'item_id' => 'i', 'field' => 'id', 'value' => 'y'], 'operation.invalid_field'];
         yield 'bad operation id' => [['id' => '../x', 'type' => 'unset_field', 'path' => '/a'], 'operation.invalid_key'];
     }
 

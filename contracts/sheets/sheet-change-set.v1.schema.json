@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:novtt:contract:sheet-change-set:1",
+  "title": "novtt.sheet-change-set/1",
+  "description": "Ordered typed operations proposed against a sheet revision. Whole-subtree replacement is not expressible: object values are only accepted for add_item. Collections are arrays of objects with a stable `id`; add_item supplies the id in item_id, so `value` MUST NOT contain `id`, and set_item_field MUST NOT target `id`.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "base_sheet_revision",
+    "operations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "novtt.sheet-change-set/1"
+    },
+    "base_sheet_revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "operations": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "$ref": "#/$defs/operation"
+      }
+    }
+  },
+  "$defs": {
+    "key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "pointer": {
+      "type": "string",
+      "maxLength": 512,
+      "pattern": "^(/([^/~_]|~[01])([^/~]|~[01])*)+$"
+    },
+    "scalar": {
+      "type": [
+        "string",
+        "number",
+        "integer",
+        "boolean",
+        "null"
+      ]
+    },
+    "operation": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "path"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/key"
+        },
+        "type": {
+          "enum": [
+            "set_field",
+            "unset_field",
+            "add_item",
+            "set_item_field",
+            "remove_item",
+            "reorder_items"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/pointer"
+        },
+        "expected": {
+          "description": "Optional precondition: the value the author saw."
+        }
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": [
+            "value"
+          ],
+          "properties": {
+            "id": true,
+            "type": {
+              "const": "set_field"
+            },
+            "path": true,
+            "expected": true,
+            "value": {
+              "$ref": "#/$defs/scalar"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "id": true,
+            "type": {
+              "const": "unset_field"
+            },
+            "path": true,
+            "expected": true
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "item_id",
+            "value"
+          ],
+          "properties": {
+            "id": true,
+            "type": {
+              "const": "add_item"
+            },
+            "path": true,
+            "expected": true,
+            "item_id": {
+              "$ref": "#/$defs/key"
+            },
+            "value": {
+              "type": "object",
+              "maxProperties": 32,
+              "additionalProperties": {
+                "$ref": "#/$defs/scalar"
+              },
+              "propertyNames": {
+                "not": {
+                  "const": "id"
+                }
+              }
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "item_id",
+            "field",
+            "value"
+          ],
+          "properties": {
+            "id": true,
+            "type": {
+              "const": "set_item_field"
+            },
+            "path": true,
+            "expected": true,
+            "item_id": {
+              "$ref": "#/$defs/key"
+            },
+            "field": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/key"
+                },
+                {
+                  "not": {
+                    "const": "id"
+                  }
+                }
+              ]
+            },
+            "value": {
+              "$ref": "#/$defs/scalar"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "item_id"
+          ],
+          "properties": {
+            "id": true,
+            "type": {
+              "const": "remove_item"
+            },
+            "path": true,
+            "expected": true,
+            "item_id": {
+              "$ref": "#/$defs/key"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "order"
+          ],
+          "properties": {
+            "id": true,
+            "type": {
+              "const": "reorder_items"
+            },
+            "path": true,
+            "expected": true,
+            "order": {
+              "type": "array",
+              "maxItems": 500,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/key"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

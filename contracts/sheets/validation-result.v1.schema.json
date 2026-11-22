@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:novtt:contract:validation-result:1",
+  "title": "novtt.validation-result/1",
+  "description": "Machine-readable validation outcome. Issues are filtered per viewer: paths the viewer cannot read are never reported.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "valid", "issues"],
+  "properties": {
+    "contract": { "const": "novtt.validation-result/1" },
+    "valid": { "type": "boolean" },
+    "issues": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "severity", "operation_ids", "paths", "params"],
+        "properties": {
+          "rule_id": { "type": "string", "pattern": "^[A-Za-z0-9_.-]{1,96}$" },
+          "severity": { "enum": ["error", "warning"] },
+          "operation_ids": { "type": "array", "items": { "type": "string", "maxLength": 64 } },
+          "paths": { "type": "array", "items": { "type": "string", "maxLength": 512 } },
+          "params": { "type": "object", "additionalProperties": { "type": ["string", "number", "integer", "boolean", "null"] } }
+        }
+      }
+    }
+  }
+}

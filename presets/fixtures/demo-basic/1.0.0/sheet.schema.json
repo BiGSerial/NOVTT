@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "demo-basic 1.0.0 sheet",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "concept": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "might": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "default": 1
+        },
+        "agility": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "default": 1
+        },
+        "wits": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "default": 1
+        }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "climb": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "lore": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        }
+      }
+    },
+    "merits": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "cost"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "cost": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7
+          }
+        }
+      }
+    },
+    "secrets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hook": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    },
+    "master": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      }
+    }
+  }
+}

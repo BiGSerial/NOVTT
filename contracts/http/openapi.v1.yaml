@@ -1,0 +1,1149 @@
+openapi: 3.1.0
+info:
+  title: NOVTT API
+  version: 1.0.0-sprint001
+  license:
+    name: MIT
+    identifier: MIT
+  description: |
+    Versioned HTTP contract for Sprint 001 (SPEC-SPRINT-001): presets, campaigns, invitations,
+    characters, NPCs, drafts and master review of sheet changes.
+
+    Conventions
+    - Every endpoint requires an authenticated actor (ADR 0009) and is authorized server-side.
+    - Resources the actor may not see return **404**, never 403, so existence does not leak.
+    - Errors are `application/problem+json` (RFC 9457) with a stable `code` (contracts/http/problem.v1.schema.json).
+    - 409 = revision/state conflict (`current_revision` included when safe); 422 = validation failure
+      (`validation` holds a novtt.validation-result/1 already filtered for the viewer).
+    - Mutations that create side effects take an `Idempotency-Key` (UUID). Same actor + key + payload
+      returns the original result; same key with another payload returns 409 `idempotency.key_reused`.
+    - Optimistic concurrency uses explicit version fields in the body (`expected_revision`,
+      `draft_version`, `review_version`).
+    - Lists are cursor-paginated (`cursor`, `limit` ≤ 100) and return `next_cursor`.
+servers:
+  - url: /api/v1
+security:
+  - sanctumCookie: []
+  - bearerToken: []
+tags:
+  - name: presets
+    description: Preset catalogue, personal library and imports
+  - name: campaigns
+    description: Campaigns and membership
+  - name: invitations
+    description: Campaign invitations
+  - name: characters
+    description: Character library and campaign instances
+  - name: npcs
+    description: NPC library and campaign NPCs
+  - name: review
+    description: Drafts, proposals, master review, grants
+paths:
+  /presets:
+    get:
+      tags: [presets]
+      summary: List preset versions visible to the actor (canonical published + own personal library)
+      operationId: listPresets
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - name: scope
+          in: query
+          schema: { enum: [all, canonical, personal], default: all }
+      responses:
+        '200':
+          description: Page of preset versions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/PresetVersionSummary' } }
+                  next_cursor: { type: [string, 'null'] }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+  /presets/imports:
+    post:
+      tags: [presets]
+      summary: Import a preset version into the actor's personal library
+      description: |
+        Validation in three stages: JSON syntax, structural contracts, engine compatibility.
+        The import is transactional and bounded (request ≤ 512 KiB). A personal import never
+        receives canonical status. An existing (family, variant, version) is never overwritten.
+      operationId: importPreset
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PresetPackage' }
+      responses:
+        '201':
+          description: Imported
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PresetVersion' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '413': { $ref: '#/components/responses/TooLarge' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /preset-versions/{presetVersionId}:
+    get:
+      tags: [presets]
+      summary: Get a preset version (content included)
+      operationId: getPresetVersion
+      parameters: [{ $ref: '#/components/parameters/PresetVersionId' }]
+      responses:
+        '200':
+          description: Preset version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PresetVersion' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /campaigns:
+    get:
+      tags: [campaigns]
+      summary: List campaigns where the actor is an active member
+      operationId: listCampaigns
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '200':
+          description: Page of campaigns
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Campaign' } }
+                  next_cursor: { type: [string, 'null'] }
+    post:
+      tags: [campaigns]
+      summary: Create a campaign pinned to a preset version; the actor becomes its master
+      operationId: createCampaign
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name, preset_version_id]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 120 }
+                description: { type: string, maxLength: 4000 }
+                preset_version_id: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Campaign' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /campaigns/{campaignId}:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [campaigns]
+      summary: Get a campaign the actor is a member of
+      operationId: getCampaign
+      responses:
+        '200':
+          description: Campaign
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Campaign' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [campaigns]
+      summary: Update name/description (master). The pinned preset version cannot change here.
+      operationId: updateCampaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expected_revision]
+              properties:
+                expected_revision: { type: integer, minimum: 1 }
+                name: { type: string, minLength: 1, maxLength: 120 }
+                description: { type: [string, 'null'], maxLength: 4000 }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Campaign' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /campaigns/{campaignId}/archive:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    post:
+      tags: [campaigns]
+      summary: Archive (master). History is preserved; archiving is not deletion.
+      operationId: archiveCampaign
+      responses:
+        '200':
+          description: Archived
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Campaign' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /campaigns/{campaignId}/members:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [campaigns]
+      summary: List active members
+      operationId: listMembers
+      responses:
+        '200':
+          description: Active members
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Member' } }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaigns/{campaignId}/members/{memberId}:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+      - name: memberId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      tags: [campaigns]
+      summary: Remove a player (master) or leave (self). The last master cannot be removed.
+      operationId: removeMember
+      responses:
+        '204': { description: Removed }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /campaigns/{campaignId}/invitations:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [invitations]
+      summary: List invitations (master). Tokens are never returned after creation.
+      operationId: listInvitations
+      responses:
+        '200':
+          description: Invitations
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Invitation' } }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [invitations]
+      summary: Create an invitation (master). The secret token appears only in this response.
+      operationId: createInvitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expires_in_hours]
+              properties:
+                expires_in_hours: { type: integer, minimum: 1, maximum: 720 }
+                max_uses: { type: integer, minimum: 1, maximum: 100, default: 1 }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Invitation'
+                  - type: object
+                    required: [token]
+                    properties:
+                      token: { type: string, minLength: 43, maxLength: 128 }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /campaigns/{campaignId}/invitations/{invitationId}:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+      - name: invitationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      tags: [invitations]
+      summary: Revoke (master)
+      operationId: revokeInvitation
+      responses:
+        '204': { description: Revoked }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /invitations/accept:
+    post:
+      tags: [invitations]
+      summary: Join a campaign as player using an invitation token
+      description: Idempotent for an actor that is already an active member. Invalid, expired, revoked and exhausted tokens all return the same 404 `invitation.not_found`.
+      operationId: acceptInvitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [token]
+              properties:
+                token: { type: string, minLength: 43, maxLength: 128 }
+      responses:
+        '200':
+          description: Member (new or existing)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Member' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /characters:
+    get:
+      tags: [characters]
+      summary: Actor's personal character library
+      operationId: listLibraryCharacters
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - name: archived
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '200':
+          description: Page
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/LibraryCharacter' } }
+                  next_cursor: { type: [string, 'null'] }
+    post:
+      tags: [characters]
+      summary: Create a personal library character
+      operationId: createLibraryCharacter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 120 }
+                preset_version_id: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LibraryCharacter' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /characters/{characterId}:
+    parameters:
+      - name: characterId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      tags: [characters]
+      summary: Get a personal library character
+      operationId: getLibraryCharacter
+      responses:
+        '200':
+          description: Library character
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LibraryCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [characters]
+      summary: Delete a library entry. Campaign instances and their history are not affected.
+      operationId: deleteLibraryCharacter
+      responses:
+        '204': { description: Deleted }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /characters/{characterId}/archive:
+    parameters:
+      - name: characterId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      tags: [characters]
+      summary: Archive a personal library character
+      operationId: archiveLibraryCharacter
+      responses:
+        '200':
+          description: Archived
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LibraryCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /campaigns/{campaignId}/characters:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [characters]
+      summary: Campaign characters visible to the actor (sheets filtered per field access)
+      operationId: listCampaignCharacters
+      responses:
+        '200':
+          description: Characters
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/CampaignCharacter' } }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [characters]
+      summary: Bring a character into the campaign (player member). Creates a separate instance pinned to the campaign preset version.
+      operationId: createCampaignCharacter
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 120 }
+                library_character_id: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Created (status draft)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /campaign-characters/{campaignCharacterId}:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
+    get:
+      tags: [characters]
+      summary: Get a campaign character with the sheet filtered for the actor
+      operationId: getCampaignCharacter
+      responses:
+        '200':
+          description: Character with sheet filtered for the actor
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaign-characters/{campaignCharacterId}/archive:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
+    post:
+      tags: [characters]
+      summary: Archive (master). Preserves history.
+      operationId: archiveCampaignCharacter
+      responses:
+        '200':
+          description: Archived
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /campaign-characters/{campaignCharacterId}/transfer:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
+    post:
+      tags: [characters]
+      summary: Transfer control to another player member (master). Audited.
+      operationId: transferCampaignCharacter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [to_user_id]
+              properties:
+                to_user_id: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Transferred
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /campaign-characters/{campaignCharacterId}/custody:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
+    put:
+      tags: [characters]
+      summary: Master takes temporary custody. Audited.
+      operationId: takeCustody
+      responses:
+        '200':
+          description: Custody taken
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [characters]
+      summary: Release custody back to the player. Audited.
+      operationId: releaseCustody
+      responses:
+        '200':
+          description: Custody released
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaign-characters/{campaignCharacterId}/approve:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
+    post:
+      tags: [review]
+      summary: Approve the character into the campaign (master). Requires its initial proposal to be applied.
+      operationId: approveCampaignCharacter
+      responses:
+        '200':
+          description: Approved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /campaign-characters/{campaignCharacterId}/grants:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
+    get:
+      tags: [review]
+      summary: Budget grants and balances visible to the actor
+      operationId: listGrants
+      responses:
+        '200':
+          description: Grants
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Grant' } }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [review]
+      summary: Grant budget (master). Granting never spends points.
+      operationId: createGrant
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [budget_id, amount]
+              properties:
+                budget_id: { type: string, pattern: '^[a-z0-9][a-z0-9_-]{0,63}$' }
+                amount: { type: integer, minimum: -10000, maximum: 10000, not: { const: 0 } }
+                reason: { type: string, maxLength: 1000 }
+      responses:
+        '201':
+          description: Granted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Grant' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /npcs:
+    get:
+      tags: [npcs]
+      summary: Actor's NPC library
+      operationId: listNpcs
+      responses:
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '200':
+          description: NPCs
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/LibraryNpc' } }
+    post:
+      tags: [npcs]
+      summary: Create a personal NPC
+      operationId: createNpc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 120 }
+                preset_version_id: { type: string, format: uuid }
+                sheet: { type: object }
+                private_notes: { type: string, maxLength: 4000 }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LibraryNpc' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /campaigns/{campaignId}/npcs:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [npcs]
+      summary: Campaign NPCs (master only in Sprint 001)
+      operationId: listCampaignNpcs
+      responses:
+        '200':
+          description: NPCs
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/CampaignNpc' } }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [npcs]
+      summary: Add an NPC to the campaign (master). Copies a sanitized sheet; private notes are never copied.
+      operationId: createCampaignNpc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                source_npc_id: { type: string, format: uuid }
+                name: { type: string, minLength: 1, maxLength: 120 }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignNpc' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /campaign-characters/{campaignCharacterId}/draft:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
+    get:
+      tags: [review]
+      summary: Actor's draft for this character (player in control)
+      operationId: getDraft
+      responses:
+        '200':
+          description: Draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Draft' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [review]
+      summary: Save the draft. Never touches the official sheet. Returns a filtered validation preview.
+      operationId: saveDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [draft_version, change_set]
+              properties:
+                draft_version: { type: integer, minimum: 0, description: 0 creates the draft }
+                change_set: { $ref: '../sheets/sheet-change-set.v1.schema.json' }
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Draft' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /campaign-characters/{campaignCharacterId}/change-requests:
+    parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
+    get:
+      tags: [review]
+      summary: List change requests of a campaign character
+      operationId: listChangeRequests
+      responses:
+        '200':
+          description: Change requests (history included)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/ChangeRequest' } }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [review]
+      summary: Submit the current draft as a proposal. At most one active proposal per character.
+      operationId: submitChangeRequest
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [draft_version]
+              properties:
+                draft_version: { type: integer, minimum: 1 }
+      responses:
+        '201':
+          description: Submitted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /change-requests/{changeRequestId}:
+    parameters: [{ $ref: '#/components/parameters/ChangeRequestId' }]
+    get:
+      tags: [review]
+      summary: Proposal grouped by section, with decisions and validation
+      operationId: getChangeRequest
+      responses:
+        '200':
+          description: Change request
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /change-requests/{changeRequestId}/withdraw:
+    parameters: [{ $ref: '#/components/parameters/ChangeRequestId' }]
+    post:
+      tags: [review]
+      summary: Author withdraws an active proposal
+      operationId: withdrawChangeRequest
+      responses:
+        '200':
+          description: Withdrawn
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /change-requests/{changeRequestId}/decisions:
+    parameters: [{ $ref: '#/components/parameters/ChangeRequestId' }]
+    put:
+      tags: [review]
+      summary: Record provisional decisions (master). Batch approval only sets provisional state; it never applies.
+      description: |
+        Approving several operations of one section at once is allowed. Every rejection carries
+        its own reason (10–1000 chars). A provisional rejection is never overwritten by a batch
+        approval: changing it requires an individual decision entry with `override: true`.
+      operationId: decideOperations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [review_version, decisions]
+              properties:
+                review_version: { type: integer, minimum: 1 }
+                decisions:
+                  type: array
+                  minItems: 1
+                  maxItems: 200
+                  items:
+                    oneOf:
+                      - type: object
+                        additionalProperties: false
+                        required: [operation_ids, decision]
+                        properties:
+                          operation_ids: { type: array, minItems: 1, maxItems: 200, uniqueItems: true, items: { type: string, maxLength: 64 } }
+                          decision: { const: approved }
+                      - type: object
+                        additionalProperties: false
+                        required: [operation_ids, decision, reason]
+                        properties:
+                          operation_ids: { type: array, minItems: 1, maxItems: 1, items: { type: string, maxLength: 64 } }
+                          decision: { const: rejected }
+                          reason: { type: string, minLength: 10, maxLength: 1000 }
+                      - type: object
+                        additionalProperties: false
+                        required: [operation_ids, decision, override]
+                        properties:
+                          operation_ids: { type: array, minItems: 1, maxItems: 1, items: { type: string, maxLength: 64 } }
+                          decision: { const: approved }
+                          override: { const: true }
+      responses:
+        '200':
+          description: Updated (review_version incremented)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /change-requests/{changeRequestId}/finalize:
+    parameters: [{ $ref: '#/components/parameters/ChangeRequestId' }]
+    post:
+      tags: [review]
+      summary: Finalize (master). Every operation must have a decision.
+      description: |
+        Validates the whole approved set in the engine against the current official sheet, then
+        applies it atomically (lock, monotonic revision, canonical and historical snapshots,
+        decisions, audit, outbox) or nothing. Rejecting everything creates no new revision.
+      operationId: finalizeChangeRequest
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [review_version]
+              properties:
+                review_version: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Finalized
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /change-requests/{changeRequestId}/rebase-preview:
+    parameters: [{ $ref: '#/components/parameters/ChangeRequestId' }]
+    post:
+      tags: [review]
+      summary: Three-way comparison of a stale proposal against the current sheet (author). No mutation.
+      operationId: previewRebase
+      responses:
+        '200':
+          description: Preview
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RebasePreview' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /change-requests/{changeRequestId}/rebase:
+    parameters: [{ $ref: '#/components/parameters/ChangeRequestId' }]
+    post:
+      tags: [review]
+      summary: Confirm a rebase (author). Rechecks permissions and revisions at commit; rejected operations never return automatically.
+      operationId: confirmRebase
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [preview_token, resolutions]
+              properties:
+                preview_token: { type: string, maxLength: 128 }
+                resolutions:
+                  type: array
+                  maxItems: 200
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required: [operation_id, resolution]
+                    properties:
+                      operation_id: { type: string, maxLength: 64 }
+                      resolution: { enum: [keep_mine, take_current, drop] }
+      responses:
+        '201':
+          description: New proposal created; the old one becomes superseded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+components:
+  securitySchemes:
+    sanctumCookie:
+      type: apiKey
+      in: cookie
+      name: novtt_session
+      description: Sanctum stateful SPA session (first-party web clients). Requires the XSRF-TOKEN cookie / X-XSRF-TOKEN header.
+    bearerToken:
+      type: http
+      scheme: bearer
+      description: Sanctum personal access token (future native clients).
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string, maxLength: 512 }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 25 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+    CampaignId:
+      name: campaignId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    CampaignCharacterId:
+      name: campaignCharacterId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    ChangeRequestId:
+      name: changeRequestId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    PresetVersionId:
+      name: presetVersionId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    Unauthenticated:
+      description: Not authenticated
+      content:
+        application/problem+json:
+          schema: { $ref: './problem.v1.schema.json' }
+    NotFound:
+      description: Not found or not visible to the actor
+      content:
+        application/problem+json:
+          schema: { $ref: './problem.v1.schema.json' }
+    Conflict:
+      description: Revision, state or idempotency conflict
+      content:
+        application/problem+json:
+          schema: { $ref: './problem.v1.schema.json' }
+    ValidationFailed:
+      description: Validation failed (filtered novtt.validation-result/1 in `validation`)
+      content:
+        application/problem+json:
+          schema: { $ref: './problem.v1.schema.json' }
+    TooLarge:
+      description: Payload above limits
+      content:
+        application/problem+json:
+          schema: { $ref: './problem.v1.schema.json' }
+    RateLimited:
+      description: Too many attempts
+      content:
+        application/problem+json:
+          schema: { $ref: './problem.v1.schema.json' }
+  schemas:
+    PresetPackage:
+      type: object
+      additionalProperties: false
+      required: [manifest, sheet_schema, sheet_ui, rules]
+      properties:
+        manifest: { $ref: '../presets/preset-manifest.v1.schema.json' }
+        sheet_schema: { type: object, description: JSON Schema Draft 2020-12 for the sheet document }
+        sheet_ui: { $ref: '../presets/sheet-ui.v1.schema.json' }
+        rules: { $ref: '../presets/rules.v1.schema.json' }
+    PresetVersionSummary:
+      type: object
+      required: [id, family_id, variant_id, version, display_name, status, canonical]
+      properties:
+        id: { type: string, format: uuid }
+        family_id: { type: string }
+        variant_id: { type: string }
+        version: { type: string }
+        display_name: { type: string }
+        status: { enum: [draft, structurally_valid, engine_compatible, reviewed, published] }
+        canonical: { type: boolean }
+    PresetVersion:
+      allOf:
+        - $ref: '#/components/schemas/PresetVersionSummary'
+        - type: object
+          required: [content_hash, engine_version, validation_report, sheet_schema, sheet_ui, rules]
+          properties:
+            content_hash: { type: string, pattern: '^[0-9a-f]{64}$' }
+            engine_version: { type: string }
+            validation_report: { $ref: '../sheets/validation-result.v1.schema.json' }
+            sheet_schema: { type: object }
+            sheet_ui: { $ref: '../presets/sheet-ui.v1.schema.json' }
+            rules: { $ref: '../presets/rules.v1.schema.json' }
+    Campaign:
+      type: object
+      required: [id, name, status, revision, preset_version_id, role]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: [string, 'null'] }
+        status: { enum: [active, archived] }
+        revision: { type: integer }
+        preset_version_id: { type: string, format: uuid }
+        role: { enum: [master, player], description: Actor's role }
+    Member:
+      type: object
+      required: [id, user_id, display_name, role]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        display_name: { type: string }
+        role: { enum: [master, player] }
+    Invitation:
+      type: object
+      required: [id, role, max_uses, uses, expires_at, revoked]
+      properties:
+        id: { type: string, format: uuid }
+        role: { const: player }
+        max_uses: { type: integer }
+        uses: { type: integer }
+        expires_at: { type: string, format: date-time }
+        revoked: { type: boolean }
+    LibraryCharacter:
+      type: object
+      required: [id, name, archived]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        preset_version_id: { type: [string, 'null'], format: uuid }
+        archived: { type: boolean }
+    CampaignCharacter:
+      type: object
+      required: [id, campaign_id, name, status, sheet_revision, player_user_id, in_custody, sheet]
+      properties:
+        id: { type: string, format: uuid }
+        campaign_id: { type: string, format: uuid }
+        name: { type: string }
+        status: { enum: [draft, pending_approval, approved, archived] }
+        sheet_revision: { type: integer }
+        player_user_id: { type: string, format: uuid }
+        in_custody: { type: boolean }
+        sheet: { type: object, description: Official sheet with every field the actor may not read removed }
+    Grant:
+      type: object
+      required: [id, budget_id, amount, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        budget_id: { type: string }
+        amount: { type: integer }
+        reason: { type: [string, 'null'] }
+        created_at: { type: string, format: date-time }
+    LibraryNpc:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        preset_version_id: { type: [string, 'null'], format: uuid }
+        private_notes: { type: [string, 'null'] }
+    CampaignNpc:
+      type: object
+      required: [id, campaign_id, name, sheet]
+      properties:
+        id: { type: string, format: uuid }
+        campaign_id: { type: string, format: uuid }
+        source_npc_id: { type: [string, 'null'], format: uuid }
+        name: { type: string }
+        sheet: { type: object }
+    Draft:
+      type: object
+      required: [campaign_character_id, draft_version, base_sheet_revision, change_set, validation]
+      properties:
+        campaign_character_id: { type: string, format: uuid }
+        draft_version: { type: integer }
+        base_sheet_revision: { type: integer }
+        change_set: { $ref: '../sheets/sheet-change-set.v1.schema.json' }
+        validation: { $ref: '../sheets/validation-result.v1.schema.json' }
+    OperationView:
+      type: object
+      required: [id, type, path, section_id]
+      properties:
+        id: { type: string }
+        type: { enum: [set_field, unset_field, add_item, set_item_field, remove_item, reorder_items] }
+        path: { type: string }
+        section_id: { type: string }
+        item_id: { type: [string, 'null'] }
+        field: { type: [string, 'null'] }
+        value: {}
+        order: { type: [array, 'null'], items: { type: string } }
+        decision:
+          type: [object, 'null']
+          required: [decision, final]
+          properties:
+            decision: { enum: [approved, rejected] }
+            reason: { type: [string, 'null'] }
+            final: { type: boolean }
+    ChangeRequest:
+      type: object
+      required: [id, campaign_character_id, status, base_sheet_revision, review_version, sections]
+      properties:
+        id: { type: string, format: uuid }
+        campaign_character_id: { type: string, format: uuid }
+        status: { enum: [submitted, in_review, awaiting_resolution, applied, rejected, withdrawn, superseded] }
+        base_sheet_revision: { type: integer }
+        review_version: { type: integer }
+        resulting_sheet_revision: { type: [integer, 'null'] }
+        sections:
+          type: array
+          items:
+            type: object
+            required: [section_id, label, operations]
+            properties:
+              section_id: { type: string }
+              label: { type: string }
+              operations: { type: array, items: { $ref: '#/components/schemas/OperationView' } }
+        validation: { $ref: '../sheets/validation-result.v1.schema.json' }
+    RebasePreview:
+      type: object
+      required: [preview_token, base_sheet_revision, current_sheet_revision, conflicts]
+      properties:
+        preview_token: { type: string }
+        base_sheet_revision: { type: integer }
+        current_sheet_revision: { type: integer }
+        conflicts:
+          type: array
+          items:
+            type: object
+            required: [operation_id, kind, path]
+            properties:
+              operation_id: { type: string }
+              kind: { enum: [value_changed, target_removed, item_removed, permission_changed, previously_rejected] }
+              path: { type: string }
+              base: {}
+              current: {}
+              mine: {}

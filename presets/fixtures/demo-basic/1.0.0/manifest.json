@@ -1,0 +1,11 @@
+{
+  "contract": "novtt.preset-manifest/1",
+  "family_id": "novtt-demo",
+  "variant_id": "demo-basic",
+  "version": "1.0.0",
+  "display_name": "Demo básico (fixture de testes)",
+  "license": "MIT (fixture original do NOVTT)",
+  "provenance": "Estrutura fictícia criada pela equipe NOVTT apenas para testes automatizados; não representa nenhum sistema publicado.",
+  "engine": { "min_version": "0.1.0" },
+  "files": { "sheet_schema": "sheet.schema.json", "sheet_ui": "sheet.ui.json", "rules": "rules.json" }
+}

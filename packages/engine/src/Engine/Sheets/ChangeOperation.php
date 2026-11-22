@@ -10,7 +10,8 @@ use InvalidArgumentException;
  * One typed operation of a novtt.sheet-change-set/1 document.
  *
  * - set_field / unset_field: `path` targets a scalar field (never a collection or the root).
- * - add_item: `path` targets a collection; `item_id` is a new stable id; `value` is the item.
+ * - add_item: `path` targets a collection (array of objects with unique `id`); `item_id` is a
+ *   new stable id; `value` is the item without `id`.
  * - set_item_field / remove_item: `path` targets a collection; `item_id` is an existing item;
  *   set_item_field also carries `field` (a single key) and `value`.
  * - reorder_items: `path` targets a collection; `order` lists every existing item id once.
@@ -49,7 +50,7 @@ final readonly class ChangeOperation
         if (($type === OperationType::SetItemField) !== ($field !== null)) {
             throw new InvalidArgumentException('operation.field_mismatch');
         }
-        if ($field !== null && preg_match(self::KEY_PATTERN, $field) !== 1) {
+        if ($field !== null && (preg_match(self::KEY_PATTERN, $field) !== 1 || $field === 'id')) {
             throw new InvalidArgumentException('operation.invalid_field');
         }
         if (($type === OperationType::ReorderItems) !== ($order !== null)) {
@@ -70,8 +71,11 @@ final readonly class ChangeOperation
             throw new InvalidArgumentException('operation.unexpected_value');
         }
         // add_item values are objects; scalar fields never receive objects (no subtree replacement).
-        if ($type === OperationType::AddItem && !is_array($value)) {
+        if ($type === OperationType::AddItem && (!is_array($value) || ($value !== [] && array_is_list($value)))) {
             throw new InvalidArgumentException('operation.item_must_be_object');
+        }
+        if ($type === OperationType::AddItem && array_key_exists('id', $value)) {
+            throw new InvalidArgumentException('operation.item_id_in_value');
         }
         if (in_array($type, [OperationType::SetField, OperationType::SetItemField], true) && is_array($value)) {
             throw new InvalidArgumentException('operation.subtree_replacement_forbidden');
