@@ -25,7 +25,7 @@ export async function api<T>(
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   path: string,
   body?: unknown,
-  options: { idempotencyKey?: string; fetcher?: typeof fetch } = {},
+  options: { idempotencyKey?: string; fetcher?: typeof fetch; base?: string } = {},
 ): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
@@ -34,7 +34,7 @@ export async function api<T>(
   if (options.idempotencyKey) headers['Idempotency-Key'] = options.idempotencyKey
   let response: Response
   try {
-    response = await (options.fetcher ?? fetch)(`/api/v1${path}`, {
+    response = await (options.fetcher ?? fetch)(`${options.base ?? '/api/v1'}${path}`, {
       method,
       headers,
       credentials: 'include',
@@ -49,4 +49,14 @@ export async function api<T>(
     throw new ApiError(response.status, String(data.code ?? `http.${response.status}`), data.validation, data.current_revision)
   }
   return data as T
+}
+
+/** Obtains the XSRF-TOKEN cookie before the first mutation of a session (Sanctum SPA flow). */
+export async function ensureCsrfCookie(fetcher: typeof fetch = fetch): Promise<void> {
+  if (xsrfToken()) return
+  try {
+    await fetcher('/sanctum/csrf-cookie', { credentials: 'include', headers: { Accept: 'application/json' } })
+  } catch {
+    throw new ApiError(0, 'network.error')
+  }
 }

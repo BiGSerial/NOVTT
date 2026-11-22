@@ -21,7 +21,20 @@ services:
       - api-vendor:/workspace/apps/api/vendor
     ports:
       - "127.0.0.1:${NOVTT_API_PORT:-8000}:8000"
-    command: ["sh", "-c", "composer install --no-interaction --prefer-dist && { [ -f .env ] || { cp .env.example .env && chown --reference=.env.example .env && php artisan key:generate; }; } && php artisan serve --host=0.0.0.0 --port=8000"]
+    # php -S (not artisan serve) so the server process inherits this environment; artisan serve
+    # only forwards a fixed allow-list of variables to its workers.
+    environment:
+      DB_HOST: postgres
+      DB_DATABASE: ${NOVTT_DB_NAME:-novtt_dev}
+      DB_USERNAME: ${NOVTT_DB_USER:-novtt}
+      DB_PASSWORD: ${NOVTT_DB_PASSWORD:-}
+      NOVTT_DEMO_MODE: ${NOVTT_DEMO_MODE:-false}
+      SANCTUM_STATEFUL_DOMAINS: localhost,localhost:${NOVTT_PLAYER_PORT:-5173},127.0.0.1,127.0.0.1:${NOVTT_PLAYER_PORT:-5173}
+      PHP_CLI_SERVER_WORKERS: "4"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["sh", "-c", "composer install --no-interaction --prefer-dist && { [ -f .env ] || { cp .env.example .env && chown --reference=.env.example .env && php artisan key:generate; }; } && cd public && exec php -S 0.0.0.0:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"]
     init: true
     security_opt: ["no-new-privileges:true"]
     profiles: ["api"]
@@ -71,6 +84,9 @@ services:
       - player-modules:/workspace/apps/player-pwa/node_modules
     ports:
       - "127.0.0.1:${NOVTT_PLAYER_PORT:-5173}:5173"
+    environment:
+      # The dev server proxies /api and /sanctum so the SPA and API share one origin (ADR 0009).
+      NOVTT_API_PROXY: http://api:8000
     command: ["sh", "-c", "npm ci && npm run dev -- --host 0.0.0.0"]
     init: true
     security_opt: ["no-new-privileges:true"]
@@ -88,7 +104,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-    profiles: ["infra"]
+    profiles: ["infra", "api"]
     security_opt: ["no-new-privileges:true"]
   redis:
     image: redis:7-alpine

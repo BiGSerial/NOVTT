@@ -32,6 +32,18 @@ function serviceWorkerBuildId(): Plugin {
   }
 }
 
+// Development only: same-origin proxy to the API so the first-party session cookie works
+// (ADR 0009). demo.html is a dev-only entry and is not part of the production build.
+const apiProxy = process.env.NOVTT_API_PROXY ?? 'http://127.0.0.1:8000'
+
 export default defineConfig({
   plugins: [vue(), serviceWorkerBuildId()],
+  server: {
+    // The demo page imports the framework-free master review panel.
+    fs: { allow: ['.', '../master-web/resources/js'] },
+    proxy: {
+      '/api': { target: apiProxy },
+      '/sanctum': { target: apiProxy },
+    },
+  },
 })
