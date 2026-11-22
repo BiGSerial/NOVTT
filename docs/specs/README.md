@@ -20,6 +20,16 @@ MUST / MUST NOT = requirement. SHOULD = preferred with documented reason to devi
 | [SPEC-002](SPEC-002-master-workspace.md) | Master multi-window workspace and realtime | ADR 0003, 0006 |
 | [SPEC-003](SPEC-003-official-rolls.md) | Server-authoritative rolls, attempts, idempotency and events | ADR 0003, 0004 |
 
+
+## Approved for Sprint 001 (owner decision 2026-11-21)
+
+| Spec | Scope | Status |
+| --- | --- | --- |
+| [SPEC-SPRINT-001](SPEC-SPRINT-001-approved.md) | Frozen Sprint 001 scope, authorization, sheet review, atomic approval | ACCEPTED / PLANNED |
+| [SPEC-PRESET-AUTHORING-001](SPEC-PRESET-AUTHORING-001.md) | Preset families, variants, personal library, canonical publication, human/AI guidance | ACCEPTED / PLANNED |
+
+**Status clarification:** The prior SPEC-005 remains PROPOSED only for details **not explicitly accepted** in the two specifications above. For overlapping requirements, these newer owner-approved specifications govern, subject to accepted ADRs. The candidate Sangue-Suga V20 preset has not been integrated or validated against the engine. Do not infer VERIFIED status from documentation.
+
 ## Proposed specifications
 
 These are PROPOSED: they await owner approval and MUST NOT be implemented as assumed requirements.
