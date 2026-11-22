@@ -192,6 +192,17 @@ final class SheetChangeEngineTest extends TestCase
         $this->assertArrayNotHasKey('_ledger', end($validated));
     }
 
+    public function test_charging_order_follows_operations_not_object_key_order(): void
+    {
+        // 3 skill points and no bonus: whichever skill the author changes first is paid.
+        $outcome = $this->evaluate(['attributes' => ['wits' => 1]], [
+            ['id' => 'l', 'type' => 'set_field', 'path' => '/skills/lore', 'value' => 3],
+            ['id' => 'c', 'type' => 'set_field', 'path' => '/skills/climb', 'value' => 1],
+        ], grants: ['bonus' => -5]);
+        $this->assertSame(['budget.insufficient'], self::rules($outcome));
+        $this->assertSame(['c'], $outcome->result->issues[0]->operationIds);
+    }
+
     public function test_precondition_on_scalar_detects_concurrent_change(): void
     {
         $outcome = $this->evaluate(['identity' => ['name' => 'Ana']], [['id' => 'n', 'type' => 'set_field', 'path' => '/identity/name', 'value' => 'Bia', 'expected' => 'Ann']]);

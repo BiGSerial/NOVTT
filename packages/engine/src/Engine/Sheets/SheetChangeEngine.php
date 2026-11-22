@@ -19,7 +19,8 @@ use Novtt\Engine\Validation\ValidationResult;
  * full candidate, phase limits, structural dependencies and budget costs with per-increment
  * provenance. Never mutates its inputs; the caller persists the outcome atomically.
  *
- * Budget ledger: the candidate keeps `/_ledger`, a list of {path, level, budget, cost}. Raising a
+ * Budget ledger: the candidate keeps `/_ledger`, a list of {path, level, budget, cost}. Changes are
+ * charged in operation order. Raising a
  * rating from r to r+1 records level r+1 paid by the first applicable cost rule whose budget can
  * afford it; lowering a rating removes the entries of the removed levels and refunds each one to
  * the budget that paid it. Grants add balance and never spend.
@@ -234,6 +235,10 @@ final readonly class SheetChangeEngine
                 $changes[$path] = [$from, $to, $costRules];
             }
         }
+        // Charge in the author's operation order (then by path): deterministic and independent
+        // of how a storage engine orders object keys (PostgreSQL JSONB does not keep them).
+        $order = array_flip(array_keys($touched));
+        uksort($changes, static fn (string $a, string $b): int => [$order[$a] ?? PHP_INT_MAX, $a] <=> [$order[$b] ?? PHP_INT_MAX, $b]);
         foreach ($changes as $path => [$from, $to]) {
             if ($to < $from) {
                 foreach ($ledger as $i => $entry) {
