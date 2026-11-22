@@ -44,7 +44,7 @@ When two options satisfy the requirements, prefer the one with lower security ri
 
 1. Read the relevant ADRs, specifications, contracts and tests before editing.
 2. State assumptions and unresolved decisions. Ask the owner when a choice changes scope or an accepted architecture.
-3. Implement the smallest coherent change; use small topic-focused commits.
+3. Work on a branch named per `docs/development/branching.md` (`feature/`, `fix/`, `chore/`, `docs/`, `refactor/`, `test/`, `ci/`, `perf/`, `release/`, `hotfix/`), created from `develop` (or `main` for `hotfix/`). Implement the smallest coherent change; use small topic-focused commits.
 4. Add or update tests for behavior, validation, authorization and failure modes.
 5. Run relevant tests and static checks. Report actual commands and outcomes; never claim unexecuted checks passed.
 6. Update the applicable specification, contract and parity matrix if observable behavior changes.

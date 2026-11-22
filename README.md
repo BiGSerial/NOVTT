@@ -25,6 +25,10 @@ NOVTT é uma plataforma de suporte a RPG de mesa, sem tabuleiro virtual obrigat�
 
 Fundação em desenvolvimento: biblioteca independente em `packages/engine`, com testes PHPUnit; PWA inicial de dados livres em `apps/player-pwa`; sincronização inicial de janelas do mestre em `apps/master-web`. A aplicação Laravel em `apps/api` ainda não foi criada.
 
+## Fluxo de branches
+
+Releases saem da `develop`; a `main` recebe apenas PRs com CI verde. Prefixos e fluxo em [`docs/development/branching.md`](docs/development/branching.md).
+
 ## Desenvolvimento local com Docker
 
 O ambiente Docker Compose permite testar o motor PHP, executar o PWA com hot reload e iniciar PostgreSQL/Redis sob demanda.
