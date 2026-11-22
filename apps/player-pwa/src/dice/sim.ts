@@ -1,5 +1,5 @@
 import { dieDef, type DieType } from './geometry'
-import { randomRotation, randomUnit, rotate, seeded, type Quat } from './math'
+import { add, normalize, randomRotation, randomUnit, rotate, scale, seeded, v, type Quat } from './math'
 
 /** Rapier's deterministic build: bit-identical simulation on every platform (same seed ⇒ same throw). */
 export type Rapier = typeof import('@dimforge/rapier3d-deterministic')
@@ -14,6 +14,14 @@ const MIN_STEPS = Math.round(0.5 * PHYSICS_HZ)
 const REST_STEPS = Math.round(0.15 * PHYSICS_HZ)
 const MAX_ATTEMPTS = 4
 const FLAT_COS = 0.99 // top face within ~8° of vertical
+/**
+ * Spin. A die thrown by hand tumbles forward (around −x, rolling towards −z) with some wobble;
+ * a purely random axis with low speed reads as "sliding", not rolling. Low angular damping keeps
+ * the spin alive in the air; contact friction then converts it into visible rolling.
+ */
+const SPIN_MIN = 34, SPIN_RANGE = 12 // ≤ 46 rad/s ≈ 44° per 60 Hz frame: faster reads as spinning backwards (wagon-wheel) on a d6
+const SPIN_WOBBLE = 0.65
+const ANGULAR_DAMPING = 0.04
 
 export interface Recording {
   frames: number
@@ -61,13 +69,14 @@ function simulateOnce(R: Rapier, dice: readonly DieType[], seed: number): Omit<R
     const spacing = 2.05, x0 = -((dice.length - 1) * spacing) / 2
     const bodies = dice.map((type, i) => {
       const def = dieDef(type)
-      const q = randomRotation(rng), spin = randomUnit(rng), w = 14 + rng() * 22
+      const q = randomRotation(rng)
+      const spin = normalize(add(v(-1, 0, 0), scale(randomUnit(rng), SPIN_WOBBLE))), w = SPIN_MIN + rng() * SPIN_RANGE
       const body = world.createRigidBody(R.RigidBodyDesc.dynamic()
         .setTranslation(x0 + i * spacing + (rng() - 0.5) * 0.3, 1.4 + rng() * 0.9, halfZ - 1.2 + (rng() - 0.5) * 0.3)
         .setRotation(q)
-        .setLinvel((rng() - 0.5) * 4, 1 + rng() * 2, -(8 + rng() * 5))
+        .setLinvel((rng() - 0.5) * 4, 5.5 + rng() * 2.5, -(8 + rng() * 5))
         .setAngvel({ x: spin.x * w, y: spin.y * w, z: spin.z * w })
-        .setLinearDamping(0.12).setAngularDamping(0.45).setCcdEnabled(true))
+        .setLinearDamping(0.12).setAngularDamping(ANGULAR_DAMPING).setCcdEnabled(true))
       const hull = R.ColliderDesc.convexHull(new Float32Array(def.vertices.flatMap(p => [p.x, p.y, p.z])))
       if (!hull) throw new Error(`convex hull failed for ${type}`)
       world.createCollider(hull.setRestitution(0.35).setFriction(0.5).setDensity(1), body)

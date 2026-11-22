@@ -22,7 +22,22 @@ Repetição só ocorre se um dado parar inclinado (até 4 vezes, semente derivad
 ### Medições (`tests/dice-core.test.ts`, Node 24, 6 dados mistos, 20 lançamentos)
 
 - Cálculo: p50 ≈ 6–13 ms, p95 ≈ 11–26 ms (o POC usava até 8 s de busca por lançamento).
-- Animação: 1,3–2,1 s de física + 0,55 s de organização.
+- Animação: 1,2–2,2 s de física + 0,55 s de organização.
+
+### Giro
+
+O dado é arremessado rolando para a frente (eixo −x, com desvio aleatório), um pouco mais alto, e
+com amortecimento angular baixo, para o giro não morrer no ar. Medido em 60 lançamentos por
+conjunto (voltas totais por dado, p50):
+
+| Conjunto | Antes | Agora | Duração p50 |
+|---|---|---|---|
+| 1d20 | 1,41 | 2,82 | 1,27 → 1,47 s |
+| 3d6 | 1,28 | 2,87 | 1,08 → 1,23 s |
+| 6 mistos | 1,15 | 2,55 | 1,68 → 1,82 s |
+
+A velocidade inicial fica em no máximo 46 rad/s (≈ 44° por quadro a 60 Hz). Acima disso, o d6
+parece girar para trás (efeito roda de carroça), porque a animação não tem desfoque de movimento.
 - Chromium headless com SwiftShader (render por software): 6–16 ms com o chunk já carregado.
 
 ## Experiência do usuário
