@@ -89,7 +89,7 @@ async function start(): Promise<void> {
         <p class="muted">Esta tela entra na sessão sozinha quando o mestre começar.</p>
       </section>
     </main>
-    <DiceTray surface="overlay" :record="table.dice.value" :feedback="{ sound: true, haptics: true }" @settled="table.settled" />
+    <DiceTray surface="overlay" persist :record="table.dice.value" :feedback="{ sound: true, haptics: true }" @settled="table.settled" />
     <ResultCard :roll="table.card.value" :me-id="me?.id" @close="table.dismissCard" />
     <Toasts :items="table.toasts.value" />
   </div>

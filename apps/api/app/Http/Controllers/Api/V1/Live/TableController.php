@@ -15,6 +15,7 @@ use App\Live\SessionStream;
 use App\Live\SheetCombination;
 use App\Live\TableSnapshot;
 use App\Models\CampaignCharacter;
+use App\Models\CampaignImage;
 use App\Models\CampaignNpc;
 use App\Models\Clue;
 use App\Models\GameSession;
@@ -55,6 +56,11 @@ final class TableController extends ApiController
             'resources.*.current' => ['required', 'integer', 'min:-99', 'max:999'],
             'conditions' => ['present', 'array', 'max:12'],
             'conditions.*' => ['string', 'min:1', 'max:40', 'distinct'],
+            'items' => ['sometimes', 'array', 'max:40'],
+            'items.*.id' => ['required', 'string', 'max:40', 'distinct'],
+            'items.*.label' => ['required', 'string', 'min:1', 'max:80'],
+            'items.*.qty' => ['required', 'integer', 'min:0', 'max:999'],
+            'items.*.note' => ['sometimes', 'nullable', 'string', 'max:200'],
         ]);
         $exists = Str::isUuid($subjectId) && ($kind === 'character'
             ? CampaignCharacter::query()->where('campaign_id', $campaignId)->whereKey($subjectId)->exists()
@@ -64,17 +70,20 @@ final class TableController extends ApiController
         }
         $resources = array_map(static fn (array $r): array => ['id' => $r['id'], 'label' => $r['label'], 'current' => min((int) $r['current'], (int) $r['max']), 'max' => (int) $r['max']], $data['resources']);
         $conditions = array_values($data['conditions']);
+        $items = array_key_exists('items', $data)
+            ? array_map(static fn (array $i): array => ['id' => (string) $i['id'], 'label' => $i['label'], 'qty' => (int) $i['qty'], 'note' => (string) ($i['note'] ?? '')], array_values($data['items']))
+            : null;
 
-        $state = DB::transaction(function () use ($actor, $campaignId, $kind, $subjectId, $data, $resources, $conditions): LiveState {
+        $state = DB::transaction(function () use ($actor, $campaignId, $kind, $subjectId, $data, $resources, $conditions, $items): LiveState {
             $session = $this->access->lockOpenForCampaign($campaignId);
             $state = LiveState::query()->where(['subject_kind' => $kind, 'subject_id' => $subjectId])->lockForUpdate()->first();
             if (($state?->revision ?? 0) !== $data['revision']) {
                 throw ApiProblem::conflict('live_state.revision_mismatch', $state?->revision ?? 0);
             }
             if ($state === null) {
-                $state = LiveState::query()->create(['campaign_id' => $campaignId, 'subject_kind' => $kind, 'subject_id' => $subjectId, 'resources' => $resources, 'conditions' => $conditions, 'revision' => 1]);
+                $state = LiveState::query()->create(['campaign_id' => $campaignId, 'subject_kind' => $kind, 'subject_id' => $subjectId, 'resources' => $resources, 'conditions' => $conditions, 'items' => $items ?? [], 'revision' => 1]);
             } else {
-                $state->update(['resources' => $resources, 'conditions' => $conditions, 'revision' => $state->revision + 1]);
+                $state->update(['resources' => $resources, 'conditions' => $conditions, 'revision' => $state->revision + 1, ...($items === null ? [] : ['items' => $items])]);
             }
             $this->audit->record($actor, $campaignId, 'live_state.updated', $state, ['subject_kind' => $kind]);
             if ($session !== null) {
@@ -196,10 +205,14 @@ final class TableController extends ApiController
             'title' => ['required', 'string', 'min:1', 'max:120'],
             'body' => ['present', 'string', 'max:2000'],
             'scene' => ['sometimes', 'nullable', 'string', 'max:120'],
+            'image_id' => ['sometimes', 'nullable', 'uuid'],
         ]);
+        if (($data['image_id'] ?? null) !== null && ! CampaignImage::query()->where(['campaign_id' => $session->campaign_id, 'id' => $data['image_id']])->exists()) {
+            throw ApiProblem::validation(new ValidationResult([new ValidationIssue('image.unknown', Severity::Error, [], ['/image_id'])]), 'image.unknown');
+        }
         $clue = DB::transaction(function () use ($sessionId, $data): Clue {
             $session = $this->access->lockOpen($sessionId);
-            $clue = Clue::query()->create(['campaign_id' => $session->campaign_id, 'session_id' => $session->getKey(), 'scene' => $data['scene'] ?? null, 'title' => $data['title'], 'body' => $data['body']]);
+            $clue = Clue::query()->create(['campaign_id' => $session->campaign_id, 'session_id' => $session->getKey(), 'scene' => $data['scene'] ?? null, 'title' => $data['title'], 'body' => $data['body'], 'image_id' => $data['image_id'] ?? null]);
             $this->stream->append($session, 'clue.saved', LiveViews::clue($clue, true), Audience::master());
 
             return $clue;
@@ -257,7 +270,7 @@ final class TableController extends ApiController
             'summary' => ['present', 'string', 'max:300'],
         ]);
         $npc = CampaignNpc::query()->where('campaign_id', $session->campaign_id)->find($data['campaign_npc_id']) ?? throw ApiProblem::notFound();
-        $entry = ['id' => $npc->getKey(), 'name' => $npc->name, 'summary' => $data['summary']];
+        $entry = ['id' => $npc->getKey(), 'name' => $npc->name, 'summary' => $data['summary'], 'portrait_image_id' => $npc->portrait_image_id];
         $session = DB::transaction(function () use ($sessionId, $entry): GameSession {
             $session = $this->access->lockOpen($sessionId);
             $revealed = array_values(array_filter($session->revealed_npcs ?? [], static fn (array $n): bool => $n['id'] !== $entry['id']));

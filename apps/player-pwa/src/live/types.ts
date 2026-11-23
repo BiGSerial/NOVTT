@@ -9,13 +9,34 @@ export interface Me { id: string; name: string; paired_device_id: string | null 
 export interface Campaign { id: string; name: string; role?: Role; preset_version_id: string; status: string; description?: string | null }
 
 export interface ResourceTrack { id: string; label: string; current: number; max: number }
-export interface LiveState { resources: ResourceTrack[]; conditions: string[]; revision: number }
+export interface Item { id: string; label: string; qty: number; note?: string }
+export interface LiveState { resources: ResourceTrack[]; conditions: string[]; items?: Item[]; revision: number }
 
 export interface Clock { id: string; label: string; segments: number; filled: number }
 export interface Compass { scene: string; objective: string; next_clue: string; clocks: Clock[]; spotlight: Record<string, number> }
 export interface InitiativeEntry { kind: 'character' | 'npc'; id: string; name: string }
 export interface Initiative { entries?: InitiativeEntry[]; turn?: number; round?: number }
-export interface RevealedNpc { id: string; name: string; summary: string }
+export interface RevealedNpc { id: string; name: string; summary: string; portrait_image_id?: string | null }
+
+/** Original scene illustrations drawn by the client (no third-party art). */
+export const ART_KEYS = ['bridge', 'forest', 'tavern', 'ruins', 'city', 'cave', 'sea', 'camp', 'road', 'castle', 'swamp', 'temple'] as const
+export type ArtKey = (typeof ART_KEYS)[number]
+
+export interface PlotScene {
+  id: string
+  title: string
+  goal: string
+  location?: string
+  read_aloud?: string
+  npcs?: string[]
+  art?: ArtKey | null
+  image_id?: string | null
+  complication?: string
+  status: 'pending' | 'current' | 'done'
+}
+export interface Plot { scenes: PlotScene[]; current: number | null }
+/** What the table sees right now (title, text to read, illustration). */
+export interface Stage { title: string; text: string; art: ArtKey | null; image_id: string | null; shown_at?: string }
 
 export interface GameSession {
   id: string
@@ -26,14 +47,16 @@ export interface GameSession {
   initiative: Initiative
   revealed_npcs: RevealedNpc[]
   compass?: Compass
+  plot?: Plot
+  stage?: Stage | null
   last_seq: number
   revision: number
   started_at: string
 }
 
 export interface Member { user_id: string; name: string; role: Role }
-export interface TableCharacter { id: string; name: string; player_user_id: string; controlled_by: string; status: string; preset_version_id: string; live: LiveState | null }
-export interface TableNpc { id: string; name: string; preset_version_id: string; live: LiveState | null }
+export interface TableCharacter { id: string; name: string; player_user_id: string; controlled_by: string; status: string; preset_version_id: string; live: LiveState | null; portrait_image_id?: string | null; concept?: string | null }
+export interface TableNpc { id: string; name: string; preset_version_id: string; live: LiveState | null; portrait_image_id?: string | null }
 
 export interface RollComponent { path: string; label: string; value?: number }
 export interface DiceSpec { faces: number; count_mode: CountMode; reading: Reading; threshold: number; successes_per_die: number; target: number | null; bonus: number | null }
@@ -82,7 +105,7 @@ export interface OfficialRoll {
 }
 
 export interface Whisper { id: string; sender_user_id: string; recipient_user_id: string; kind: 'message' | 'clue'; body: string; created_at: string }
-export interface Clue { id: string; scene: string | null; title: string; body: string; revealed_to: 'table' | 'user' | null; revealed_user_id: string | null; revealed_at: string | null }
+export interface Clue { id: string; scene: string | null; title: string; body: string; revealed_to: 'table' | 'user' | null; revealed_user_id: string | null; revealed_at: string | null; image_id?: string | null }
 export interface Suggestion { id: string; campaign_character_id: string; character_name: string; player_user_id: string; paths: string[]; note: string | null; status: 'pending' | 'accepted' | 'dismissed' }
 export interface MasterNote { id: string; session_id: string | null; body: string; tags: string[]; pinned: boolean; revision: number; updated_at: string | null }
 
@@ -118,10 +141,29 @@ export interface SheetUi { sections: SheetUiSection[] }
 
 export interface RoteiroContent {
   strong_start: string
-  scenes: { title: string; goal: string; clues: { title: string; body: string }[] }[]
+  scenes: RoteiroScene[]
   npcs: { name: string; voice: string; wants: string; secret: string }[]
   clocks: { label: string; segments: number }[]
   wants: { character: string; text: string }[]
+  locations: { name: string; aspects: string[] }[]
+  rewards: string[]
+}
+export interface RoteiroScene {
+  title: string
+  goal: string
+  clues: { title: string; body: string }[]
+  location?: string
+  read_aloud?: string
+  npcs?: string[]
+  art?: ArtKey | null
+  image_id?: string | null
+  complication?: string
+}
+export interface CarryOver {
+  unrevealed_clues: { title: string; body: string; scene: string | null }[]
+  open_threads: { id: string; title: string; summary: string; thread_status: string | null }[]
+  characters: { id: string; name: string; concept: string | null; motivation: string | null }[]
+  last_roteiro_title: string | null
 }
 export interface Roteiro { id: string; campaign_id: string; title: string; content: Partial<RoteiroContent>; revision: number; updated_at: string | null }
 

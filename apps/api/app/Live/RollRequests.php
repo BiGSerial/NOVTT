@@ -67,6 +67,9 @@ final readonly class RollRequests
                 throw self::invalid('roll.character_unavailable', '/campaign_character_id');
             }
             $components = $this->combination->resolve($character->preset_version_id, (array) $character->sheet, $data['paths']);
+            // Owner, 2026-11-22: rolls are between the player and the master unless the master
+            // asks for the table (secret: false) or reveals the result later.
+            $data['secret'] ??= true;
             $roller = $character->custodian_user_id ?? $character->player_user_id;
             $request = $this->persistRequest($session, $master, $roller, $components, $data, characterId: $character->getKey(), npcId: null);
 

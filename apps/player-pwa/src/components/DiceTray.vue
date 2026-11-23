@@ -21,6 +21,8 @@ const props = defineProps<{
   warmSkin?: DiceSkin
   /** 'overlay': the dice roll over the whole page (transparent, no tray) and then fade away. */
   surface?: Surface
+  /** Overlay only: keep the settled dice on the page until the record is cleared (live table). */
+  persist?: boolean
 }>()
 const emit = defineEmits<{ settled: [record: RollAnimationRecord] }>()
 
@@ -54,6 +56,7 @@ function dismiss(): void {
   }, reducedMotion() ? 0 : OVERLAY_FADE_MS)
 }
 function onPageInput(event: Event): void {
+  if (props.persist) return
   if (phase.value === 'done' && !(event instanceof KeyboardEvent && event.key !== 'Escape')) dismiss()
 }
 
@@ -122,7 +125,12 @@ async function show(record: RollAnimationRecord | null): Promise<void> {
   announced.value = ''
   clearTimeout(dismissTimer)
   fading.value = false
-  if (!record) { phase.value = 'idle'; covering.value = false; animator?.clear(); return }
+  if (!record) {
+    phase.value = 'idle'
+    // Leaving dice fade out instead of vanishing (the result card already holds the outcome).
+    if (overlay.value && covering.value) dismiss(); else { covering.value = false; animator?.clear() }
+    return
+  }
   phase.value = animator ? 'rolling' : 'loading'
   covering.value = overlay.value
   // Bring the tray into view on small screens (the roll button sits above it).
@@ -144,7 +152,7 @@ async function show(record: RollAnimationRecord | null): Promise<void> {
   if (mine !== token) return
   phase.value = 'done'
   announced.value = `Resultado: ${summary(record)}`
-  if (overlay.value) dismissTimer = setTimeout(dismiss, OVERLAY_HOLD_MS)
+  if (overlay.value && !props.persist) dismissTimer = setTimeout(dismiss, OVERLAY_HOLD_MS)
   emit('settled', record)
 }
 

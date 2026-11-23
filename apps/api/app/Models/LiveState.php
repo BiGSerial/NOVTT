@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 /** Resources and conditions of a character or NPC during play (LT-05). */
-#[Fillable(['campaign_id', 'subject_kind', 'subject_id', 'resources', 'conditions', 'revision'])]
+#[Fillable(['campaign_id', 'subject_kind', 'subject_id', 'resources', 'conditions', 'items', 'revision'])]
 class LiveState extends Model
 {
     use HasUuids;
@@ -22,6 +22,7 @@ class LiveState extends Model
         return [
             'resources' => 'array',
             'conditions' => 'array',
+            'items' => 'array',
             'revision' => 'integer',
         ];
     }

@@ -42,7 +42,7 @@ async function submit(): Promise<void> {
   }
 }
 
-async function seat(role: 'master' | 'player' | 'player2' | 'player3'): Promise<void> {
+async function seat(role: 'master' | 'player' | 'player2' | 'player3' | 'player4' | 'player5'): Promise<void> {
   busy.value = true
   error.value = ''
   try {
@@ -98,6 +98,8 @@ async function seat(role: 'master' | 'player' | 'player2' | 'player3'): Promise<
             <button type="button" class="seat" :disabled="busy" @click="seat('player')">Lyra <small>Ana</small></button>
             <button type="button" class="seat" :disabled="busy" @click="seat('player2')">Bram <small>Bruno</small></button>
             <button type="button" class="seat" :disabled="busy" @click="seat('player3')">Nix <small>Carla</small></button>
+            <button type="button" class="seat" :disabled="busy" @click="seat('player4')">Tomé <small>Davi</small></button>
+            <button type="button" class="seat" :disabled="busy" @click="seat('player5')">Selene <small>Eva</small></button>
           </div>
         </div>
       </template>

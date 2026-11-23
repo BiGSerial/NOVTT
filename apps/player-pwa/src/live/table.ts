@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
 import type {
-  Clue, Compass, GameSession, Initiative, LiveState, MasterNote, OfficialRoll, RevealedNpc, RollRequest,
+  Clue, Compass, GameSession, Initiative, Plot, Stage, LiveState, MasterNote, OfficialRoll, RevealedNpc, RollRequest,
   SessionEvent, Suggestion, TableSnapshot, Whisper,
 } from './types'
 
@@ -15,6 +15,7 @@ export interface TableHooks {
   onWhisper?: (w: Whisper) => void
   onClue?: (c: Clue) => void
   onRequest?: (r: RollRequest) => void
+  onStage?: (stage: Stage | null) => void
 }
 
 export type Fetcher = (after: number) => Promise<{ data: SessionEvent[]; last_seq: number; has_more: boolean }>
@@ -132,6 +133,28 @@ export class TableState {
         }
         break
       }
+      case 'plot.updated': {
+        const { revision, plot, compass } = p as { revision: number; plot: Plot; compass?: Compass }
+        if (revision >= s.session.revision) {
+          s.session.plot = plot
+          if (compass) s.session.compass = compass
+          s.session.revision = revision
+        }
+        break
+      }
+      case 'stage.updated': {
+        const { revision, stage } = p as { revision: number; stage: Stage | null }
+        s.session.stage = stage
+        if (revision > s.session.revision) s.session.revision = revision
+        this.hooks.onStage?.(stage)
+        break
+      }
+      case 'portrait.updated': {
+        const { kind, id, portrait_image_id } = p as { kind: 'character' | 'npc'; id: string; portrait_image_id: string | null }
+        const target = (kind === 'character' ? s.characters : s.npcs).find(c => c.id === id)
+        if (target) target.portrait_image_id = portrait_image_id
+        break
+      }
       case 'initiative.updated': {
         const { revision, initiative } = p as { revision: number; initiative: Initiative }
         if (revision >= s.session.revision) {
@@ -197,6 +220,10 @@ export class TableState {
     clue: (c: Clue) => upsert(this.s.clues, c),
     session: (g: GameSession) => {
       Object.assign(this.s.session, { ...g, last_seq: this.s.session.last_seq })
+    },
+    portrait: (kind: 'character' | 'npc', id: string, imageId: string | null) => {
+      const t = (kind === 'character' ? this.s.characters : this.s.npcs).find(c => c.id === id)
+      if (t) t.portrait_image_id = imageId
     },
     live: (kind: 'character' | 'npc', id: string, live: LiveState) => {
       const t = (kind === 'character' ? this.s.characters : this.s.npcs).find(c => c.id === id)

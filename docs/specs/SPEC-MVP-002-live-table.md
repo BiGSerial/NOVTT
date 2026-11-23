@@ -11,7 +11,7 @@ Prototype (approved look and flow): https://claude.ai/artifact/98nL3Haurj6Jjk8fW
   the master (or a master's own roll for an NPC) is official (ADR 0004 unchanged). A combination the
   player composes during a session becomes a *suggestion* the master can turn into a request with
   one tap. Anything else is a free, LOCAL / UNOFFICIAL roll.
-- D2 Visibility: player rolls are **visible to the whole table** by default; the master MAY mark a
+- D2 Visibility (**revised 2026-11-22 by the owner, see SPEC-MVP-003**: player rolls are now private to the player and the master by default; the master may roll "à mesa" or reveal). Original text: player rolls are **visible to the whole table** by default; the master MAY mark a
   request *secret* (result delivered only to the master and that player). Master rolls for NPCs
   are **secret by default** and MAY be revealed later.
 - D3 The master chooses the dice of a request (owner: "o mestre tem de dizer qual dado ele deve

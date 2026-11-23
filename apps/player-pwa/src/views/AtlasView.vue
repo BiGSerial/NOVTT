@@ -4,6 +4,7 @@ import { ApiError } from '../api/client'
 import BrandMark from '../components/BrandMark.vue'
 import { campaigns, world } from '../live/api'
 import { go, me } from '../live/user'
+import { applyTheme, loadTheme } from '../live/theme'
 import type { AtlasEntry, AtlasKind } from '../live/types'
 
 /**
@@ -29,6 +30,7 @@ const linked = computed(() => entries.value.filter(e => selected.value?.links?.i
 
 onMounted(async () => {
   if (!me.value) return go('#/')
+  applyTheme(loadTheme(props.campaignId))
   master.value = (await campaigns.list()).data.find(c => c.id === props.campaignId)?.role === 'master'
   entries.value = (await world.atlas(props.campaignId)).data
   if (entries.value[0]) pick(entries.value[0])

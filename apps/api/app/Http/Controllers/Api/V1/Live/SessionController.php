@@ -10,11 +10,13 @@ use App\Domain\CampaignRole;
 use App\Http\Controllers\Api\V1\ApiController;
 use App\Http\Problems\ApiProblem;
 use App\Live\Audience;
+use App\Live\Plot;
 use App\Live\SessionAccess;
 use App\Live\SessionStream;
 use App\Live\TableSnapshot;
 use App\Models\Campaign;
 use App\Models\CampaignCharacter;
+use App\Models\CampaignImage;
 use App\Models\CampaignNpc;
 use App\Models\Clue;
 use App\Models\GameSession;
@@ -69,6 +71,8 @@ final class SessionController extends ApiController
                     'compass' => $roteiro === null ? ['scene' => '', 'objective' => '', 'clocks' => [], 'next_clue' => '', 'spotlight' => (object) []] : $roteiro->compassSeed(),
                     'initiative' => ['entries' => [], 'turn' => 0, 'round' => 1],
                     'revealed_npcs' => [],
+                    'plot' => Plot::fromRoteiro($roteiro),
+                    'stage' => null,
                     'last_seq' => 0,
                     'revision' => 1,
                     'started_at' => now(),
@@ -235,5 +239,107 @@ final class SessionController extends ApiController
         });
 
         return new JsonResponse(TableSnapshot::session($session, true));
+    }
+
+    /**
+     * Walks the story (NT-03): the master edits the scene list and/or moves the current scene.
+     * Moving the current scene re-points the compass at it (clocks and spotlight are kept).
+     */
+    public function plot(Request $request, string $sessionId): JsonResponse
+    {
+        $actor = $this->actor($request);
+        [$session] = $this->access->session($actor, $sessionId);
+        $this->access->requireMaster($actor, $session->campaign_id);
+        $data = $this->input($request, [
+            'revision' => ['required', 'integer', 'min:1'],
+            'plot' => ['required', 'array'],
+            'plot.current' => ['present', 'nullable', 'integer', 'min:0', 'max:'.(Plot::MAX_SCENES - 1)],
+            'plot.scenes' => ['present', 'array', 'max:'.Plot::MAX_SCENES],
+            'plot.scenes.*.id' => ['sometimes', 'nullable', 'string', 'max:40'],
+            'plot.scenes.*.title' => ['required', 'string', 'min:1', 'max:120'],
+            'plot.scenes.*.goal' => ['sometimes', 'nullable', 'string', 'max:300'],
+            'plot.scenes.*.status' => ['sometimes', 'in:pending,current,done'],
+            ...Plot::sceneRules('plot.scenes.*'),
+        ]);
+        $scenes = $data['plot']['scenes'];
+        $this->requireImages($session->campaign_id, array_column($scenes, 'image_id'), '/plot/scenes');
+        $current = $data['plot']['current'];
+        if ($current !== null && $current >= count($scenes)) {
+            throw ApiProblem::validation(new ValidationResult([new ValidationIssue('plot.current_invalid', Severity::Error, [], ['/plot/current'])]), 'plot.current_invalid');
+        }
+        $plot = Plot::normalize($scenes, $current);
+
+        $session = DB::transaction(function () use ($sessionId, $data, $plot): GameSession {
+            $session = $this->access->lockOpen($sessionId);
+            if ($session->revision !== $data['revision']) {
+                throw ApiProblem::conflict('session.revision_mismatch', $session->revision);
+            }
+            $before = $session->plot ?? ['scenes' => [], 'current' => null];
+            $scene = $plot['current'] === null ? null : $plot['scenes'][$plot['current']];
+            $previous = ($before['current'] ?? null) === null ? null : ($before['scenes'][$before['current']]['id'] ?? null);
+            $compass = (array) ($session->compass ?? []);
+            if ($scene !== null && ($plot['current'] !== ($before['current'] ?? null) || $scene['id'] !== $previous)) {
+                $next = Clue::query()->where(['session_id' => $session->getKey(), 'scene' => $scene['title']])->whereNull('revealed_at')->orderBy('created_at')->value('title');
+                $compass = [
+                    'scene' => $scene['title'], 'objective' => $scene['goal'], 'next_clue' => (string) ($next ?? ''),
+                    'clocks' => $compass['clocks'] ?? [], 'spotlight' => (object) ($compass['spotlight'] ?? []),
+                ];
+                $session->compass = $compass;
+            }
+            $session->plot = $plot;
+            $session->revision++;
+            $this->stream->append($session, 'plot.updated', ['revision' => $session->revision, 'plot' => $plot, 'compass' => (object) $compass], Audience::master());
+
+            return $session;
+        });
+
+        return new JsonResponse(TableSnapshot::session($session, true));
+    }
+
+    /** What the whole table sees now: a scene card with read-aloud text and art (NT-04). */
+    public function stage(Request $request, string $sessionId): JsonResponse
+    {
+        $actor = $this->actor($request);
+        [$session] = $this->access->session($actor, $sessionId);
+        $this->access->requireMaster($actor, $session->campaign_id);
+        $data = $this->input($request, [
+            'revision' => ['required', 'integer', 'min:1'],
+            'stage' => ['present', 'nullable', 'array'],
+            'stage.title' => ['required_with:stage', 'string', 'min:1', 'max:120'],
+            'stage.text' => ['sometimes', 'nullable', 'string', 'max:1500'],
+            'stage.art' => ['sometimes', 'nullable', 'string', 'in:'.implode(',', Plot::ART)],
+            'stage.image_id' => ['sometimes', 'nullable', 'uuid'],
+        ]);
+        $stage = $data['stage'] === null ? null : [
+            'title' => $data['stage']['title'],
+            'text' => (string) ($data['stage']['text'] ?? ''),
+            'art' => $data['stage']['art'] ?? null,
+            'image_id' => $data['stage']['image_id'] ?? null,
+            'shown_at' => now()->format(DATE_RFC3339_EXTENDED),
+        ];
+        $this->requireImages($session->campaign_id, [$stage['image_id'] ?? null], '/stage/image_id');
+
+        $session = DB::transaction(function () use ($sessionId, $data, $stage): GameSession {
+            $session = $this->access->lockOpen($sessionId);
+            if ($session->revision !== $data['revision']) {
+                throw ApiProblem::conflict('session.revision_mismatch', $session->revision);
+            }
+            $session->stage = $stage;
+            $session->revision++;
+            $this->stream->append($session, 'stage.updated', ['revision' => $session->revision, 'stage' => $stage], Audience::table());
+
+            return $session;
+        });
+
+        return new JsonResponse(TableSnapshot::session($session, true));
+    }
+
+    /** @param  list<mixed>  $ids */
+    private function requireImages(string $campaignId, array $ids, string $pointer): void
+    {
+        $ids = array_values(array_unique(array_filter($ids, static fn ($v): bool => is_string($v) && $v !== '')));
+        if ($ids !== [] && CampaignImage::query()->where('campaign_id', $campaignId)->whereIn('id', $ids)->count() !== count($ids)) {
+            throw ApiProblem::validation(new ValidationResult([new ValidationIssue('image.unknown', Severity::Error, [], [$pointer])]), 'image.unknown');
+        }
     }
 }

@@ -38,12 +38,14 @@ final class TableSnapshot
             'roteiro_id' => $s->roteiro_id,
             'initiative' => (object) ($s->initiative ?? []),
             'revealed_npcs' => $s->revealed_npcs ?? [],
+            'stage' => $s->stage,
             'last_seq' => $s->last_seq,
             'revision' => $s->revision,
             'started_at' => $s->started_at->format(DATE_RFC3339_EXTENDED),
         ];
         if ($asMaster) {
             $view['compass'] = (object) ($s->compass ?? []);
+            $view['plot'] = $s->plot ?? ['scenes' => [], 'current' => null];
         }
 
         return $view;
@@ -59,8 +61,8 @@ final class TableSnapshot
             ->orderBy('campaign_members.role')->orderBy('users.name')
             ->get(['campaign_members.user_id', 'campaign_members.role', 'users.name']);
         $characters = CampaignCharacter::query()->where('campaign_id', $campaignId)->where('status', '!=', CampaignCharacterStatus::Archived->value)->orderBy('name')
-            ->get(['id', 'name', 'player_user_id', 'custodian_user_id', 'status', 'preset_version_id']);
-        $npcs = $asMaster ? CampaignNpc::query()->where('campaign_id', $campaignId)->whereNull('archived_at')->orderBy('name')->get(['id', 'name', 'preset_version_id']) : collect();
+            ->get(['id', 'name', 'player_user_id', 'custodian_user_id', 'status', 'preset_version_id', 'portrait_image_id', 'sheet']);
+        $npcs = $asMaster ? CampaignNpc::query()->where('campaign_id', $campaignId)->whereNull('archived_at')->orderBy('name')->get(['id', 'name', 'preset_version_id', 'portrait_image_id']) : collect();
         $states = LiveState::query()->where('campaign_id', $campaignId)
             ->when(! $asMaster, fn ($q) => $q->where('subject_kind', 'character'))
             ->get()->keyBy('subject_id');
@@ -98,9 +100,12 @@ final class TableSnapshot
                 'id' => $c->getKey(), 'name' => $c->name, 'player_user_id' => $c->player_user_id,
                 'controlled_by' => $c->custodian_user_id ?? $c->player_user_id, 'status' => $c->status->value,
                 'preset_version_id' => $c->preset_version_id,
+                'portrait_image_id' => $c->portrait_image_id,
+                // Identity text is readable by its owner and the master only (sheet access rules).
+                'concept' => $asMaster || ($c->custodian_user_id ?? $c->player_user_id) === $me ? self::concept($c) : null,
                 'live' => self::live($states->get($c->getKey())),
             ])->values(),
-            'npcs' => $npcs->map(static fn (CampaignNpc $n): array => ['id' => $n->getKey(), 'name' => $n->name, 'preset_version_id' => $n->preset_version_id, 'live' => self::live($states->get($n->getKey()))])->values(),
+            'npcs' => $npcs->map(static fn (CampaignNpc $n): array => ['id' => $n->getKey(), 'name' => $n->name, 'preset_version_id' => $n->preset_version_id, 'portrait_image_id' => $n->portrait_image_id, 'live' => self::live($states->get($n->getKey()))])->values(),
             'requests' => $requests->map(static fn (RollRequest $r): array => RollViews::request($r, (string) ($names[$r->campaign_character_id ?? $r->campaign_npc_id] ?? '')))->values(),
             'rolls' => $rolls->reverse()->map(function (OfficialRoll $roll) use ($rollRequests, $names, $asMaster): array {
                 $r = $rollRequests[$roll->roll_request_id];
@@ -115,10 +120,19 @@ final class TableSnapshot
         ];
     }
 
-    /** @return array{resources: list<array<string, mixed>>, conditions: list<string>, revision: int}|null */
+    /** @return array{resources: list<array<string, mixed>>, conditions: list<string>, items: list<array<string, mixed>>, revision: int}|null */
     public static function live(?LiveState $state): ?array
     {
-        return $state === null ? null : ['resources' => $state->resources, 'conditions' => $state->conditions, 'revision' => $state->revision];
+        return $state === null ? null : ['resources' => $state->resources, 'conditions' => $state->conditions, 'items' => $state->items ?? [], 'revision' => $state->revision];
+    }
+
+    public static function concept(CampaignCharacter $c): ?string
+    {
+        $sheet = (array) $c->sheet;
+        $identity = (array) ($sheet['identity'] ?? []);
+        $value = $identity['concept'] ?? null;
+
+        return is_string($value) && $value !== '' ? mb_substr($value, 0, 200) : null;
     }
 
     /** @return list<string> */

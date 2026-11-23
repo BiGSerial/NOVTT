@@ -25,8 +25,8 @@ use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
- * Live-table demonstration (SPEC-MVP-002): a master, three players with approved characters,
- * NPCs, resources, a roteiro and an Atlas, on the original "Mesa NOVTT" preset. All fictional.
+ * Live-table demonstration (SPEC-MVP-002/003): a master, five players with approved characters,
+ * ten NPCs, resources and items, a five-scene roteiro and an Atlas, on the original "Mesa NOVTT" preset. All fictional.
  * Idempotent: running it again reuses what exists.
  */
 final readonly class TableDemoSeeder
@@ -40,6 +40,8 @@ final readonly class TableDemoSeeder
         'player' => [DemoMode::PLAYER_EMAIL, 'Ana (demo)'],
         'player2' => ['jogador2@demo.novtt.invalid', 'Bruno (demo)'],
         'player3' => ['jogador3@demo.novtt.invalid', 'Carla (demo)'],
+        'player4' => ['jogador4@demo.novtt.invalid', 'Davi (demo)'],
+        'player5' => ['jogador5@demo.novtt.invalid', 'Eva (demo)'],
     ];
 
     private const CHARACTERS = [
@@ -49,25 +51,43 @@ final readonly class TableDemoSeeder
             'Pagar a dívida com a guilda.', 'Voltar a ser covarde.', 'Protege Lyra como uma irmã.', 'Martelo, avental de couro, 12 moedas', 'Forjou a chave que abre a eclusa.'],
         'player3' => ['Nix', 'Erudita de sorriso fácil', ['vigor' => 1, 'agilidade' => 3, 'astucia' => 4, 'presenca' => 3], ['investigacao' => 3, 'saber' => 3, 'persuasao' => 2, 'furtividade' => 1],
             'Provar que a Mãe Corva existe.', 'Ser esquecida.', 'Rival amigável de Lyra.', 'Diário, lanterna, tinta que brilha', 'Carrega uma carta selada da Mãe Corva.'],
+        'player4' => ['Tomé', 'Barqueiro aposentado e rabugento', ['vigor' => 3, 'agilidade' => 2, 'astucia' => 3, 'presenca' => 2], ['sobrevivencia' => 3, 'atletismo' => 2, 'luta' => 1, 'saber' => 1],
+            'Reaver o barco que Oren lhe tomou.', 'Morrer em terra firme.', 'Ensinou Lyra a nadar.', 'Remo de freixo, rede, cachimbo', 'Sabe a passagem secreta sob a eclusa.'],
+        'player5' => ['Selene', 'Cantora de feira com voz de sereia', ['vigor' => 2, 'agilidade' => 3, 'astucia' => 2, 'presenca' => 4], ['persuasao' => 3, 'furtividade' => 2, 'pontaria' => 1, 'saber' => 1],
+            'Descobrir quem canta debaixo da ponte.', 'Perder a voz.', 'Deve um favor a Nix.', 'Alaúde, faca curta, frasco de mel', 'A voz debaixo da ponte é a da sua irmã.'],
+    ];
+
+    /** Starting inventory per character (live items, master-managed). */
+    private const ITEMS = [
+        'Lyra' => [['Flechas', 12], ['Corda (15 m)', 1], ['Ração seca', 3]],
+        'Bram' => [['Martelo de forja', 1], ['Moedas', 12], ['Tocha', 2]],
+        'Nix' => [['Diário de campo', 1], ['Lanterna', 1], ['Carta selada', 1]],
+        'Tomé' => [['Remo de freixo', 1], ['Rede de pesca', 1], ['Fumo de cachimbo', 5]],
+        'Selene' => [['Alaúde', 1], ['Frasco de mel', 2], ['Moedas', 7]],
     ];
 
     private const NPCS = [
         ['Guardião da Ponte', ['vigor' => 4, 'agilidade' => 2, 'astucia' => 2, 'presenca' => 3], ['luta' => 3, 'atletismo' => 2], 'Voz grave, frases curtas. Quer cobrar o pedágio a qualquer custo.', 12],
         ['Mãe Corva', ['vigor' => 1, 'agilidade' => 3, 'astucia' => 5, 'presenca' => 4], ['saber' => 4, 'persuasao' => 3, 'furtividade' => 2], 'Fala em perguntas. Quer o diário de Nix.', 8],
         ['Oren, o barqueiro', ['vigor' => 2, 'agilidade' => 3, 'astucia' => 3, 'presenca' => 2], ['furtividade' => 2, 'persuasao' => 2], 'Gagueja quando mente. Esconde o irmão de Lyra.', 7],
+        ['Capitã Ilsa Morn', ['vigor' => 3, 'agilidade' => 3, 'astucia' => 3, 'presenca' => 4], ['luta' => 3, 'persuasao' => 2, 'pontaria' => 2], 'Olhar de quem já perdeu muito. Quer a eclusa sob a lei.', 10],
+        ['Velho Barqueiro', ['vigor' => 1, 'agilidade' => 1, 'astucia' => 3, 'presenca' => 2], ['saber' => 3, 'sobrevivencia' => 2], 'Conta histórias sem fim. Sabe quem canta na ponte.', 5],
+        ['Irmã Fenda', ['vigor' => 2, 'agilidade' => 2, 'astucia' => 4, 'presenca' => 3], ['saber' => 3, 'investigacao' => 3], 'Sussurra orações ao rio. Vende segredos por velas.', 6],
+        ['Corvo-sentinela', ['vigor' => 1, 'agilidade' => 5, 'astucia' => 2, 'presenca' => 1], ['furtividade' => 4], 'Olhos da Mãe Corva. Grasna quando alguém mente.', 3],
+        ['Contrabandista Juca', ['vigor' => 2, 'agilidade' => 4, 'astucia' => 3, 'presenca' => 3], ['furtividade' => 3, 'persuasao' => 3, 'luta' => 1], 'Sorriso de ouro falso. Quer passar a carga antes da cheia.', 7],
+        ['Lobo Cinzento', ['vigor' => 4, 'agilidade' => 4, 'astucia' => 1, 'presenca' => 2], ['luta' => 3, 'atletismo' => 3], 'Ameaça. Caça em matilha na névoa da margem.', 9],
+        ['Eco da Ponte', ['vigor' => 3, 'agilidade' => 2, 'astucia' => 4, 'presenca' => 5], ['persuasao' => 4, 'saber' => 2], 'Ameaça. Repete as palavras de quem atravessa, distorcidas.', 14],
     ];
 
-    public function __construct(private PresetImporter $importer, private AuditTrail $audit)
-    {
-    }
+    public function __construct(private PresetImporter $importer, private AuditTrail $audit) {}
 
     /** @return array{campaign: Campaign} */
     public function seed(string $repositoryRoot): array
     {
-        if (!DemoMode::enabled()) {
+        if (! DemoMode::enabled()) {
             throw new RuntimeException('Demo mode is disabled.');
         }
-        [$raw, $missing] = PresetImporter::readDirectory($repositoryRoot . '/' . self::PRESET_DIRECTORY);
+        [$raw, $missing] = PresetImporter::readDirectory($repositoryRoot.'/'.self::PRESET_DIRECTORY);
         if ($raw === null) {
             throw new RuntimeException("Table demo preset is missing {$missing}.");
         }
@@ -104,7 +124,7 @@ final readonly class TableDemoSeeder
                     'approved_by' => $master->getKey(), 'approved_at' => now(),
                 ]);
                 CharacterSheetRevision::query()->create(['campaign_character_id' => $character->getKey(), 'revision' => 1, 'sheet' => $sheet, 'created_by' => $master->getKey(), 'created_at' => now()]);
-                $this->live($campaign, 'character', $character->getKey(), [['vida', 'Vida', 5 + $attrs['vigor'], 5 + $attrs['vigor']], ['vontade', 'Vontade', 3 + $attrs['presenca'], 3 + $attrs['presenca']]]);
+                $this->live($campaign, 'character', $character->getKey(), [['vida', 'Vida', 5 + $attrs['vigor'], 5 + $attrs['vigor']], ['vontade', 'Vontade', 3 + $attrs['presenca'], 3 + $attrs['presenca']]], self::ITEMS[$cname] ?? []);
                 $characters[$cname] = $character;
             }
 
@@ -120,16 +140,40 @@ final readonly class TableDemoSeeder
             Roteiro::query()->create(['campaign_id' => $campaign->getKey(), 'title' => 'Sessão 1 · A ponte que canta', 'revision' => 1, 'content' => [
                 'strong_start' => 'A ponte de Vau Cinzento range e uma voz canta debaixo dela: “Pague, ou o rio paga por vocês”.',
                 'scenes' => [
-                    ['title' => 'O pedágio', 'goal' => 'Atravessar a ponte sem pagar com sangue', 'clues' => [['title' => 'Corda cortada', 'body' => 'A corda de segurança foi cortada com lâmina fina, há pouco tempo.'], ['title' => 'Moedas molhadas', 'body' => 'O Guardião guarda moedas que ainda pingam água do rio.']]],
-                    ['title' => 'A cabana da Mãe Corva', 'goal' => 'Descobrir o que ela sabe do irmão de Lyra', 'clues' => [['title' => 'Pena de corvo no diário', 'body' => 'Uma pena marca a página sobre a eclusa.']]],
-                    ['title' => 'A eclusa', 'goal' => 'Abrir a eclusa antes da cheia', 'clues' => [['title' => 'A chave do ferreiro', 'body' => 'A fechadura tem a marca da forja de Bram.']]],
+                    ['title' => 'O pedágio', 'goal' => 'Atravessar a ponte sem pagar com sangue', 'location' => 'Ponte de Vau Cinzento', 'art' => 'bridge',
+                        'read_aloud' => 'A névoa sobe do rio como fumaça de forja apagada. A ponte de tábuas geme sob o peso de vocês, e lá embaixo, entre os pilares cobertos de limo, alguém canta uma canção que ninguém aqui deveria conhecer.',
+                        'npcs' => ['Guardião da Ponte', 'Eco da Ponte'], 'complication' => 'O Eco repete em voz alta o segredo de quem falar primeiro.',
+                        'clues' => [['title' => 'Corda cortada', 'body' => 'A corda de segurança foi cortada com lâmina fina, há pouco tempo.'], ['title' => 'Moedas molhadas', 'body' => 'O Guardião guarda moedas que ainda pingam água do rio.']]],
+                    ['title' => 'A estrada da margem', 'goal' => 'Chegar à cabana antes do anoitecer', 'location' => 'Trilha dos salgueiros', 'art' => 'road',
+                        'read_aloud' => 'A trilha segue colada ao rio, entre salgueiros que choram até a água. Pegadas grandes demais para um cão cortam a lama, e todas apontam para o mesmo lado que vocês.',
+                        'npcs' => ['Lobo Cinzento', 'Contrabandista Juca'], 'complication' => 'A matilha cerca quem ficar para trás.',
+                        'clues' => [['title' => 'Carga escondida', 'body' => 'Caixotes com o selo da Guilda da Forja, enterrados na lama.']]],
+                    ['title' => 'A cabana da Mãe Corva', 'goal' => 'Descobrir o que ela sabe do irmão de Lyra', 'location' => 'Cabana sobre palafitas', 'art' => 'swamp',
+                        'read_aloud' => 'A cabana se equilibra sobre palafitas tortas, coberta de penas negras. Dezenas de corvos se calam ao mesmo tempo quando vocês pisam na primeira tábua.',
+                        'npcs' => ['Mãe Corva', 'Corvo-sentinela'], 'complication' => 'Ela só responde a quem lhe der algo de valor sentimental.',
+                        'clues' => [['title' => 'Pena de corvo no diário', 'body' => 'Uma pena marca a página sobre a eclusa.'], ['title' => 'Retrato rasgado', 'body' => 'Metade de um retrato: um menino com o rosto de Lyra.']]],
+                    ['title' => 'A taverna do Sino', 'goal' => 'Convencer a Capitã a não fechar a eclusa', 'location' => 'Taverna do Sino Rachado', 'art' => 'tavern',
+                        'read_aloud' => 'O calor da lareira e o cheiro de peixe frito batem no rosto de vocês. No canto, a Capitã Ilsa Morn joga cartas sozinha, e o Velho Barqueiro já está no meio de uma história que ninguém pediu.',
+                        'npcs' => ['Capitã Ilsa Morn', 'Velho Barqueiro', 'Irmã Fenda'], 'complication' => 'A Irmã Fenda vende para a Capitã o que ouvir na mesa.',
+                        'clues' => [['title' => 'A dívida da guilda', 'body' => 'A Capitã tem a promissória de Bram assinada pela guilda.']]],
+                    ['title' => 'A eclusa', 'goal' => 'Abrir a eclusa antes da cheia', 'location' => 'Eclusa velha e casa de barcos', 'art' => 'ruins',
+                        'read_aloud' => 'As engrenagens da eclusa estão cobertas de ferrugem e de flores do rio. A água já sobe pelos degraus de pedra, e de dentro da casa de barcos vem uma luz de lamparina.',
+                        'npcs' => ['Oren, o barqueiro'], 'complication' => 'Abrir a eclusa inunda a casa de barcos, onde está o irmão.',
+                        'clues' => [['title' => 'A chave do ferreiro', 'body' => 'A fechadura tem a marca da forja de Bram.'], ['title' => 'Passagem submersa', 'body' => 'Uma corrente de ar sai por baixo das pedras: há um túnel.']]],
                 ],
                 'npcs' => [
                     ['name' => 'Guardião da Ponte', 'voice' => 'Grave, frases curtas', 'wants' => 'Cobrar o pedágio', 'secret' => 'Trabalha para Oren'],
                     ['name' => 'Mãe Corva', 'voice' => 'Fala em perguntas', 'wants' => 'O diário de Nix', 'secret' => 'É a mãe do irmão desaparecido'],
+                    ['name' => 'Capitã Ilsa Morn', 'voice' => 'Seca, militar', 'wants' => 'Ordem na eclusa', 'secret' => 'Também deve à guilda'],
                 ],
-                'clocks' => [['label' => 'Cheia do rio', 'segments' => 6], ['label' => 'Paciência do Guardião', 'segments' => 4]],
-                'wants' => [['character' => 'Lyra', 'text' => 'Uma pista real do irmão'], ['character' => 'Bram', 'text' => 'Uma chance de ser corajoso'], ['character' => 'Nix', 'text' => 'Ver a Mãe Corva de perto']],
+                'clocks' => [['label' => 'Cheia do rio', 'segments' => 6], ['label' => 'Paciência do Guardião', 'segments' => 4], ['label' => 'A matilha se aproxima', 'segments' => 4]],
+                'wants' => [['character' => 'Lyra', 'text' => 'Uma pista real do irmão'], ['character' => 'Bram', 'text' => 'Uma chance de ser corajoso'], ['character' => 'Nix', 'text' => 'Ver a Mãe Corva de perto'], ['character' => 'Tomé', 'text' => 'Ver o barco de volta'], ['character' => 'Selene', 'text' => 'Ouvir a voz da irmã']],
+                'locations' => [
+                    ['name' => 'Ponte de Vau Cinzento', 'aspects' => ['Tábuas que cantam ao vento', 'Pilares cobertos de limo verde', 'Sinos pendurados por pescadores mortos']],
+                    ['name' => 'Cabana sobre palafitas', 'aspects' => ['Penas negras em cada fresta', 'Cheiro de ervas queimadas', 'Um espelho que não reflete corvos']],
+                    ['name' => 'Eclusa velha', 'aspects' => ['Engrenagens do tamanho de carroças', 'Flores que crescem na ferrugem', 'Água subindo degrau a degrau']],
+                ],
+                'rewards' => ['Barco de Tomé de volta', 'Promissória de Bram rasgada', 'Mapa da passagem submersa', 'Favor da Mãe Corva'],
             ]]);
 
             $atlas = [];
@@ -151,13 +195,18 @@ final readonly class TableDemoSeeder
         });
     }
 
-    /** @param list<array{0: string, 1: string, 2: int, 3: int}> $tracks */
-    private function live(Campaign $campaign, string $kind, string $id, array $tracks): void
+    /**
+     * @param  list<array{0: string, 1: string, 2: int, 3: int}>  $tracks
+     * @param  list<array{0: string, 1: int}>  $items
+     */
+    private function live(Campaign $campaign, string $kind, string $id, array $tracks, array $items = []): void
     {
         LiveState::query()->create([
             'campaign_id' => $campaign->getKey(), 'subject_kind' => $kind, 'subject_id' => $id,
             'resources' => array_map(static fn (array $t): array => ['id' => $t[0], 'label' => $t[1], 'current' => $t[2], 'max' => $t[3]], $tracks),
-            'conditions' => [], 'revision' => 1,
+            'conditions' => [],
+            'items' => array_map(static fn (array $i, int $n): array => ['id' => 'i'.($n + 1), 'label' => $i[0], 'qty' => $i[1], 'note' => ''], $items, array_keys($items)),
+            'revision' => 1,
         ]);
     }
 

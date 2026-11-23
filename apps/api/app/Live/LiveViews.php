@@ -36,6 +36,7 @@ final class LiveViews
             'revealed_to' => $c->revealed_to,
             'revealed_user_id' => $asMaster ? $c->revealed_user_id : null,
             'revealed_at' => $c->revealed_at?->format(DATE_RFC3339_EXTENDED),
+            'image_id' => $c->image_id,
         ];
     }
 

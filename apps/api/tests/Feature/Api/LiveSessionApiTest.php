@@ -91,7 +91,7 @@ final class LiveSessionApiTest extends TestCase
 
     public function test_pool_comes_from_the_official_sheet_and_the_roll_is_resolved_by_the_server(): void
     {
-        $request = $this->requestRoll()->assertCreated();
+        $request = $this->requestRoll(['secret' => false])->assertCreated()->assertJsonPath('secret', false);
         // Agility 3 + Climb 2 + modifier 1 = six d10, fixed (no player choice).
         $request->assertJsonPath('max_dice', 6)->assertJsonPath('min_dice', 6)->assertJsonPath('components.0.value', 3)->assertJsonPath('components.1.label', 'Escalar');
 
@@ -147,6 +147,20 @@ final class LiveSessionApiTest extends TestCase
         $d20->assertJsonPath('dice.bonus', 6)->assertJsonPath('max_dice', 1);
         $roll = $this->roll($d20->json('id'))->assertCreated();
         self::assertSame($roll->json('results.0') + 6, $roll->json('total'));
+    }
+
+    public function test_requests_are_between_player_and_master_by_default(): void
+    {
+        $id = $this->requestRoll()->assertCreated()->assertJsonPath('secret', true)->json('id');
+        $roll = $this->roll($id)->assertCreated();
+        self::assertNotContains('roll.requested', array_column($this->eventsFor($this->bruno), 'type'));
+        self::assertNotContains('roll.resolved', array_column($this->eventsFor($this->bruno), 'type'));
+        // The master can bring it to the table afterwards, with the numbers (it is a player roll).
+        $this->actingAs($this->master)->postJson("/api/v1/official-rolls/{$roll->json('id')}/reveal")->assertOk();
+        $revealed = collect($this->eventsFor($this->bruno))->firstWhere('type', 'roll.revealed');
+        self::assertSame($roll->json('results'), $revealed['payload']['results']);
+        self::assertSame(1, $revealed['payload']['modifier']);
+        $this->actingAs($this->bruno)->getJson("/api/v1/sessions/{$this->sessionId}/snapshot")->assertJsonCount(1, 'rolls');
     }
 
     public function test_secret_request_reaches_only_master_and_roller(): void
@@ -240,7 +254,7 @@ final class LiveSessionApiTest extends TestCase
     public function test_sequence_is_gap_free_and_recovery_is_filtered(): void
     {
         $this->requestRoll(['secret' => true]);
-        $this->requestRoll();
+        $this->requestRoll(['secret' => false]);
         $seqs = SessionEvent::query()->where('session_id', $this->sessionId)->orderBy('seq')->pluck('seq')->all();
         self::assertSame(range(1, count($seqs)), $seqs);
         $bruno = $this->eventsFor($this->bruno);

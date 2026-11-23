@@ -4,7 +4,7 @@ import { faceCounts, outcomeText } from '../../live/dice'
 import type { OfficialRoll } from '../../live/types'
 
 /** Official results, newest first. Masters can reveal secret rolls and replay any result. */
-const props = defineProps<{ rolls: OfficialRoll[]; master?: boolean; limit?: number }>()
+const props = defineProps<{ rolls: OfficialRoll[]; master?: boolean; limit?: number; meId?: string }>()
 defineEmits<{ reveal: [roll: OfficialRoll]; replay: [roll: OfficialRoll] }>()
 const items = computed(() => [...props.rolls].reverse().slice(0, props.limit ?? 40))
 const time = (iso: string) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
@@ -16,7 +16,7 @@ const time = (iso: string) => new Date(iso).toLocaleTimeString('pt-BR', { hour: 
       <div class="feed-top">
         <strong>{{ r.subject.name }}</strong>
         <span class="muted small">{{ r.label }}</span>
-        <span v-if="r.secret && !r.revealed" class="pill secret">secreta</span>
+        <span v-if="r.secret && !r.revealed" class="pill secret">{{ r.roller_user_id === meId ? 'entre você e o mestre' : 'secreta' }}</span>
         <time class="muted small" :datetime="r.created_at">{{ time(r.created_at) }}</time>
       </div>
       <div class="feed-faces">
