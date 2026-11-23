@@ -15,6 +15,10 @@ const props = defineProps<{
   readonly?: boolean
   /** Budget id → player-facing label (preset rules). Raw ids are never shown. */
   budgetLabels?: Record<string, string>
+  /** Path → option value → label (from the preset's choices), so codes are never shown. */
+  optionLabels?: Record<string, Record<string, string>>
+  /** Server-computed values (derived fields of the draft preview) shown instead of the draft's. */
+  computedValues?: Record<string, unknown>
 }>()
 const emit = defineEmits<{ changed: [] }>()
 
@@ -23,6 +27,7 @@ const emit = defineEmits<{ changed: [] }>()
 const version = ref(0)
 function valueOf(path: string): unknown {
   void version.value
+  if (props.computedValues && path in props.computedValues) return props.computedValues[path]
   return props.draft.value(path)
 }
 function itemsOf(path: string) {
@@ -156,6 +161,17 @@ function display(value: unknown): string {
                 :aria-describedby="describedBy(element.path, !!element.description)"
                 @change="setField(element.path, ($event.target as HTMLTextAreaElement).value)"
               />
+              <select
+                v-else-if="element.widget === 'select' && node(element.path).enum"
+                :id="fieldId(element.path)"
+                :value="(valueOf(element.path) as string) ?? ''"
+                :aria-invalid="errorsFor(element.path).length ? 'true' : undefined"
+                :aria-describedby="describedBy(element.path, !!element.description)"
+                @change="setField(element.path, ($event.target as HTMLSelectElement).value)"
+              >
+                <option value="">Escolha…</option>
+                <option v-for="option in node(element.path).enum" :key="String(option)" :value="String(option)">{{ optionLabels?.[element.path]?.[String(option)] ?? option }}</option>
+              </select>
               <input
                 v-else-if="element.widget === 'boolean'"
                 :id="fieldId(element.path)"
@@ -183,7 +199,7 @@ function display(value: unknown): string {
           </template>
           <dl v-else class="readonly">
             <dt :id="fieldId(element.path)">{{ element.label }}</dt>
-            <dd>{{ display(valueOf(element.path)) }}</dd>
+            <dd>{{ optionLabels?.[element.path]?.[String(valueOf(element.path))] ?? display(valueOf(element.path)) }}</dd>
           </dl>
           <p v-for="(issue, index) in errorsFor(element.path)" :id="index === 0 ? fieldId(element.path, '-error') : undefined" :key="index" class="error">
             {{ message(issue) }}

@@ -26,6 +26,33 @@ const messages: Record<string, (p: Params) => string> = {
   'resource.not_found': () => 'Não encontrado.',
   'rate_limit.exceeded': () => 'Muitas tentativas. Aguarde um pouco.',
   'network.error': () => 'Sem conexão com o servidor.',
+  // Preset engine (rules/2): choices, constraints, progression, resources, derived values.
+  'op.derived_read_only': () => 'Este valor é calculado pela ficha e não pode ser editado.',
+  'choice.prerequisite_unmet': () => 'Esta opção exige um pré-requisito que a ficha ainda não cumpre.',
+  'choice.unknown_option': () => 'Esta opção não existe neste sistema.',
+  'constraint.failed': () => 'Esta combinação não é permitida pelas regras do sistema.',
+  'budget.overdrawn': () => 'Esta mudança deixa pontos já gastos sem saldo. Devolva alguns pontos antes.',
+  'progression.level_not_earned': p => `Ainda não há experiência para o nível ${p.requested} (liberado até o ${p.earned}).`,
+  'progression.level_skip': () => 'Suba um nível por vez.',
+  'progression.level_decrease': () => 'O nível não pode diminuir por proposta.',
+  'resource.out_of_range': p => `O valor precisa ficar entre ${p.min} e ${p.max}.`,
+  'inventory.over_capacity': p => `Carga acima do limite (${p.load} de ${p.capacity}).`,
+  'derived.evaluation_failed': () => 'Não foi possível calcular este valor com os dados atuais.',
+  'character.creation_incomplete': () => 'A criação ainda tem etapas incompletas.',
+  'character.locked_by_session': () => 'A ficha está travada durante a sessão ao vivo. Envie a proposta depois.',
+  // Campaign set-up and master review.
+  'campaign.preset_unavailable': () => 'Este preset não está disponível para campanhas.',
+  'campaign.archived': () => 'A campanha está arquivada.',
+  'invitation.not_found': () => 'Convite inválido, expirado ou esgotado.',
+  'character.already_in_campaign': () => 'Este personagem já está na campanha.',
+  'character.no_applied_sheet': () => 'Aplique ao menos uma proposta antes de ativar o personagem.',
+  'character.active_proposal': () => 'Finalize a proposta em análise antes de ativar o personagem.',
+  'change_request.not_active': () => 'Esta proposta já foi encerrada.',
+  'change_request.review_version_conflict': () => 'A revisão foi alterada em outra janela. Os dados foram recarregados.',
+  'change_request.stale': () => 'A ficha mudou desde a proposta. O jogador precisa atualizar o rascunho.',
+  'decision.incomplete': () => 'Decida todas as operações antes de finalizar.',
+  'decision.rejection_requires_individual_override': () => 'Uma rejeição só pode ser revertida individualmente.',
+  'idempotency.key_required': () => 'Não foi possível concluir a operação.',
 }
 
 export function t(code: string, params: Params = {}): string {
