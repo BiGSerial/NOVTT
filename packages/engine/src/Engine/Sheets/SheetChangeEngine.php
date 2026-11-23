@@ -8,6 +8,8 @@ use InvalidArgumentException;
 use Novtt\Engine\Presets\SchemaNavigator;
 use Novtt\Engine\Presets\SheetLayout;
 use Novtt\Engine\Presets\SheetProjector;
+use Novtt\Engine\Formula\FormulaException;
+use Novtt\Engine\Rules\Mechanics;
 use Novtt\Engine\Validation\Severity;
 use Novtt\Engine\Validation\StructuralValidator;
 use Novtt\Engine\Validation\ValidationIssue;
@@ -29,6 +31,8 @@ final readonly class SheetChangeEngine
 {
     public const LEDGER = '_ledger';
 
+    private Mechanics $mechanics;
+
     /**
      * @param array<string, mixed> $sheetSchema the pinned version's sheet JSON Schema (assoc)
      * @param array<string, mixed>|object $sheetSchemaObject the same schema as an object tree
@@ -41,6 +45,12 @@ final readonly class SheetChangeEngine
         private array $rules,
         private StructuralValidator $structure,
     ) {
+        $this->mechanics = new Mechanics($rules, new SchemaNavigator($sheetSchema));
+    }
+
+    public function mechanics(): Mechanics
+    {
+        return $this->mechanics;
     }
 
     /**
@@ -81,6 +91,9 @@ final readonly class SheetChangeEngine
 
         [$candidate, $budgetIssues] = $this->settleBudgets($sheet, $candidate, $phase, $grants, $schema, $touched);
         $issues = [...$issues, ...$budgetIssues, ...$this->phaseLimits($candidate, $phase, $schema, $touched), ...$this->dependencies($candidate, $touched)];
+        foreach ($this->mechanics->check($sheet, $candidate, $phase, $grants, array_keys($touched)) as $issue) {
+            $issues[] = new ValidationIssue($issue->ruleId, $issue->severity, $this->opsFor($issue->paths, $touched), $issue->paths, $issue->params);
+        }
 
         return new ChangeOutcome(new ValidationResult($issues), $candidate, $this->balances($candidate, $grants));
     }
@@ -88,17 +101,7 @@ final readonly class SheetChangeEngine
     /** @param array<string, mixed> $sheet @param array<string, int> $grants @return array<string, int> */
     public function balances(array $sheet, array $grants): array
     {
-        $balances = [];
-        foreach ($this->rules['budgets'] as $budget) {
-            $balances[$budget['id']] = (int) ($budget['initial_amount'] ?? 0) + (int) ($grants[$budget['id']] ?? 0);
-        }
-        foreach ((array) ($sheet[self::LEDGER] ?? []) as $entry) {
-            if (isset($balances[$entry['budget']])) {
-                $balances[$entry['budget']] -= (int) $entry['cost'];
-            }
-        }
-
-        return $balances;
+        return Mechanics::balancesOf($this->mechanics->budgetView($sheet, $grants));
     }
 
     private function authorize(ChangeOperation $op, Actor $actor, SchemaNavigator $schema): ?ValidationIssue
@@ -108,6 +111,10 @@ final readonly class SheetChangeEngine
         $denied = new ValidationIssue('op.path_not_allowed', Severity::Error, [$op->key], $actor === Actor::Player ? [] : [$path->toString()]);
         if (str_starts_with($path->segments[0], '_')) {
             return $denied;
+        }
+        if ($this->mechanics->isDerivedPath($path)) {
+            // Derived values are computed by the engine; nobody writes them, not even the master.
+            return new ValidationIssue('op.derived_read_only', Severity::Error, [$op->key], [$path->toString()]);
         }
         $element = $this->layout->element($path);
         $isItemOp = in_array($op->type, [OperationType::AddItem, OperationType::SetItemField, OperationType::RemoveItem, OperationType::ReorderItems], true);
@@ -222,7 +229,8 @@ final readonly class SheetChangeEngine
     {
         $issues = [];
         $ledger = array_values((array) ($base[self::LEDGER] ?? []));
-        $balances = $this->balances($base, $grants);
+        // Amounts may depend on the sheet (e.g. a priority choice or a level): use the candidate's.
+        $balances = Mechanics::balancesOf($this->mechanics->budgetView($candidate, $grants, $ledger));
         $rated = $this->ratedTargets($schema);
 
         // Refunds first (lowered ratings), then charges, so a player can move points.
@@ -259,7 +267,13 @@ final readonly class SheetChangeEngine
                         $paid = true; // printed/free dot: no ledger entry
                         break;
                     }
-                    $cost = self::cost($rule['model'], $level - 1);
+                    try {
+                        $cost = $this->mechanics->cost($rule['model'], $level - 1, $candidate, $grants);
+                    } catch (FormulaException $e) {
+                        $issues[] = new ValidationIssue($e->ruleId, Severity::Error, $touched[$path] ?? [], [$path], ['rule' => $rule['id']]);
+                        $paid = true;
+                        break;
+                    }
                     $needed ??= ['budget' => $rule['budget'], 'cost' => $cost];
                     if (($balances[$rule['budget']] ?? 0) >= $cost) {
                         $balances[$rule['budget']] -= $cost;
@@ -359,17 +373,6 @@ final readonly class SheetChangeEngine
         $node = $schema->at($pointer) ?? [];
 
         return (int) ($node['default'] ?? $node['minimum'] ?? 0);
-    }
-
-    /** @param array<string, mixed> $model */
-    private static function cost(array $model, int $currentRating): int
-    {
-        return match ($model['type']) {
-            'fixed_per_dot' => (int) $model['amount'],
-            'current_rating_multiplier' => $currentRating === 0 ? (int) ($model['when_zero'] ?? $model['multiplier']) : $currentRating * (int) $model['multiplier'],
-            'new_rating_multiplier' => ($currentRating + 1) * (int) $model['multiplier'],
-            default => throw new InvalidArgumentException('UNSUPPORTED_CAPABILITY: cost model'),
-        };
     }
 
     /** @param array<string, mixed> $sheet */
