@@ -1,8 +1,9 @@
 import { add, cross, dot, length, normalize, scale, seeded, sub, v, type Vec3 } from './math'
 
-export const DIE_TYPES = ['d6', 'd8', 'd10', 'd12', 'd20'] as const
+/** Physical die shapes. (The d100 is a pair of d10 with special labels, see record.ts.) */
+export const DIE_TYPES = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20'] as const
 export type DieType = (typeof DIE_TYPES)[number]
-export const SIDES: Record<DieType, number> = { d6: 6, d8: 8, d10: 10, d12: 12, d20: 20 }
+export const SIDES: Record<DieType, number> = { d4: 4, d6: 6, d8: 8, d10: 10, d12: 12, d20: 20 }
 
 export interface Face {
   index: number
@@ -17,11 +18,21 @@ export interface Face {
   verts: Vec3[]
 }
 
+/** A printed number on the die surface (several per result on a d4). */
+export interface Label { number: number; center: Vec3; normal: Vec3; up: Vec3; size: number }
+
 export interface DieDef {
   type: DieType
   sides: number
   vertices: Vec3[]
+  /**
+   * Result features: the feature whose direction points up is the result. A face for most dice;
+   * a vertex for the d4 (its result is read at the top corner).
+   */
   faces: Face[]
+  /** Hull polygons to draw. */
+  polygons: { verts: Vec3[]; normal: Vec3 }[]
+  labels: Label[]
   /** Circumradius, used for spacing. */
   radius: number
 }
@@ -101,7 +112,48 @@ function build(type: DieType, vertices: Vec3[], polygons: number[][], labelFacto
     if (i % 2) { numbers[a] = sides + 1 - n; numbers[b] = n } else { numbers[a] = n; numbers[b] = sides + 1 - n }
   })
   const faces = raw.map(f => ({ ...f, number: numbers[f.index] }))
-  return { type, sides, vertices, faces, radius: Math.max(...vertices.map(length)) }
+  return {
+    type, sides, vertices, faces,
+    polygons: faces.map(f => ({ verts: f.verts, normal: f.normal })),
+    labels: faces.map(f => ({ number: f.number, center: f.center, normal: f.normal, up: f.up, size: f.labelSize })),
+    radius: Math.max(...vertices.map(length)),
+  }
+}
+
+/**
+ * Tetrahedron read at the top vertex: each face carries three numbers, one per corner, upright
+ * towards that corner; the number shared by the three visible faces at the top is the result.
+ */
+function d4(): DieDef {
+  const pts = scaleTo([v(1, 1, 1), v(1, -1, -1), v(-1, 1, -1), v(-1, -1, 1)], 1.1 * SIZE)
+  const inradius = length(pts[0]) / 3
+  const faces: Face[] = pts.map((p, index) => ({
+    index, number: index + 1, normal: normalize(p), center: p,
+    up: normalize(sub(pts[(index + 1) % 4], scale(normalize(p), dot(pts[(index + 1) % 4], normalize(p))))),
+    dist: inradius, labelSize: 0, verts: pts.filter((_, j) => j !== index),
+  }))
+  const polygons: DieDef['polygons'] = []
+  const labels: Label[] = []
+  for (let k = 0; k < 4; k++) {
+    // The face opposite vertex k.
+    const tri = pts.filter((_, j) => j !== k)
+    const normal = scale(normalize(pts[k]), -1)
+    const center = scale(tri.reduce(add, v(0, 0, 0)), 1 / 3)
+    const ordered = dot(cross(sub(tri[1], tri[0]), sub(tri[2], tri[0])), normal) > 0 ? tri : [tri[0], tri[2], tri[1]]
+    polygons.push({ verts: ordered, normal })
+    const triInradius = length(sub(scale(add(tri[0], tri[1]), 0.5), center))
+    for (const corner of tri) {
+      const towards = sub(corner, center)
+      labels.push({
+        number: pts.indexOf(corner) + 1,
+        center: add(center, scale(towards, 0.5)),
+        normal,
+        up: normalize(towards),
+        size: triInradius * 1.15,
+      })
+    }
+  }
+  return { type: 'd4', sides: 4, vertices: pts, faces, polygons, labels, radius: Math.max(...pts.map(length)) }
 }
 
 function d6(): DieDef {
@@ -167,7 +219,7 @@ const cache = new Map<DieType, DieDef>()
 export function dieDef(type: DieType): DieDef {
   let def = cache.get(type)
   if (!def) {
-    def = { d6, d8, d10, d12, d20 }[type]()
+    def = { d4, d6, d8, d10, d12, d20 }[type]()
     cache.set(type, def)
   }
   return def

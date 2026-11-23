@@ -4,9 +4,10 @@ import { DIE_TYPES, dieDef, SIDES, type DieType } from '../src/dice/geometry'
 import { dot, length, qmul, rotate, sub } from '../src/dice/math'
 import { simulateRoll } from '../src/dice/sim'
 import { relabel, symmetryTable } from '../src/dice/symmetry'
+import { detectImpacts } from '../src/dice/impacts'
 
 describe('dice geometry', () => {
-  it.each(DIE_TYPES)('%s has numbered planar faces and opposite faces summing to n + 1', type => {
+  it.each(DIE_TYPES.filter(t => t !== 'd4'))('%s has numbered planar faces and opposite faces summing to n + 1', type => {
     const def = dieDef(type)
     const n = SIDES[type]
     expect(def.faces.map(f => f.number).sort((a, b) => a - b)).toEqual(Array.from({ length: n }, (_, i) => i + 1))
@@ -15,6 +16,19 @@ describe('dice geometry', () => {
       const opposite = def.faces.find(g => dot(g.normal, f.normal) < -0.999)!
       expect(opposite.number + f.number).toBe(n + 1)
       expect(Math.abs(dot(f.up, f.normal))).toBeLessThan(1e-9)
+    }
+  })
+
+  it('d4 is read at the top vertex: each number printed once on each of its three faces', () => {
+    const def = dieDef('d4')
+    expect(def.faces.map(f => f.number)).toEqual([1, 2, 3, 4])
+    expect(def.polygons).toHaveLength(4)
+    expect(def.labels).toHaveLength(12)
+    for (let n = 1; n <= 4; n++) expect(def.labels.filter(l => l.number === n)).toHaveLength(3)
+    for (const f of def.faces) {
+      // Resting on the opposite face puts the centre at the inradius.
+      const opposite = def.polygons.find(p => dot(p.normal, f.normal) < -0.999)!
+      expect(Math.abs(-dot(opposite.verts[0], f.normal) - f.dist)).toBeLessThan(1e-9)
     }
   })
 
@@ -30,7 +44,7 @@ describe('dice geometry', () => {
 })
 
 describe('dice simulation', () => {
-  const dice: DieType[] = ['d20', 'd20', 'd6', 'd10', 'd12', 'd8']
+  const dice: DieType[] = ['d20', 'd4', 'd6', 'd10', 'd12', 'd8']
 
   it('is deterministic for a seed and shows the requested results after relabelling', () => {
     const a = simulateRoll(RAPIER, dice, 123456)
@@ -38,7 +52,7 @@ describe('dice simulation', () => {
     expect(Array.from(b.poses)).toEqual(Array.from(a.poses))
     expect(b.landed).toEqual(a.landed)
 
-    const results = [20, 1, 6, 10, 7, 3]
+    const results = [20, 4, 6, 10, 7, 3]
     const n = dice.length, last = (a.frames - 1) * n * 7
     dice.forEach((type, i) => {
       const o = last + i * 7
@@ -47,6 +61,15 @@ describe('dice simulation', () => {
       const face = dieDef(type).faces.find(f => f.number === results[i])!
       expect(rotate(visual, face.normal).y).toBeGreaterThan(0.95)
     })
+  })
+
+  it('impacts for sound are deterministic, bounded and inside the animation', () => {
+    const r = simulateRoll(RAPIER, dice, 99)
+    const a = detectImpacts(r, dice.length), b = detectImpacts(simulateRoll(RAPIER, dice, 99), dice.length)
+    expect(a.length).toBeGreaterThan(0)
+    expect(a.length).toBeLessThanOrEqual(24)
+    expect(b).toEqual(a)
+    for (const hit of a) { expect(hit.t).toBeLessThanOrEqual(r.frames / 60); expect(hit.strength).toBeGreaterThan(0); expect(hit.strength).toBeLessThanOrEqual(1) }
   })
 
   it('different seeds give different throws', () => {

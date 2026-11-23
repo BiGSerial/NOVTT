@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { loadDiceStage } from '../dice/loader'
 import type { RollAnimationRecord } from '../dice/record'
+import type { DiceSkin } from '../dice/skins'
 import type { AnimationMode, DiceAnimator } from '../dice/stage'
 
 /**
@@ -14,6 +15,10 @@ const props = defineProps<{
   label?: string
   loader?: typeof loadDiceStage
   instant?: boolean
+  /** Sound and vibration on impacts (presentation only). */
+  feedback?: { sound: boolean; haptics: boolean }
+  /** Skin to pre-compile while idle (the next roll's likely skin). */
+  warmSkin?: DiceSkin
 }>()
 const emit = defineEmits<{ settled: [record: RollAnimationRecord] }>()
 
@@ -25,6 +30,7 @@ const order = ref<number[]>([])
 const announced = ref('')
 const stats = ref('')
 let animator: DiceAnimator | null = null
+const ready = ref(false)
 let observer: ResizeObserver | null = null
 let token = 0
 
@@ -43,21 +49,49 @@ function summary(r: RollAnimationRecord): string {
   return `${r.dice.length}${r.dice[0].type}: ${values}${r.dice.length > 1 ? ` (soma ${total.value})` : ''}`
 }
 
-async function ensureAnimator(): Promise<DiceAnimator | null> {
-  if (animator || unavailable.value) return animator
-  if (!canvas.value || !host.value) return null
-  try {
-    const stage = await (props.loader ?? loadDiceStage)()
-    animator = stage.create(canvas.value)
-    const resize = () => animator?.resize(host.value!.clientWidth, host.value!.clientHeight)
-    resize()
-    if (typeof ResizeObserver !== 'undefined') { observer = new ResizeObserver(resize); observer.observe(host.value) }
-  } catch {
-    unavailable.value = true
-    animator = null
-  }
-  return animator
+let pending: Promise<DiceAnimator | null> | null = null
+
+function ensureAnimator(): Promise<DiceAnimator | null> {
+  if (animator || unavailable.value) return Promise.resolve(animator)
+  if (!canvas.value || !host.value) return Promise.resolve(null)
+  pending ??= (async () => {
+    try {
+      const stage = await (props.loader ?? loadDiceStage)()
+      if (!canvas.value || !host.value) return null
+      animator = stage.create(canvas.value)
+      ready.value = true
+      if (props.feedback) animator.feedback = { ...props.feedback }
+      const resize = () => animator?.resize(host.value!.clientWidth, host.value!.clientHeight)
+      resize()
+      if (typeof ResizeObserver !== 'undefined') { observer = new ResizeObserver(resize); observer.observe(host.value) }
+    } catch {
+      unavailable.value = true
+      animator = null
+    }
+    return animator
+  })()
+  return pending
 }
+
+/**
+ * Warm-up: load the 3D stack while the user is still choosing, so the first roll starts at once.
+ * Skipped when the user asked the browser to save data (it then loads on the first roll).
+ */
+function preload(): void {
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true
+  if (saveData) return
+  const idle = (globalThis as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+  const warm = async () => {
+    const a = await ensureAnimator()
+    if (!a || !props.warmSkin) return
+    const run = () => { try { a.warmUp(props.warmSkin!) } catch { /* best effort */ } }
+    if (idle) idle(run, { timeout: 1500 }); else setTimeout(run, 50)
+  }
+  if (idle) idle(() => { void warm() }, { timeout: 1500 })
+  else setTimeout(() => { void warm() }, 300)
+}
+
+watch(() => props.feedback, f => { if (animator && f) animator.feedback = { ...f } }, { deep: true })
 
 async function show(record: RollAnimationRecord | null): Promise<void> {
   const mine = ++token
@@ -88,7 +122,7 @@ async function show(record: RollAnimationRecord | null): Promise<void> {
 }
 
 watch(() => props.record, r => { void show(r) })
-onMounted(() => { if (props.record) void show(props.record) })
+onMounted(() => { if (props.record) void show(props.record); else preload() })
 onBeforeUnmount(() => { token++; observer?.disconnect(); animator?.dispose(); animator = null })
 </script>
 
@@ -98,6 +132,7 @@ onBeforeUnmount(() => { token++; observer?.disconnect(); animator?.dispose(); an
       <canvas ref="canvas" aria-hidden="true"></canvas>
       <button v-if="phase === 'rolling'" type="button" class="skip" @click="animator?.skip()">Pular animação</button>
       <p v-if="phase === 'loading'" class="stage-note">Preparando a mesa…</p>
+      <p v-else-if="phase === 'idle' && !ready" class="stage-note" aria-hidden="true">Mesa de dados</p>
     </div>
     <p v-if="unavailable" class="help">Dados 3D indisponíveis neste navegador; o resultado é exibido em texto.</p>
     <ol v-if="record && phase === 'done'" class="dice-results" aria-label="Valores">

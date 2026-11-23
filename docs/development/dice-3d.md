@@ -22,15 +22,56 @@ Repetição só ocorre se um dado parar inclinado (até 4 vezes, semente derivad
 ### Medições (`tests/dice-core.test.ts`, Node 24, 6 dados mistos, 20 lançamentos)
 
 - Cálculo: p50 ≈ 6–13 ms, p95 ≈ 11–26 ms (o POC usava até 8 s de busca por lançamento).
-- Animação: 1,3–2,1 s de física + 0,55 s de organização.
+- Animação: 1,2–2,2 s de física + 0,55 s de organização.
+
+### Giro
+
+O dado é arremessado rolando para a frente (eixo −x, com desvio aleatório), um pouco mais alto, e
+com amortecimento angular baixo, para o giro não morrer no ar. Medido em 60 lançamentos por
+conjunto (voltas totais por dado, p50):
+
+| Conjunto | Antes | Agora | Duração p50 |
+|---|---|---|---|
+| 1d20 | 1,41 | 2,82 | 1,27 → 1,47 s |
+| 3d6 | 1,28 | 2,87 | 1,08 → 1,23 s |
+| 6 mistos | 1,15 | 2,55 | 1,68 → 1,82 s |
+
+A velocidade inicial fica em no máximo 46 rad/s (≈ 44° por quadro a 60 Hz). Acima disso, o d6
+parece girar para trás (efeito roda de carroça), porque a animação não tem desfoque de movimento.
 - Chromium headless com SwiftShader (render por software): 6–16 ms com o chunk já carregado.
 
-## Mesma animação para o mestre
+## Experiência do usuário
 
-Um `RollAnimationRecord` (`novtt.dice-roll-animation/1`: dados, resultados, semente, skin)
-reproduz a mesma animação em qualquer cliente: a variante *deterministic* do Rapier é
-bit-idêntica entre plataformas, e a semeadura não usa trigonometria do JS. Mesmo se uma
-trajetória divergisse, os números mostrados seriam os do registro (troca de rótulos local).
+- **Primeira rolagem sem espera**: o 3D é baixado e aquecido (shaders compilados, física e
+  tabelas de simetria prontas) enquanto a pessoa escolhe os dados, em tempo ocioso. Com
+  "economia de dados" do navegador ativa, só carrega na primeira rolagem.
+- **Rolar de novo a qualquer momento**: um novo lançamento substitui o atual na hora.
+- **Som e vibração**: impactos inferidos da trajetória gravada (determinísticos, iguais para o
+  mestre), som sintetizado com Web Audio (sem arquivos), vibração curta onde o aparelho suporta.
+  Botão "Som ligado/desligado" ao lado de "Rolar", lembrado no dispositivo.
+- **d4**: resultado no vértice de cima; cada face traz três números, um por canto.
+- **d100**: par de d10 (dezenas 00–90 e unidades 0–9; 00 + 0 = 100) lado a lado; até 3 por
+  rolagem para respeitar o limite de 6 dados na mesa.
+- A fileira final se ajusta à largura da mesa.
+
+Medido no Chromium headless com renderização por software (pior caso que um aparelho real),
+do clique até os dados se moverem: primeira rolagem 97 ms (era 272 ms sem aquecimento),
+rerrolagem no meio da animação 58 ms, 3d100 47 ms.
+
+## Animação para o mestre
+
+Decisão do dono (2026-11-22): **o resultado precisa ser fiel em qualquer plataforma; o movimento
+não precisa ser idêntico.** A animação no mestre existe para imersão.
+
+- O que é normativo: os números de um `RollAnimationRecord` (`novtt.dice-roll-animation/1`:
+  dados, resultados, semente, skin) — e, nas rolagens oficiais, os resultados do servidor. Todo
+  cliente MUST mostrar exatamente esses valores na face de cima (troca de rótulos por simetria,
+  `symmetry.ts`), qualquer que seja a trajetória.
+- O que é cosmético: a trajetória. A semente é uma sugestão; outro cliente MAY usar outro motor
+  de física ou outra semente. Na PWA ele hoje coincide (Rapier *deterministic*), mas isso não é
+  requisito nem é testado entre plataformas.
+- Consequência para o Android: qualquer motor de física nativo serve, desde que aplique a mesma
+  troca de rótulos e os mesmos rótulos de face (d4 no vértice, d100 como par dezenas/unidades).
 
 No MVP, a rolagem livre é espelhada só entre janelas do mesmo navegador (`BroadcastChannel`,
 seção "Dados do jogador" em `demo.html`), continua LOCAL · NÃO OFICIAL e não vai ao servidor.
@@ -56,10 +97,11 @@ fileira. `prefers-reduced-motion` mostra direto a posição final; botão "Pular
 
 ## Pendências
 
-- **Rolagens oficiais**: para o mestre e o jogador verem a mesma animação, o evento
-  `dice.roll.resolved` precisa carregar a semente de animação (nova versão de contrato; exige
-  aprovação do dono). Hoje só o espelho local existe.
-- **Android** (ADR 0005/SPEC-001 PC-11): renderer equivalente ainda não existe.
-- **d4 e d100** saíram dos dados livres (antes ofereciam d4–d100 até 100 dados); voltam quando
-  houver leitura por vértice (d4) e par percentil (d100). Limite atual: 6 dados.
+- **Rolagens oficiais**: como o movimento não precisa coincidir, cada cliente pode animar com
+  a própria semente e assentar nos resultados de `dice.roll.resolved`; a semente de animação no
+  evento deixa de ser necessária. Hoje só o espelho local existe.
+- **Android** (ADR 0005/SPEC-001 PC-11): renderer equivalente ainda não existe. O teste de
+  paridade é de resultado (face de cima = valor do registro para todo dado e face), com fixtures
+  compartilhadas, não de trajetória.
+- Limite de 6 dados na mesa (antes os dados livres aceitavam até 100); aprovado pelo dono.
 - Validação visual em aparelhos reais (iOS Safari, Android Chrome) e leitores de tela.
