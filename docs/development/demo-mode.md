@@ -23,6 +23,13 @@ sh scripts/dev.sh down
 
 Depois do login, tudo passa pelas rotas, policies, idempotência e auditoria reais.
 
+## Mesa ao vivo (SPEC-MVP-002)
+
+O seed também cria **A Ponte de Vau Cinzento (demo)** no preset original `novtt-mesa`: mestre,
+três jogadores (`player`, `player2`, `player3` no login de demo) com Lyra, Bram e Nix aprovados,
+três PdMs com vida, um roteiro (que semeia bússola, relógios e pistas ao iniciar a sessão), Atlas e
+uma nota fixada. Abra uma janela por papel (janela anônima ou outro navegador para cada um).
+
 ## Travas de segurança
 
 - Ativo só com `NOVTT_DEMO_MODE=true` **e** `APP_ENV` `local` ou `testing`; em qualquer outro
