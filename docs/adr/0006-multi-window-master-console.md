@@ -1,6 +1,6 @@
 # ADR 0006: Multi-window master console
 
-Status: Accepted
+Status: Accepted · amended by ADR 0011 (paired devices across machines)
 
 ## Goal
 
