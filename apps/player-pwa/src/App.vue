@@ -11,6 +11,7 @@ const TableView = defineAsyncComponent(() => import('./views/TableView.vue'))
 const TabletView = defineAsyncComponent(() => import('./views/TabletView.vue'))
 const RoteiroView = defineAsyncComponent(() => import('./views/RoteiroView.vue'))
 const AtlasView = defineAsyncComponent(() => import('./views/AtlasView.vue'))
+const CampaignCharactersView = defineAsyncComponent(() => import('./views/campaign/CampaignCharactersView.vue'))
 
 const route = ref(location.hash)
 const onHash = (): void => { route.value = location.hash }
@@ -23,6 +24,7 @@ const match = (pattern: string) => new RegExp(`^#/${pattern}$`, 'i').exec(route.
 const view = computed(() => {
   let id: string | null
   if ((id = match(`personagens/${UUID}`))) return { c: CharacterDraftView, props: { characterId: id } }
+  if ((id = match(`campanha/${UUID}/personagens`))) return { c: CampaignCharactersView, props: { campaignId: id } }
   if ((id = match(`mesa/${UUID}`))) return { c: TableView, props: { campaignId: id } }
   if ((id = match(`roteiro/${UUID}`))) return { c: RoteiroView, props: { campaignId: id } }
   if ((id = match(`atlas/${UUID}`))) return { c: AtlasView, props: { campaignId: id } }

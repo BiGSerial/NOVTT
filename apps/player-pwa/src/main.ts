@@ -13,6 +13,7 @@ import '@fontsource/alegreya-sans/latin-800.css'
 import './styles/base.css'
 import './styles/table.css'
 import './styles/narrative.css'
+import './styles/campaign.css'
 
 createApp(App).mount('#app')
 
