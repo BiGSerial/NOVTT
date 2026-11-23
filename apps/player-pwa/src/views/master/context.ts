@@ -224,7 +224,8 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
     atmosphereTimer = setTimeout(async () => {
       try {
         const { hour, weather, intensity, time_scale, transition_seconds } = next
-        t.value.local.atmosphere(await sessionApi.atmosphere(s.value.session.id, { hour, weather, intensity, time_scale, transition_seconds }))
+        const fog = Math.round((next.fog ?? 0) * 100) / 100
+        t.value.local.atmosphere(await sessionApi.atmosphere(s.value.session.id, { hour, weather, intensity, fog, time_scale, transition_seconds }))
       } catch (e) { fail(e) }
     }, 350)
   }

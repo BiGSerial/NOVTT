@@ -12,26 +12,11 @@
 .scene-art .photo-tint { position: absolute; inset: 0; mix-blend-mode: multiply; pointer-events: none; transition: opacity 1s linear; }
 .scene-art .weather-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-/* Fog crossing the whole screen: above the content, below dialogs, result card and toasts. */
-.fog-veil { position: fixed; inset: 0; z-index: 40; pointer-events: none; overflow: hidden; opacity: var(--fog-amount); transition: opacity 2s ease; }
-.fog-band {
-  position: absolute; left: -60%; width: 220%; height: 45%; border-radius: 50%;
-  background: radial-gradient(closest-side, var(--fog) 0%, color-mix(in srgb, var(--fog) 70%, transparent) 55%, transparent 100%);
-  filter: blur(22px);
-  animation: fog-drift 70s linear infinite;
-}
-.fog-band.b1 { top: 0; animation-duration: 85s; opacity: .85; }
-.fog-band.b2 { top: 34%; animation-duration: 60s; animation-delay: -25s; opacity: .7; }
-.fog-band.b3 { top: 62%; animation-duration: 100s; animation-delay: -60s; opacity: .95; }
-@keyframes fog-drift {
-  from { transform: translateX(-30%) translateY(0); }
-  50% { transform: translateX(5%) translateY(-3%); }
-  to { transform: translateX(40%) translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .fog-band { animation: none; }
-  .fog-veil { opacity: calc(var(--fog-amount) * .6); }
-}
+/* Fog crossing the whole screen (canvas, FogVeil.vue): above the content, below dialogs,
+   result card and toasts. Lightning flash: the whole screen, very low opacity. */
+.fog-veil { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 40; pointer-events: none; }
+.storm-flash { position: fixed; inset: 0; z-index: 41; pointer-events: none; opacity: 0; background: radial-gradient(120% 90% at 50% 0%, #e8eeff, #b9c6ee 60%, #8d9bc6); mix-blend-mode: screen; }
+@media (prefers-reduced-motion: reduce) { .storm-flash { display: none; } }
 
 /* Master weather control (scene banner). */
 .weather-btn { display: inline-flex; align-items: center; gap: 6px; }

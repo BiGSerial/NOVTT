@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FogVeil from '../components/live/FogVeil.vue'
+import StormFlash from '../components/live/StormFlash.vue'
 import { provideAtmosphere } from '../live/useAtmosphere'
 import { computed, onMounted, ref, watch } from 'vue'
 import BrandMark from '../components/BrandMark.vue'
@@ -95,6 +96,7 @@ const origin = location.origin
 
     <SceneBanner />
     <FogVeil />
+    <StormFlash />
     <InitiativeStrip />
 
     <div class="console">

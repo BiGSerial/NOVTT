@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FogVeil from '../components/live/FogVeil.vue'
+import StormFlash from '../components/live/StormFlash.vue'
 import { provideAtmosphere } from '../live/useAtmosphere'
 import { computed, onMounted, ref, watch } from 'vue'
 import { ApiError } from '../api/client'
@@ -114,6 +115,7 @@ async function pickPortrait(ev: Event): Promise<void> {
 <template>
   <div class="player" :class="{ paused: s.session.status === 'paused' }">
     <FogVeil />
+    <StormFlash />
     <header class="player-hero">
       <SceneArt :art="stage?.art ?? 'road'" :image-id="stage?.image_id ?? null" />
       <div class="hero-shade" />

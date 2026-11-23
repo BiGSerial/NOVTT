@@ -10,6 +10,8 @@ export interface Atmosphere {
   hour: number
   weather: Weather
   intensity: number
+  /** Fog layer over any weather, 0..1 (absent on atmospheres saved before it existed). */
+  fog?: number
   /** Game minutes that pass per real minute; 0 freezes the clock. */
   time_scale: number
   transition_seconds: number
@@ -18,7 +20,7 @@ export interface Atmosphere {
 }
 
 /** Tonight, clear: the look every scene had before the master touched the weather. */
-export const DEFAULT_ATMOSPHERE: Atmosphere = { hour: 21, weather: 'clear', intensity: 0.5, time_scale: 0, transition_seconds: 4 }
+export const DEFAULT_ATMOSPHERE: Atmosphere = { hour: 21, weather: 'clear', intensity: 0.5, fog: 0, time_scale: 0, transition_seconds: 4 }
 
 export const WEATHER_LABELS: Record<Weather, string> = {
   clear: 'Limpo', clouds: 'Nublado', rain: 'Chuva', storm: 'Tempestade', fog: 'Neblina', snow: 'Neve',
@@ -58,9 +60,11 @@ export function currentHour(a: Atmosphere, nowMs: number): number {
 
 /** How much of each weather is present (0..1); transitions cross-fade these amounts. */
 export type WeatherMix = Record<Weather, number>
-export function weatherMix(weather: Weather, intensity: number): WeatherMix {
+export function weatherMix(weather: Weather, intensity: number, fog = 0): WeatherMix {
   const mix = { clear: 0, clouds: 0, rain: 0, storm: 0, fog: 0, snow: 0 } as WeatherMix
   mix[weather] = weather === 'clear' ? 1 : Math.max(0.05, Math.min(1, intensity))
+  // Fog is its own layer: it can hang over rain, snow or a storm ('fog' weather is kept for old states).
+  mix.fog = Math.max(mix.fog, Math.max(0, Math.min(1, fog)))
   return mix
 }
 
@@ -130,10 +134,10 @@ export function skyState(hour: number, mix: WeatherMix, p: SkyPalette): SkyState
   let top = blend3(p.nightTop, p.dawnTop, p.dayTop, w)
   let bottom = blend3(p.nightBottom, p.dawnBottom, p.dayBottom, w)
   // Overcast skies lose colour toward grey; storms also darken.
-  const overcast = Math.min(1, mix.clouds * 0.55 + mix.rain * 0.65 + mix.storm * 0.85 + mix.fog * 0.5 + mix.snow * 0.5)
+  const overcast = Math.min(1, mix.clouds * 0.9 + mix.rain * 0.75 + mix.storm * 0.9 + mix.fog * 0.35 + mix.snow * 0.55)
   const grey = mixHex('#7d8088', '#24262b', w.night)
-  top = mixHex(top, grey, overcast * 0.6)
-  bottom = mixHex(bottom, grey, overcast * 0.5)
+  top = mixHex(top, grey, overcast * 0.75)
+  bottom = mixHex(bottom, grey, overcast * 0.6)
   if (mix.storm) {
     top = mixHex(top, '#0b0c10', mix.storm * 0.45)
     bottom = mixHex(bottom, '#15161c', mix.storm * 0.35)
@@ -154,7 +158,8 @@ export function skyState(hour: number, mix: WeatherMix, p: SkyPalette): SkyState
     storm: mix.storm,
     fog: mix.fog,
     snow: mix.snow,
-    fogColor: p.fog,
+    // Fog takes the light of the hour: pale by day, a dark veil under the moon.
+    fogColor: mixHex(p.fog, mixHex(top, '#000000', 0.35), (1 - Math.min(1, (w.day * 0.3 + w.dawn * 0.12) / 0.3)) * 0.62),
     lightColor: p.light,
   }
 }
@@ -199,6 +204,10 @@ export function tweenMix(from: WeatherMix, to: WeatherMix, t: number): WeatherMi
 
 /** Short narrative line for players when the master changes the weather or the period. */
 export function describeChange(before: Atmosphere | null, after: Atmosphere): string | null {
+  const fogBefore = before?.fog ?? 0
+  const fogAfter = after.fog ?? 0
+  if (before && before.weather === after.weather && fogAfter >= 0.15 && fogBefore < 0.15) return 'A névoa avança.'
+  if (before && before.weather === after.weather && fogAfter < 0.15 && fogBefore >= 0.15) return 'A névoa se dissipa.'
   if (!before || before.weather !== after.weather) {
     return {
       clear: 'O céu se abre.', clouds: 'Nuvens cobrem o céu.', rain: 'Começa a chover.',
