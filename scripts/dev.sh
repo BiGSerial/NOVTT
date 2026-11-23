@@ -11,16 +11,24 @@ require_db_password() {
     exit 1
   fi
 }
+# Local Reverb credentials: generated once per checkout, kept only in the ignored .env.
+ensure_reverb_keys() {
+  if ! grep -q '^NOVTT_REVERB_APP_KEY=..*' .env; then
+    printf '\nNOVTT_REVERB_APP_KEY=%s\nNOVTT_REVERB_APP_SECRET=%s\n' "$(od -An -tx1 -N16 /dev/urandom | tr -d ' \n')" "$(od -An -tx1 -N32 /dev/urandom | tr -d ' \n')" >> .env
+    echo "Chaves locais do Reverb geradas no .env."
+  fi
+}
 case "${1:-help}" in
   setup) docker compose --profile test build engine; docker compose --profile test run --rm engine ;;
   test) docker compose --profile test run --build --rm engine; docker compose --profile test run --build --rm api-test; docker compose --profile player run --rm --no-deps player sh -c 'npm ci && npm test && npm run build' ;;
   api-test) docker compose --profile test run --build --rm api-test ;;
-  api) require_db_password; docker compose --profile api up --build api ;;
+  api) require_db_password; ensure_reverb_keys; docker compose --profile api up --build api reverb worker ;;
   demo)
     # Local demonstration: API + PWA with a seeded campaign. Never use outside local.
     require_db_password
+    ensure_reverb_keys
     export NOVTT_DEMO_MODE=true
-    docker compose --profile api --profile player up -d --build api player
+    docker compose --profile api --profile player up -d --build api reverb worker player
     echo "Aguardando a API…"
     i=0
     until docker compose --profile api exec -T api php artisan --version >/dev/null 2>&1 && curl -fs "http://127.0.0.1:${NOVTT_API_PORT:-8000}/up" >/dev/null 2>&1; do

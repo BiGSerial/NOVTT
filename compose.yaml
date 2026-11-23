@@ -1,4 +1,25 @@
 name: novtt
+# Shared runtime configuration of the API processes (HTTP, Reverb, queue worker, outbox relay).
+# Local development only: Redis and Reverb are reachable only inside the compose network.
+x-api-env: &api-env
+  DB_HOST: postgres
+  DB_DATABASE: ${NOVTT_DB_NAME:-novtt_dev}
+  DB_USERNAME: ${NOVTT_DB_USER:-novtt}
+  DB_PASSWORD: ${NOVTT_DB_PASSWORD:-}
+  NOVTT_DEMO_MODE: ${NOVTT_DEMO_MODE:-false}
+  SANCTUM_STATEFUL_DOMAINS: localhost,localhost:${NOVTT_PLAYER_PORT:-5173},127.0.0.1,127.0.0.1:${NOVTT_PLAYER_PORT:-5173}
+  REDIS_HOST: redis
+  CACHE_STORE: redis
+  QUEUE_CONNECTION: redis
+  BROADCAST_CONNECTION: reverb
+  REVERB_APP_ID: novtt-local
+  REVERB_APP_KEY: ${NOVTT_REVERB_APP_KEY:-}
+  REVERB_APP_SECRET: ${NOVTT_REVERB_APP_SECRET:-}
+  REVERB_HOST: reverb
+  REVERB_PORT: "8080"
+  REVERB_SCHEME: http
+  REVERB_SCALING_ENABLED: "true"
+  REVERB_ALLOWED_ORIGINS: localhost,127.0.0.1
 services:
   engine:
     build:
@@ -24,17 +45,52 @@ services:
     # php -S (not artisan serve) so the server process inherits this environment; artisan serve
     # only forwards a fixed allow-list of variables to its workers.
     environment:
-      DB_HOST: postgres
-      DB_DATABASE: ${NOVTT_DB_NAME:-novtt_dev}
-      DB_USERNAME: ${NOVTT_DB_USER:-novtt}
-      DB_PASSWORD: ${NOVTT_DB_PASSWORD:-}
-      NOVTT_DEMO_MODE: ${NOVTT_DEMO_MODE:-false}
-      SANCTUM_STATEFUL_DOMAINS: localhost,localhost:${NOVTT_PLAYER_PORT:-5173},127.0.0.1,127.0.0.1:${NOVTT_PLAYER_PORT:-5173}
+      <<: *api-env
       PHP_CLI_SERVER_WORKERS: "4"
-    depends_on:
+    depends_on: &api-deps
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     command: ["sh", "-c", "composer install --no-interaction --prefer-dist && { [ -f .env ] || { cp .env.example .env && chown --reference=.env.example .env && php artisan key:generate; }; } && cd public && exec php -S 0.0.0.0:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"]
+    init: true
+    security_opt: ["no-new-privileges:true"]
+    profiles: ["api"]
+  # WebSocket server (Pusher protocol). Not published: the dev server proxies /app to it.
+  reverb:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /workspace/apps/api
+    volumes:
+      - ./:/workspace
+      - api-vendor:/workspace/apps/api/vendor
+    environment: *api-env
+    depends_on:
+      api:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    command: ["sh", "-c", "until [ -f vendor/autoload.php ] && [ -f .env ]; do sleep 1; done; exec php artisan reverb:start --host=0.0.0.0 --port=8080"]
+    init: true
+    security_opt: ["no-new-privileges:true"]
+    profiles: ["api"]
+  # Queue worker (broadcast jobs) and outbox relay (retries anything not yet delivered).
+  worker:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /workspace/apps/api
+    volumes:
+      - ./:/workspace
+      - api-vendor:/workspace/apps/api/vendor
+    environment: *api-env
+    depends_on:
+      api:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    command: ["sh", "-c", "until [ -f vendor/autoload.php ] && [ -f .env ]; do sleep 1; done; php artisan novtt:events:relay --loop & exec php artisan queue:work redis --tries=5 --backoff=1 --sleep=1"]
     init: true
     security_opt: ["no-new-privileges:true"]
     profiles: ["api"]
@@ -87,6 +143,7 @@ services:
     environment:
       # The dev server proxies /api and /sanctum so the SPA and API share one origin (ADR 0009).
       NOVTT_API_PROXY: http://api:8000
+      NOVTT_WS_PROXY: ws://reverb:8080
     command: ["sh", "-c", "npm ci && npm run dev -- --host 0.0.0.0"]
     init: true
     security_opt: ["no-new-privileges:true"]
@@ -116,7 +173,7 @@ services:
       retries: 10
     volumes:
       - redis-data:/data
-    profiles: ["infra"]
+    profiles: ["infra", "api"]
     security_opt: ["no-new-privileges:true"]
 volumes:
   api-vendor:
