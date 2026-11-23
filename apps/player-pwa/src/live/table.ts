@@ -1,3 +1,4 @@
+import type { Atmosphere } from './atmosphere'
 import { reactive } from 'vue'
 import type {
   Clue, Compass, GameSession, Initiative, Plot, Stage, LiveState, MasterNote, OfficialRoll, RevealedNpc, RollRequest,
@@ -16,6 +17,7 @@ export interface TableHooks {
   onClue?: (c: Clue) => void
   onRequest?: (r: RollRequest) => void
   onStage?: (stage: Stage | null) => void
+  onAtmosphere?: (before: Atmosphere | null, after: Atmosphere) => void
 }
 
 export type Fetcher = (after: number) => Promise<{ data: SessionEvent[]; last_seq: number; has_more: boolean }>
@@ -149,6 +151,14 @@ export class TableState {
         this.hooks.onStage?.(stage)
         break
       }
+      case 'atmosphere.updated': {
+        const a = p as Atmosphere
+        const before = s.session.atmosphere ?? null
+        if (before?.revision !== undefined && a.revision !== undefined && a.revision < before.revision) break
+        s.session.atmosphere = a
+        this.hooks.onAtmosphere?.(before, a)
+        break
+      }
       case 'portrait.updated': {
         const { kind, id, portrait_image_id } = p as { kind: 'character' | 'npc'; id: string; portrait_image_id: string | null }
         const target = (kind === 'character' ? s.characters : s.npcs).find(c => c.id === id)
@@ -220,6 +230,12 @@ export class TableState {
     clue: (c: Clue) => upsert(this.s.clues, c),
     session: (g: GameSession) => {
       Object.assign(this.s.session, { ...g, last_seq: this.s.session.last_seq })
+    },
+    /** The master's preview and own response: applied at once, older revisions never win. */
+    atmosphere: (a: Atmosphere) => {
+      const before = this.s.session.atmosphere
+      if (before?.revision !== undefined && a.revision !== undefined && a.revision < before.revision) return
+      this.s.session.atmosphere = a
     },
     portrait: (kind: 'character' | 'npc', id: string, imageId: string | null) => {
       const t = (kind === 'character' ? this.s.characters : this.s.npcs).find(c => c.id === id)

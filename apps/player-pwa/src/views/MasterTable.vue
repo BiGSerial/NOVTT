@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import FogVeil from '../components/live/FogVeil.vue'
+import { provideAtmosphere } from '../live/useAtmosphere'
 import { computed, onMounted, ref, watch } from 'vue'
 import BrandMark from '../components/BrandMark.vue'
 import LinkBadge from '../components/live/LinkBadge.vue'
@@ -23,6 +25,7 @@ const props = defineProps<{ table: ReturnType<typeof useLiveTable>; campaign: Ca
 const m = createMasterContext(props.table, props.campaign)
 provideMaster(m)
 const s = m.s
+provideAtmosphere(computed(() => s.value.session.atmosphere ?? null))
 const theme = ref<ThemeId>(loadTheme(props.campaign.id))
 watch(theme, v => saveTheme(props.campaign.id, v))
 
@@ -91,6 +94,7 @@ const origin = location.origin
     </header>
 
     <SceneBanner />
+    <FogVeil />
     <InitiativeStrip />
 
     <div class="console">

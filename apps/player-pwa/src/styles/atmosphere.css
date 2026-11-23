@@ -1,0 +1,48 @@
+/* Atmosphere (SPEC-MVP-003 NT-10): dawn/dusk and day colours per theme, read by the sky engine
+   (live/atmosphere.ts) next to the night colours (--art-sky-*). Each theme keeps its mood: the
+   horror day stays pale and sickly, the sci-fi day is teal. */
+:root {
+  --art-dawn-top: #3A3C74; --art-dawn-bottom: #E2925E;
+  --art-day-top: #4C84C4; --art-day-bottom: #B7D4EC;
+}
+:root[data-campaign-theme='fantasia'] { --art-dawn-top: #3E3550; --art-dawn-bottom: #E89A56; --art-day-top: #5B8FC2; --art-day-bottom: #E6D7B0; }
+:root[data-campaign-theme='horror'] { --art-dawn-top: #2A1E24; --art-dawn-bottom: #9A4A3C; --art-day-top: #6E7378; --art-day-bottom: #B9B2A6; }
+:root[data-campaign-theme='scifi'] { --art-dawn-top: #10324A; --art-dawn-bottom: #3FB7A9; --art-day-top: #2A7FA6; --art-day-bottom: #A6E6E6; }
+
+.scene-art .photo-tint { position: absolute; inset: 0; mix-blend-mode: multiply; pointer-events: none; transition: opacity 1s linear; }
+.scene-art .weather-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* Fog crossing the whole screen: above the content, below dialogs, result card and toasts. */
+.fog-veil { position: fixed; inset: 0; z-index: 40; pointer-events: none; overflow: hidden; opacity: var(--fog-amount); transition: opacity 2s ease; }
+.fog-band {
+  position: absolute; left: -60%; width: 220%; height: 45%; border-radius: 50%;
+  background: radial-gradient(closest-side, var(--fog) 0%, color-mix(in srgb, var(--fog) 70%, transparent) 55%, transparent 100%);
+  filter: blur(22px);
+  animation: fog-drift 70s linear infinite;
+}
+.fog-band.b1 { top: 0; animation-duration: 85s; opacity: .85; }
+.fog-band.b2 { top: 34%; animation-duration: 60s; animation-delay: -25s; opacity: .7; }
+.fog-band.b3 { top: 62%; animation-duration: 100s; animation-delay: -60s; opacity: .95; }
+@keyframes fog-drift {
+  from { transform: translateX(-30%) translateY(0); }
+  50% { transform: translateX(5%) translateY(-3%); }
+  to { transform: translateX(40%) translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fog-band { animation: none; }
+  .fog-veil { opacity: calc(var(--fog-amount) * .6); }
+}
+
+/* Master weather control (scene banner). */
+.weather-btn { display: inline-flex; align-items: center; gap: 6px; }
+.weather-panel { position: fixed; right: 16px; top: 120px; z-index: 70; max-height: calc(100vh - 140px); overflow: auto; width: min(420px, calc(100vw - 32px)); padding: 14px 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--ornament); box-shadow: var(--shadow); display: grid; gap: 12px; }
+.weather-panel h3 { margin: 0; font-size: 16px; }
+.weather-now { display: flex; align-items: baseline; gap: 8px; }
+.weather-now b { font: 700 26px var(--font-display); color: var(--accent); }
+.weather-panel input[type='range'] { width: 100%; accent-color: var(--accent); }
+.weather-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.weather-row .chip { width: auto; flex: 0 0 auto; min-height: 34px; padding: 4px 12px; font-size: 14px; }
+.weather-panel > .ghost { width: auto; justify-self: end; }
+.weather-panel label { display: grid; gap: 4px; font-weight: 700; font-size: 14px; }
+.weather-panel select { min-height: 36px; }
+.hour-track { height: 8px; border-radius: 999px; background: linear-gradient(90deg, #14183a 0%, #14183a 18%, #e2925e 25%, #6aa2d6 35%, #8fc0e8 50%, #6aa2d6 66%, #e2925e 76%, #14183a 84%, #14183a 100%); }

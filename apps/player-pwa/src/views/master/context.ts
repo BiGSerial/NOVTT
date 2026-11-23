@@ -1,5 +1,6 @@
 import { computed, inject, provide, reactive, ref, watch, type ComputedRef, type InjectionKey, type Ref } from 'vue'
 import { ApiError } from '../../api/client'
+import { DEFAULT_ATMOSPHERE, type Atmosphere } from '../../live/atmosphere'
 import { images, rolls, session as sessionApi, table as tableApi, type RequestInput } from '../../live/api'
 import { plain } from '../../live/sheet'
 import type { TableState } from '../../live/table'
@@ -212,6 +213,21 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
       table.toast(next ? 'Cena mostrada aos jogadores' : 'Tela dos jogadores recolhida')
     } catch (e) { fail(e) }
   }
+  // ---------- Atmosphere (weather, time of day) ----------
+  const atmosphere = computed<Atmosphere>(() => s.value.session.atmosphere ?? DEFAULT_ATMOSPHERE)
+  let atmosphereTimer: ReturnType<typeof setTimeout> | undefined
+  /** Previews at once on this screen, then saves (debounced) so dragging the clock stays light. */
+  function setAtmosphere(change: Partial<Atmosphere>): void {
+    const next = { ...atmosphere.value, ...change, set_at: new Date().toISOString() }
+    t.value.local.atmosphere({ ...next, revision: undefined })
+    clearTimeout(atmosphereTimer)
+    atmosphereTimer = setTimeout(async () => {
+      try {
+        const { hour, weather, intensity, time_scale, transition_seconds } = next
+        t.value.local.atmosphere(await sessionApi.atmosphere(s.value.session.id, { hour, weather, intensity, time_scale, transition_seconds }))
+      } catch (e) { fail(e) }
+    }, 350)
+  }
   const showScene = (sc: PlotScene) => showStage({ title: sc.title, text: sc.read_aloud ?? '', art: sc.art ?? null, image_id: sc.image_id ?? null })
 
   // ---------- Initiative ----------
@@ -272,7 +288,7 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
     table, campaign, t, s, sheets, busy, cast, byId, selection, focus, selected, select, selectMany, clearSelection,
     inScene, toggleInScene, paths, togglePath, suggestionId, fromSuggestion, playerName, fail, request, dismiss, cancel, grant, reveal, pendingFor,
     saveLive, adjustMany, conditionMany, compass, saveCompass, setClock, addClock, removeClock, spotlight, spotlightLow,
-    plot, currentScene, savePlot, goToScene, addScene, stage, showStage, showScene,
+    plot, currentScene, savePlot, goToScene, addScene, stage, showStage, showScene, atmosphere, setAtmosphere,
     initiative, initFrom, initMove, initRemove, nextTurn, endInitiative,
     players, whisper, revealClue, addClue, revealNpc, note, upload, setPortrait,
   }

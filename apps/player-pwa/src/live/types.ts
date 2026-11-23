@@ -1,4 +1,5 @@
 /** Client mirrors of contracts/http/openapi.v1.yaml 1.1 and contracts/events/session-event.v1. */
+import type { Atmosphere } from './atmosphere'
 
 export type Role = 'master' | 'player'
 export type Reading = 'sum' | 'highest' | 'successes'
@@ -49,6 +50,8 @@ export interface GameSession {
   compass?: Compass
   plot?: Plot
   stage?: Stage | null
+  /** Weather and time of day the master set for the table (null until set). */
+  atmosphere?: Atmosphere | null
   last_seq: number
   revision: number
   started_at: string

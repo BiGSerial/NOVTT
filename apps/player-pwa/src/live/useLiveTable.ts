@@ -1,3 +1,4 @@
+import { describeChange } from './atmosphere'
 import { onBeforeUnmount, ref, shallowRef } from 'vue'
 import { ApiError } from '../api/client'
 import type { RollAnimationRecord } from '../dice/record'
@@ -106,6 +107,7 @@ export function useLiveTable(campaignId: string, opts: { connect?: () => Promise
         onWhisper: (w: Whisper) => { if (w.sender_user_id !== snap.me.user_id) toast(w.kind === 'clue' ? 'Uma pista chegou só para você' : 'Novo sussurro', 'whisper') },
         onClue: (c: Clue) => toast(`Pista revelada: ${c.title}`, 'clue'),
         onStage: st => { if (st && snap.role !== 'master') toast(`Nova cena: ${st.title}`, 'clue') },
+        onAtmosphere: (before, after) => { const line = snap.role !== 'master' ? describeChange(before, after) : null; if (line) toast(line) },
       })
       state.value = t
       const pending = buffer

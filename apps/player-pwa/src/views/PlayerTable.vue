@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import FogVeil from '../components/live/FogVeil.vue'
+import { provideAtmosphere } from '../live/useAtmosphere'
 import { computed, onMounted, ref, watch } from 'vue'
 import { ApiError } from '../api/client'
 import BrandMark from '../components/BrandMark.vue'
@@ -24,6 +26,7 @@ import type { Campaign, OfficialRoll, RollRequest } from '../live/types'
 const props = defineProps<{ table: ReturnType<typeof useLiveTable>; campaign: Campaign }>()
 const t = computed(() => props.table.state.value!)
 const s = computed(() => t.value.s)
+provideAtmosphere(computed(() => s.value.session.atmosphere ?? null))
 const me = computed(() => s.value.me.user_id)
 const sheets = useSheets(props.campaign.id)
 const tab = ref<'sheet' | 'scene' | 'diary' | 'rolls'>('sheet')
@@ -110,6 +113,7 @@ async function pickPortrait(ev: Event): Promise<void> {
 
 <template>
   <div class="player" :class="{ paused: s.session.status === 'paused' }">
+    <FogVeil />
     <header class="player-hero">
       <SceneArt :art="stage?.art ?? 'road'" :image-id="stage?.image_id ?? null" />
       <div class="hero-shade" />

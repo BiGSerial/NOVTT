@@ -6,6 +6,7 @@ import { ART_LABELS } from '../../live/art'
 import { oracle } from '../../live/oracle'
 import { ART_KEYS, type ArtKey } from '../../live/types'
 import { useMaster } from './context'
+import WeatherControl from './WeatherControl.vue'
 
 /**
  * The scene on top of the console: where the story is, what it must resolve, the threat clocks,
@@ -57,6 +58,7 @@ const twist = ref('')
           <button v-else-if="onStage" type="button" class="ghost on-art" @click="m.showStage(null)">Recolher da tela</button>
           <button v-if="sc?.read_aloud" type="button" class="ghost on-art" :aria-expanded="readOpen" @click="readOpen = !readOpen">Ler em voz alta</button>
           <button v-if="!sc?.complication" type="button" class="ghost on-art" title="Uma complicação improvisada (só para você)" @click="twist = oracle.complication()">Complicar</button>
+          <WeatherControl />
         </div>
         <blockquote v-if="readOpen && sc?.read_aloud" class="read-aloud">{{ sc.read_aloud }}</blockquote>
       </div>
@@ -84,7 +86,7 @@ const twist = ref('')
         <label>O que precisa ser resolvido <input v-model="draft.goal" maxlength="300" /></label>
         <label>Texto para ler (opcional) <textarea v-model="draft.read_aloud" rows="3" maxlength="1500" /></label>
         <fieldset class="art-pick"><legend>Ilustração</legend>
-          <button v-for="k in ART_KEYS" :key="k" type="button" class="art-option" :class="{ on: draft.art === k }" :aria-pressed="draft.art === k" @click="draft.art = k"><SceneArt :art="k" /><span>{{ ART_LABELS[k] }}</span></button>
+          <button v-for="k in ART_KEYS" :key="k" type="button" class="art-option" :class="{ on: draft.art === k }" :aria-pressed="draft.art === k" @click="draft.art = k"><SceneArt :art="k" static /><span>{{ ART_LABELS[k] }}</span></button>
         </fieldset>
         <div class="row"><button type="submit" class="primary">Ir para esta cena</button><button type="button" class="ghost" @click="saveAdhoc(false)">Guardar para depois</button><button type="button" class="link" @click="adding = false">Cancelar</button></div>
       </form>

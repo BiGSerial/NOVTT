@@ -1,3 +1,4 @@
+import type { Atmosphere } from './atmosphere'
 import { api, ApiError, ensureCsrfCookie } from '../api/client'
 import type {
   AtlasEntry, Campaign, CarryOver, Clue, Item, Plot, Stage, Compass, DiceChoice, GameSession, LiveState, MasterNote, Me, OfficialRoll,
@@ -40,6 +41,7 @@ export const session = {
   compass: (id: string, revision: number, compass: Compass) => mutate<GameSession>('PUT', `/sessions/${id}/compass`, { revision, compass }),
   plot: (id: string, revision: number, plot: Plot) => mutate<GameSession>('PUT', `/sessions/${id}/plot`, { revision, plot }),
   stage: (id: string, revision: number, stage: Omit<Stage, 'shown_at'> | null) => mutate<GameSession>('PUT', `/sessions/${id}/stage`, { revision, stage }),
+  atmosphere: (id: string, a: Pick<Atmosphere, 'hour' | 'weather' | 'intensity' | 'time_scale' | 'transition_seconds'>) => mutate<Atmosphere>('PUT', `/sessions/${id}/atmosphere`, a),
   initiative: (id: string, revision: number, entries: { kind: 'character' | 'npc'; id: string }[], turn: number, round: number) =>
     mutate<GameSession>('PUT', `/sessions/${id}/initiative`, { revision, entries, turn, round }),
 }
