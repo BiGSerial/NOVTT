@@ -144,6 +144,8 @@ services:
       # The dev server proxies /api and /sanctum so the SPA and API share one origin (ADR 0009).
       NOVTT_API_PROXY: http://api:8000
       NOVTT_WS_PROXY: ws://reverb:8080
+      # Public Reverb app key (sent to every browser anyway); the secret never leaves the API.
+      VITE_REVERB_APP_KEY: ${NOVTT_REVERB_APP_KEY:-}
     command: ["sh", "-c", "npm ci && npm run dev -- --host 0.0.0.0"]
     init: true
     security_opt: ["no-new-privileges:true"]

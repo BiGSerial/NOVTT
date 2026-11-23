@@ -10,6 +10,10 @@ const SPACING = 2.4
 const PAIR_SPACING = 2.15
 /** Distance from the player's edge to the row's centre line. */
 export const ROW_INSET = 1.35
+/** Distance between rows when a pool wraps. */
+const ROW_GAP = 2.3
+/** Below this squeeze a row would look crowded: wrap instead. */
+const MIN_SQUEEZE = 0.92
 
 /**
  * Final presentation: dice are pulled to a row at the player's edge (bottom of the screen),
@@ -24,33 +28,48 @@ export function arrange(dice: { shape: DieType; face: number; group: number }[],
     return xs.reduce((a, b) => a + b, 0) / xs.length
   }
   const order = groups.sort((a, b) => meanX(a) - meanX(b) || a - b)
-  const slots: number[] = []
-  const xs: number[] = []
-  let x = 0
-  let previous: number | null = null
-  for (const g of order) {
-    dice.forEach((d, i) => {
-      if (d.group !== g) return
-      if (slots.length) x += previous === g ? PAIR_SPACING : SPACING
-      slots.push(i)
-      xs.push(x)
-      previous = g
-    })
-  }
-  // Shrink the gaps if the row would overflow the table (6 large dice on a narrow table).
   const reach = Math.max(...dice.map(d => dieDef(d.shape).radius))
   const room = table.halfX - 0.25 - reach
-  const squeeze = x / 2 > room ? room / (x / 2) : 1
-  const offset = (x * squeeze) / 2
+  // How many dice fit side by side without squeezing below MIN_SQUEEZE; large official pools
+  // (up to 12 dice) wrap into more rows instead of overlapping (first row on top, reading order).
+  const fit = Math.max(1, Math.floor((2 * room) / (SPACING * MIN_SQUEEZE)) + 1)
+  const groupSize = (g: number) => dice.filter(d => d.group === g).length
+  const rows: number[][] = [[]]
+  let used = 0
+  for (const g of order) {
+    const n = groupSize(g)
+    if (used + n > fit && rows[rows.length - 1].length) { rows.push([]); used = 0 }
+    rows[rows.length - 1].push(g)
+    used += n
+  }
   const targets: Pose[] = new Array(dice.length)
-  slots.forEach((i, slot) => {
-    const def = dieDef(dice[i].shape)
-    const feature = def.faces.find(f => f.number === dice[i].face)!
-    const q = finals[i].q
-    // 1) Settle exactly on the result; 2) yaw the label upright for the viewer.
-    const flat = qmul(fromUnitVectors(rotate(q, feature.normal), UP), q)
-    const upright = qmul(yawBetween(rotate(flat, feature.up), SCREEN_UP), flat)
-    targets[i] = { p: v(xs[slot] * squeeze - offset, feature.dist, table.halfZ - rowInset), q: upright }
+  rows.forEach((rowGroups, r) => {
+    const slots: number[] = []
+    const xs: number[] = []
+    let x = 0
+    let previous: number | null = null
+    for (const g of rowGroups) {
+      dice.forEach((d, i) => {
+        if (d.group !== g) return
+        if (slots.length) x += previous === g ? PAIR_SPACING : SPACING
+        slots.push(i)
+        xs.push(x)
+        previous = g
+      })
+    }
+    // Shrink the gaps if the row would still overflow the table (6 large dice on a narrow table).
+    const squeeze = x / 2 > room ? room / (x / 2) : 1
+    const offset = (x * squeeze) / 2
+    const z = table.halfZ - rowInset - (rows.length - 1 - r) * ROW_GAP
+    slots.forEach((i, slot) => {
+      const def = dieDef(dice[i].shape)
+      const feature = def.faces.find(f => f.number === dice[i].face)!
+      const q = finals[i].q
+      // 1) Settle exactly on the result; 2) yaw the label upright for the viewer.
+      const flat = qmul(fromUnitVectors(rotate(q, feature.normal), UP), q)
+      const upright = qmul(yawBetween(rotate(flat, feature.up), SCREEN_UP), flat)
+      targets[i] = { p: v(xs[slot] * squeeze - offset, feature.dist, z), q: upright }
+    })
   })
   return { targets, order }
 }
