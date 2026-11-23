@@ -1,0 +1,64 @@
+{
+  "contract": "novtt.sheet-ui/1",
+  "default_access": "read_only",
+  "sections": [
+    {
+      "id": "identity",
+      "label": "Identidade",
+      "elements": [
+        { "kind": "field", "path": "/identity/name", "label": "Nome", "widget": "text", "access": "editable" },
+        { "kind": "field", "path": "/identity/concept", "label": "Conceito", "widget": "text", "access": "editable" }
+      ]
+    },
+    {
+      "id": "attributes",
+      "label": "Atributos",
+      "access": "approval_required",
+      "elements": [
+        { "kind": "field", "path": "/attributes/might", "label": "Vigor", "widget": "dot_rating" },
+        { "kind": "field", "path": "/attributes/agility", "label": "Agilidade", "widget": "dot_rating" },
+        { "kind": "field", "path": "/attributes/wits", "label": "Astúcia", "widget": "dot_rating" }
+      ]
+    },
+    {
+      "id": "skills",
+      "label": "Perícias",
+      "access": "approval_required",
+      "elements": [
+        { "kind": "field", "path": "/skills/climb", "label": "Escalar", "widget": "dot_rating" },
+        { "kind": "field", "path": "/skills/lore", "label": "Saber", "widget": "dot_rating" }
+      ]
+    },
+    {
+      "id": "merits",
+      "label": "Qualidades",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/merits",
+          "label": "Qualidades",
+          "access": "approval_required",
+          "max_items": 20,
+          "item_fields": [
+            { "field": "name", "label": "Nome", "widget": "text" },
+            { "field": "cost", "label": "Custo", "widget": "integer" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "secrets",
+      "label": "Segredos",
+      "elements": [
+        { "kind": "field", "path": "/secrets/hook", "label": "Gancho", "widget": "textarea", "access": "hidden" }
+      ]
+    },
+    {
+      "id": "master",
+      "label": "Mestre",
+      "elements": [
+        { "kind": "field", "path": "/master/notes", "label": "Notas do mestre", "widget": "textarea", "access": "master_only" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "contract": "novtt.rules/1",
+  "budgets": [
+    { "id": "attribute_points", "kind": "initial", "label": "Pontos de atributo", "initial_amount": 4 },
+    { "id": "skill_points", "kind": "initial", "label": "Pontos de perícia", "initial_amount": 3 },
+    { "id": "bonus", "kind": "bonus", "label": "Pontos bônus", "initial_amount": 5 },
+    { "id": "xp", "kind": "experience", "label": "Experiência", "initial_amount": 0 }
+  ],
+  "costs": [
+    { "id": "attr_initial", "phase": "creation", "budget": "attribute_points", "targets": ["/attributes/*"], "model": { "type": "fixed_per_dot", "amount": 1 }, "free_dots": 1 },
+    { "id": "attr_bonus", "phase": "creation", "budget": "bonus", "targets": ["/attributes/*"], "model": { "type": "fixed_per_dot", "amount": 5 }, "free_dots": 1 },
+    { "id": "skill_initial", "phase": "creation", "budget": "skill_points", "targets": ["/skills/*"], "model": { "type": "fixed_per_dot", "amount": 1 } },
+    { "id": "skill_bonus", "phase": "creation", "budget": "bonus", "targets": ["/skills/*"], "model": { "type": "fixed_per_dot", "amount": 2 } },
+    { "id": "attr_xp", "phase": "advancement", "budget": "xp", "targets": ["/attributes/*"], "model": { "type": "current_rating_multiplier", "multiplier": 4 } },
+    { "id": "skill_xp", "phase": "advancement", "budget": "xp", "targets": ["/skills/*"], "model": { "type": "current_rating_multiplier", "multiplier": 2, "when_zero": 3 } }
+  ],
+  "phase_limits": [
+    { "id": "creation_skill_cap", "phase": "creation", "targets": ["/skills/*"], "max": 3 }
+  ],
+  "dependencies": [
+    { "id": "lore_needs_wits", "path": "/skills/lore", "requires": ["/attributes/wits"] }
+  ]
+}

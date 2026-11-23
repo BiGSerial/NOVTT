@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Problem Details (RFC 9457)",
+  "description": "Error envelope for application/problem+json. `code` is stable and translated by clients; `detail` is developer-facing only.",
+  "type": "object",
+  "required": [
+    "type",
+    "title",
+    "status",
+    "code"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "format": "uri-reference"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "integer",
+      "minimum": 400,
+      "maximum": 599
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.]{1,96}$"
+    },
+    "detail": {
+      "type": "string"
+    },
+    "instance": {
+      "type": "string"
+    },
+    "validation": {
+      "$ref": "../sheets/validation-result.v1.schema.json"
+    },
+    "current_revision": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

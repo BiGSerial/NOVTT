@@ -38,6 +38,12 @@ NOVTT is not a VTT. The backend is authoritative for rules, permissions and pers
 
 A master creates a session; a player joins from Android; the player requests a roll; the backend validates and executes it; the master receives an authorized realtime event. Include idempotency and reconnection handling before production release.
 
+## Sprint 001 layering
+
+- Validation: syntax (API) → structure via the engine's `StructuralValidator` port (JSON Schema 2020-12 adapter in the API) → engine rules. See ADR 0010.
+- Persistence: PostgreSQL only (partial unique indexes, JSONB, row locks, append-only triggers). Domain tables and invariants: `docs/development/domain-model.md`.
+- Authentication: Sanctum (ADR 0009); every `/api/v1` route requires an authenticated actor and policies are default-deny.
+
 ## Security
 
 Never run arbitrary PHP, JavaScript or shell from preset definitions. Enforce per-campaign authorization, strict schemas, rate limits, and audit trails. Use secure random number generation for official dice rolls.

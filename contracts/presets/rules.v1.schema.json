@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:novtt:contract:rules:1",
+  "title": "novtt.rules/1",
+  "description": "Declarative mechanics supported by the engine in Sprint 001: budgets, phase-dependent costs, phase limits and structural dependencies. No executable code. Unknown capabilities are rejected (UNSUPPORTED_CAPABILITY).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "budgets", "costs"],
+  "properties": {
+    "contract": { "const": "novtt.rules/1" },
+    "budgets": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "label"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "kind": { "enum": ["initial", "bonus", "experience", "other"] },
+          "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "initial_amount": { "type": "integer", "minimum": 0, "maximum": 10000, "default": 0 }
+        }
+      }
+    },
+    "costs": {
+      "type": "array",
+      "maxItems": 256,
+      "description": "For a rated field change in a phase, the first matching rule (in order) prices each increment.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "phase", "budget", "targets", "model"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "phase": { "$ref": "#/$defs/phase" },
+          "budget": { "$ref": "#/$defs/id" },
+          "targets": { "type": "array", "minItems": 1, "maxItems": 128, "items": { "$ref": "#/$defs/target" } },
+          "model": {
+            "oneOf": [
+              {
+                "type": "object", "additionalProperties": false, "required": ["type", "amount"],
+                "properties": { "type": { "const": "fixed_per_dot" }, "amount": { "type": "integer", "minimum": 0, "maximum": 1000 } }
+              },
+              {
+                "type": "object", "additionalProperties": false, "required": ["type", "multiplier"],
+                "properties": {
+                  "type": { "enum": ["current_rating_multiplier", "new_rating_multiplier"] },
+                  "multiplier": { "type": "integer", "minimum": 1, "maximum": 1000 },
+                  "when_zero": { "type": "integer", "minimum": 0, "maximum": 1000, "description": "Cost of the first dot when the current rating is zero." }
+                }
+              }
+            ]
+          },
+          "free_dots": { "type": "integer", "minimum": 0, "maximum": 100, "default": 0, "description": "Dots per target that cost nothing in this phase (e.g. a printed starting dot)." }
+        }
+      }
+    },
+    "phase_limits": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "phase", "targets", "max"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "phase": { "$ref": "#/$defs/phase" },
+          "targets": { "type": "array", "minItems": 1, "maxItems": 128, "items": { "$ref": "#/$defs/target" } },
+          "max": { "type": "integer", "minimum": 0, "maximum": 100 }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "maxItems": 256,
+      "description": "Directed structural dependencies: a non-empty/non-zero value at `path` requires every path in `requires` to be set. Must be acyclic.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "requires"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "path": { "$ref": "#/$defs/pointer" },
+          "requires": { "type": "array", "minItems": 1, "maxItems": 16, "items": { "$ref": "#/$defs/pointer" } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+    "phase": { "enum": ["creation", "advancement"] },
+    "pointer": { "type": "string", "maxLength": 512, "pattern": "^(/([^/~_]|~[01])([^/~]|~[01])*)+$" },
+    "target": {
+      "type": "string",
+      "maxLength": 512,
+      "description": "A JSON Pointer, or a pointer ending in /* matching direct children.",
+      "pattern": "^(/([^/~_]|~[01])([^/~]|~[01])*)+(/\\*)?$"
+    }
+  }
+}

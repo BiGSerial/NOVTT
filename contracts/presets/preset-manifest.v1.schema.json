@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:novtt:contract:preset-manifest:1",
+  "title": "novtt.preset-manifest/1",
+  "description": "Identity, version, provenance and file list of one preset version. Carries no rules.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "family_id", "variant_id", "version", "display_name", "license", "provenance", "engine", "files"],
+  "properties": {
+    "contract": { "const": "novtt.preset-manifest/1" },
+    "family_id": { "$ref": "#/$defs/slug" },
+    "variant_id": { "$ref": "#/$defs/slug" },
+    "version": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?$"
+    },
+    "display_name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "license": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "provenance": { "type": "string", "minLength": 1, "maxLength": 1000, "description": "Who authored the structure and from which licensed or original source." },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min_version"],
+      "properties": { "min_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" } }
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sheet_schema", "sheet_ui", "rules"],
+      "properties": {
+        "sheet_schema": { "const": "sheet.schema.json" },
+        "sheet_ui": { "const": "sheet.ui.json" },
+        "rules": { "const": "rules.json" }
+      }
+    }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" }
+  }
+}
