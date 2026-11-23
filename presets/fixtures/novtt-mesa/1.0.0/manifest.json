@@ -1,0 +1,17 @@
+{
+  "contract": "novtt.preset-manifest/1",
+  "family_id": "novtt-mesa",
+  "variant_id": "mesa-demo",
+  "version": "1.0.0",
+  "display_name": "Mesa NOVTT (demonstração)",
+  "license": "MIT (conteúdo original do NOVTT)",
+  "provenance": "Sistema genérico criado pela equipe NOVTT para demonstrar a mesa ao vivo; não reproduz nenhum sistema publicado.",
+  "engine": {
+    "min_version": "0.1.0"
+  },
+  "files": {
+    "sheet_schema": "sheet.schema.json",
+    "sheet_ui": "sheet.ui.json",
+    "rules": "rules.json"
+  }
+}

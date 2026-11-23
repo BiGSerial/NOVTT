@@ -1,0 +1,172 @@
+{
+  "contract": "novtt.sheet-ui/1",
+  "default_access": "read_only",
+  "sections": [
+    {
+      "id": "identity",
+      "label": "Identidade",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/identity/name",
+          "label": "Nome",
+          "widget": "text",
+          "access": "editable"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/concept",
+          "label": "Conceito",
+          "widget": "text",
+          "access": "editable"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/motivation",
+          "label": "O que quer",
+          "widget": "textarea",
+          "access": "editable"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/fear",
+          "label": "Do que tem medo",
+          "widget": "textarea",
+          "access": "editable"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/bonds",
+          "label": "Laços",
+          "widget": "textarea",
+          "access": "editable"
+        }
+      ]
+    },
+    {
+      "id": "attributes",
+      "label": "Atributos",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/attributes/vigor",
+          "label": "Vigor",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/agilidade",
+          "label": "Agilidade",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/astucia",
+          "label": "Astúcia",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/presenca",
+          "label": "Presença",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "label": "Perícias",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/skills/atletismo",
+          "label": "Atletismo",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/furtividade",
+          "label": "Furtividade",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/investigacao",
+          "label": "Investigação",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/persuasao",
+          "label": "Persuasão",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/luta",
+          "label": "Luta",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/pontaria",
+          "label": "Pontaria",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/saber",
+          "label": "Saber",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/sobrevivencia",
+          "label": "Sobrevivência",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "gear",
+      "label": "Equipamento",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/gear/items",
+          "label": "Itens",
+          "widget": "textarea",
+          "access": "editable"
+        }
+      ]
+    },
+    {
+      "id": "secrets",
+      "label": "Segredos",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/secrets/hook",
+          "label": "Gancho",
+          "widget": "textarea",
+          "access": "hidden"
+        }
+      ]
+    },
+    {
+      "id": "master",
+      "label": "Mestre",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/master/notes",
+          "label": "Notas do mestre",
+          "widget": "textarea",
+          "access": "master_only"
+        }
+      ]
+    }
+  ]
+}

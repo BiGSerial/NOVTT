@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Dev;
 
 use App\Demo\DemoMode;
+use App\Demo\TableDemoSeeder;
 use App\Domain\ChangeRequestStatus;
 use App\Http\Problems\ApiProblem;
 use App\Models\Campaign;
@@ -34,14 +35,14 @@ final class DemoController
     {
         $data = $request->json()->all();
         $role = $data['role'] ?? null;
-        if (array_diff(array_keys($data), ['role']) !== [] || !in_array($role, ['master', 'player'], true)) {
+        if (array_diff(array_keys($data), ['role']) !== [] || !in_array($role, ['master', 'player', 'player2', 'player3'], true)) {
             throw ApiProblem::validation(new ValidationResult([new ValidationIssue('demo.invalid_role', Severity::Error, [], ['/role'])]), 'request.invalid');
         }
         if (!$request->hasSession()) {
             // Only first-party origins (SANCTUM_STATEFUL_DOMAINS) get a session cookie.
             throw new ApiProblem(400, 'demo.stateful_origin_required');
         }
-        $user = User::query()->where('email', $role === 'master' ? DemoMode::MASTER_EMAIL : DemoMode::PLAYER_EMAIL)->first();
+        $user = User::query()->where('email', $role === 'master' ? DemoMode::MASTER_EMAIL : TableDemoSeeder::PLAYERS[$role][0])->first();
         if ($user === null) {
             throw new ApiProblem(409, 'demo.not_seeded');
         }
@@ -73,11 +74,11 @@ final class DemoController
             ->where('campaign_character_id', $character->getKey())
             ->whereIn('status', ChangeRequestStatus::ACTIVE)
             ->value('id');
-        $role = match ($user?->email) {
-            DemoMode::MASTER_EMAIL => 'master',
-            DemoMode::PLAYER_EMAIL => 'player',
-            default => null,
-        };
+        $role = $user?->email === DemoMode::MASTER_EMAIL ? 'master' : null;
+        foreach (TableDemoSeeder::PLAYERS as $key => [$email]) {
+            $role = $user?->email === $email ? $key : $role;
+        }
+        $table = $master === null ? null : Campaign::query()->where('owner_user_id', $master->getKey())->where('name', TableDemoSeeder::CAMPAIGN_NAME)->value('id');
 
         return [
             'seeded' => $campaign !== null && $character !== null,
@@ -85,6 +86,7 @@ final class DemoController
             'campaign_id' => $campaign?->getKey(),
             'campaign_character_id' => $character?->getKey(),
             'active_change_request_id' => $active,
+            'table_campaign_id' => $table,
         ];
     }
 }
