@@ -57,7 +57,7 @@ final class SessionController extends ApiController
 
         try {
             [$status, $body] = DB::transaction(fn (): array => $idempotency->run($actor, 'session.start', $key, hash('sha256', $campaignId.CanonicalJson::encode($data)), function () use ($actor, $campaignId, $data): array {
-                Campaign::query()->lockForUpdate()->findOrFail($campaignId);
+                $campaign = Campaign::query()->lockForUpdate()->findOrFail($campaignId);
                 $roteiro = null;
                 if (($data['roteiro_id'] ?? null) !== null) {
                     $roteiro = Roteiro::query()->where('campaign_id', $campaignId)->find($data['roteiro_id']) ?? throw ApiProblem::notFound();
@@ -76,6 +76,8 @@ final class SessionController extends ApiController
                     'last_seq' => 0,
                     'revision' => 1,
                     'started_at' => now(),
+                    // Session snapshot of the campaign's pinned preset version (ADR 0012).
+                    'preset_version_id' => $campaign->preset_version_id,
                 ]);
                 if ($roteiro !== null) {
                     foreach ($roteiro->clueSeeds() as $clue) {

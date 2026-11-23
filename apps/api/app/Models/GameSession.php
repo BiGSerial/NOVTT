@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 /** Live session of a campaign (SPEC-MVP-002 LT-02). */
-#[Fillable(['campaign_id', 'title', 'status', 'started_by', 'roteiro_id', 'compass', 'initiative', 'revealed_npcs', 'plot', 'stage', 'last_seq', 'revision', 'started_at', 'ended_at'])]
+#[Fillable(['campaign_id', 'title', 'status', 'started_by', 'roteiro_id', 'compass', 'initiative', 'revealed_npcs', 'plot', 'stage', 'last_seq', 'revision', 'started_at', 'ended_at', 'preset_version_id'])]
 class GameSession extends Model
 {
     use HasUuids;
