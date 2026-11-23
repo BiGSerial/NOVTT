@@ -16,18 +16,14 @@ const ROW_GAP = 2.3
 const MIN_SQUEEZE = 0.92
 
 /**
- * Final presentation: dice are pulled to a row at the player's edge (bottom of the screen),
- * in left-to-right order of where they stopped (paths barely cross), resting flat on the result
+ * Final presentation: dice are pulled to a row at the player's edge (bottom of the screen) in
+ * the order of the results (the same sequence as the result card; owner request), resting flat on the result
  * with the number upright. Dice of the same group (a d100 pair) stay side by side, tens first.
  * Returns the target pose per physical die and the left-to-right order of the groups.
  */
 export function arrange(dice: { shape: DieType; face: number; group: number }[], finals: Pose[], table: Table = TABLE, rowInset = ROW_INSET): { targets: Pose[]; order: number[] } {
   const groups = [...new Set(dice.map(d => d.group))]
-  const meanX = (g: number) => {
-    const xs = dice.flatMap((d, i) => (d.group === g ? [finals[i].p.x] : []))
-    return xs.reduce((a, b) => a + b, 0) / xs.length
-  }
-  const order = groups.sort((a, b) => meanX(a) - meanX(b) || a - b)
+  const order = groups.sort((a, b) => a - b)
   const reach = Math.max(...dice.map(d => dieDef(d.shape).radius))
   const room = table.halfX - 0.25 - reach
   // How many dice fit side by side without squeezing below MIN_SQUEEZE; large official pools
