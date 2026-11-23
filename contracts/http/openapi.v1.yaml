@@ -2060,6 +2060,39 @@ components:
                   condition_met: { type: boolean }
                   issues: { type: integer }
             issues: { type: array, items: { type: object } }
+        choices: { $ref: '#/components/schemas/CharacterChoices' }
+    CharacterChoices:
+      type: array
+      description: >-
+        Present for rules/2 presets. Each declared choice the viewer may read, its current value and
+        which options the sheet's prerequisites allow now. Presentation aid only; the server still
+        validates every submission.
+      items:
+        type: object
+        required: [id, path, value, options]
+        properties:
+          id: { type: string }
+          path: { type: string }
+          value: { type: [string, integer, boolean, 'null'] }
+          options:
+            type: array
+            items:
+              type: object
+              required: [value, available]
+              properties:
+                value: { type: [string, integer, boolean] }
+                available: { type: boolean }
+    SheetPreview:
+      type: object
+      description: >-
+        The draft applied to the official sheet, projected for the author exactly like
+        CampaignCharacter.sheet (derived values included, hidden fields removed). Never stored.
+      required: [sheet, decision_trace]
+      properties:
+        sheet: { type: object }
+        decision_trace: { type: array, items: { type: object } }
+        creation: { type: object, description: 'Same shape as CampaignCharacter.creation, computed for the candidate sheet.' }
+        choices: { $ref: '#/components/schemas/CharacterChoices' }
     Grant:
       type: object
       required: [id, budget_id, amount, created_at]
@@ -2101,6 +2134,11 @@ components:
           description: >-
             Remaining balance per budget id if this draft were applied (additive since 2026-11-22).
             Same values the actor can already read via the grants endpoint.
+        preview:
+          description: Candidate sheet for the guided builder (additive since 2026-11-23).
+          oneOf:
+            - $ref: '#/components/schemas/SheetPreview'
+            - type: 'null'
     OperationView:
       type: object
       required: [id, type, path, section_id]
