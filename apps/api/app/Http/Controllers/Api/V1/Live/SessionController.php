@@ -336,6 +336,44 @@ final class SessionController extends ApiController
         return new JsonResponse(TableSnapshot::session($session, true));
     }
 
+    /**
+     * Table atmosphere (SPEC-MVP-003 NT-10): the master sets time of day, weather, intensity and
+     * how fast game time flows; every member sees it. It has its own revision so frequent changes
+     * (a slider) never conflict with plot, stage or compass edits guarded by the session revision.
+     */
+    public function atmosphere(Request $request, string $sessionId): JsonResponse
+    {
+        $actor = $this->actor($request);
+        [$session] = $this->access->session($actor, $sessionId);
+        $this->access->requireMaster($actor, $session->campaign_id);
+        $data = $this->input($request, [
+            'hour' => ['required', 'numeric', 'min:0', 'lt:24', 'multiple_of:0.25'],
+            'weather' => ['required', 'string', 'in:clear,clouds,rain,storm,fog,snow'],
+            'intensity' => ['required', 'numeric', 'min:0', 'max:1'],
+            'time_scale' => ['required', 'integer', 'min:0', 'max:120'],
+            'transition_seconds' => ['required', 'integer', 'min:0', 'max:30'],
+        ]);
+
+        $atmosphere = DB::transaction(function () use ($sessionId, $data): array {
+            $session = $this->access->lockOpen($sessionId);
+            $atmosphere = [
+                'hour' => (float) $data['hour'],
+                'weather' => (string) $data['weather'],
+                'intensity' => round((float) $data['intensity'], 2),
+                'time_scale' => (int) $data['time_scale'],
+                'transition_seconds' => (int) $data['transition_seconds'],
+                'set_at' => now()->format(DATE_RFC3339_EXTENDED),
+                'revision' => (int) ($session->atmosphere['revision'] ?? 0) + 1,
+            ];
+            $session->atmosphere = $atmosphere; // saved by append() together with last_seq
+            $this->stream->append($session, 'atmosphere.updated', $atmosphere, Audience::table());
+
+            return $atmosphere;
+        });
+
+        return new JsonResponse($atmosphere);
+    }
+
     /** @param  list<mixed>  $ids */
     private function requireImages(string $campaignId, array $ids, string $pointer): void
     {

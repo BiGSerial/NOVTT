@@ -100,6 +100,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:novtt-api'])->group(f
     Route::put('sessions/{sessionId}/initiative', [SessionController::class, 'initiative'])->whereUuid('sessionId');
     Route::put('sessions/{sessionId}/plot', [SessionController::class, 'plot'])->whereUuid('sessionId');
     Route::put('sessions/{sessionId}/stage', [SessionController::class, 'stage'])->whereUuid('sessionId');
+    Route::put('sessions/{sessionId}/atmosphere', [SessionController::class, 'atmosphere'])->whereUuid('sessionId');
 
     // Narrative table (SPEC-MVP-003): images, portraits and prep carry-over.
     Route::post('campaigns/{campaignId}/images', [ImageController::class, 'upload'])->whereUuid('campaignId')->middleware('throttle:novtt-uploads');

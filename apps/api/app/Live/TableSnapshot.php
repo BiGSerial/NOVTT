@@ -39,6 +39,7 @@ final class TableSnapshot
             'initiative' => (object) ($s->initiative ?? []),
             'revealed_npcs' => $s->revealed_npcs ?? [],
             'stage' => $s->stage,
+            'atmosphere' => $s->atmosphere,
             'last_seq' => $s->last_seq,
             'revision' => $s->revision,
             'started_at' => $s->started_at->format(DATE_RFC3339_EXTENDED),
