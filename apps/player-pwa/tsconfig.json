@@ -22,6 +22,8 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.vue",
-    "vite.config.ts"
+    "vite.config.ts",
+    "tests/**/*.ts",
+    "../master-web/resources/js/**/*.ts"
   ]
 }
