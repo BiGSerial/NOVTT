@@ -180,6 +180,13 @@ final class PresetEngineApiTest extends TestCase
         $this->submitDraft($this->player, $this->character)->assertCreated();
     }
 
+    public function test_a_character_in_creation_can_be_sent_during_a_live_session(): void
+    {
+        $this->actingAs($this->master)->postJson("/api/v1/campaigns/{$this->campaign->getKey()}/sessions", ['title' => 'Sessão 1'], ['Idempotency-Key' => (string) Str::uuid()]);
+        $this->saveDraft($this->player, $this->character, self::linhagensCreation())->assertOk();
+        $this->submitDraft($this->player, $this->character)->assertCreated();
+    }
+
     public function test_history_keeps_each_applied_snapshot_with_its_origin(): void
     {
         $this->created();

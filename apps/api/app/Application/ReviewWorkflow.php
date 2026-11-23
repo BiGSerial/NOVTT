@@ -543,10 +543,14 @@ final readonly class ReviewWorkflow
 
     /**
      * While the campaign has an active live session, a preset with governance.lock_during_session
-     * keeps players from submitting sheet proposals (ADR 0012). Drafts stay editable.
+     * keeps players from changing approved sheets (ADR 0012). Drafts stay editable, and a
+     * character still in creation can be sent: a player joining mid-session must be able to play.
      */
     private function assertNotLockedBySession(CampaignCharacter $character): void
     {
+        if ($character->status !== CampaignCharacterStatus::Approved) {
+            return;
+        }
         if (!$this->changes->mechanics($character->preset_version_id)->locksDuringSession()) {
             return;
         }
