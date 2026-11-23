@@ -380,6 +380,32 @@ final class Mechanics
         return ['complete' => $allComplete && $issues === [], 'steps' => $steps, 'issues' => $issues];
     }
 
+    /**
+     * For each declared choice, which options the sheet currently allows (prerequisites only;
+     * the server still validates every submission). Lets a client grey out options with the
+     * same rules the engine applies.
+     *
+     * @param array<string, mixed> $sheet
+     * @param array<string, int> $grants
+     * @return list<array{id: string, path: string, value: mixed, options: list<array{value: mixed, available: bool}>}>
+     */
+    public function choiceAvailability(array $sheet, array $grants): array
+    {
+        $scope = $this->scope($sheet, $grants);
+        $out = [];
+        foreach ($this->rules['creation']['choices'] ?? [] as $choice) {
+            $options = [];
+            foreach ($choice['options'] as $option) {
+                $ignored = [];
+                $options[] = ['value' => $option['value'], 'available' => !isset($option['requires']) || $this->truth($option['requires'], $scope, $ignored, []) === true];
+            }
+            $value = $scope->pointer((string) $choice['path']);
+            $out[] = ['id' => (string) $choice['id'], 'path' => (string) $choice['path'], 'value' => $value === '' ? null : $value, 'options' => $options];
+        }
+
+        return $out;
+    }
+
     /** @param list<string> $paths @param array<string, mixed> $step */
     private function touchesStep(array $paths, array $step): bool
     {

@@ -111,6 +111,16 @@ final class PresetEngineAcceptanceTest extends TestCase
 
     // Test 2: creation by choices and steps ------------------------------------------------------
 
+    public function test_choice_availability_follows_prerequisites(): void
+    {
+        $mechanics = (new DemoPreset('demo-linhagens'))->mechanics();
+        $gift = static fn (array $sheet): array => array_column($mechanics->choiceAvailability($sheet, [])[1]['options'], 'available', 'value');
+
+        $this->assertSame(['voo_curto' => false, 'pele_de_pedra' => false, 'sussurro' => true], $gift([]));
+        $this->assertSame(['voo_curto' => true, 'pele_de_pedra' => false, 'sussurro' => true], $gift(['origin' => ['lineage' => 'aurora']]));
+        $this->assertSame('aurora', $mechanics->choiceAvailability(['origin' => ['lineage' => 'aurora']], [])[0]['value']);
+    }
+
     public function test_a_choice_allows_one_option_and_forbids_another_by_prerequisite(): void
     {
         $preset = new DemoPreset('demo-linhagens');
