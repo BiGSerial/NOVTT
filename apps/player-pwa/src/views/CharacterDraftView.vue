@@ -10,13 +10,15 @@ const props = defineProps<{ characterId: string; fetcher?: typeof fetch }>()
 
 interface Character { id: string; name: string; status: string; sheet_revision: number; preset_version_id: string; sheet: Sheet }
 interface PresetVersion { sheet_ui: SheetUi; sheet_schema: Record<string, unknown>; rules?: { budgets?: { id: string; label: string }[] } }
-interface Draft { draft_version: number; base_sheet_revision: number; change_set: ChangeSet; validation: ValidationResult }
+interface Draft { draft_version: number; base_sheet_revision: number; change_set: ChangeSet; validation: ValidationResult; balances?: Record<string, number> }
 
 const character = ref<Character | null>(null)
 const preset = shallowRef<PresetVersion | null>(null)
 const draft = shallowRef<DraftModel | null>(null)
 const draftVersion = ref(0)
 const issues = ref<ValidationIssue[]>([])
+/** Remaining points per budget as the server computed them for the current draft. */
+const balances = ref<Record<string, number>>({})
 const status = ref('')
 const failure = ref('')
 const busy = ref(false)
@@ -26,6 +28,7 @@ let autosave: ReturnType<typeof setTimeout> | undefined
 let saving: Promise<boolean> | null = null
 let again = false
 
+const budgetList = computed(() => (preset.value?.rules?.budgets ?? []).filter(b => b.id in balances.value).map(b => ({ ...b, left: balances.value[b.id] })))
 const budgetLabels = computed(() => Object.fromEntries((preset.value?.rules?.budgets ?? []).map(b => [b.id, b.label])))
 
 const pendingKey = `novtt.submit.${props.characterId}`
@@ -39,11 +42,13 @@ async function load(): Promise<void> {
       const d = await api<Draft>('GET', `/campaign-characters/${props.characterId}/draft`, undefined, { fetcher: props.fetcher })
       draftVersion.value = d.draft_version
       issues.value = d.validation.issues
+      balances.value = d.balances ?? {}
       draft.value = new DraftModel(c.sheet, d.base_sheet_revision, d.change_set)
       size.value = draft.value.size
     } catch (error) {
       if (!(error instanceof ApiError) || error.status !== 404) throw error
       draft.value = new DraftModel(c.sheet, c.sheet_revision)
+      balances.value = (await api<{ balances: Record<string, number> }>('GET', `/campaign-characters/${props.characterId}/grants`, undefined, { fetcher: props.fetcher })).balances
     }
   } catch (error) {
     failure.value = t(error instanceof ApiError ? error.code : 'network.error')
@@ -84,6 +89,7 @@ async function persist(): Promise<boolean> {
     const saved = await api<Draft>('PUT', `/campaign-characters/${props.characterId}/draft`, { draft_version: draftVersion.value, change_set: draft.value.changeSet }, { fetcher: props.fetcher })
     draftVersion.value = saved.draft_version
     issues.value = saved.validation.issues
+    if (saved.balances) balances.value = saved.balances
     status.value = saved.validation.valid ? 'Rascunho salvo.' : 'Rascunho salvo com pendências.'
     return saved.validation.valid
   } catch (error) {
@@ -132,6 +138,14 @@ onBeforeUnmount(() => clearTimeout(autosave))
         <p class="eyebrow">FICHA</p>
         <h1>{{ character.name }}</h1>
       </header>
+      <aside v-if="budgetList.length" class="budget-bar" aria-label="Pontos disponíveis">
+        <dl>
+          <div v-for="b in budgetList" :key="b.id" :class="{ empty: b.left <= 0 }">
+            <dt>{{ b.label }}</dt>
+            <dd>{{ b.left }}</dd>
+          </div>
+        </dl>
+      </aside>
       <SheetEditor
         :ui="preset.sheet_ui"
         :schema="preset.sheet_schema"
