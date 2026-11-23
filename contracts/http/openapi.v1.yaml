@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.1.0-mvp002
+  version: 1.2.0-mvp003
   license:
     name: MIT
     identifier: MIT
@@ -1339,6 +1339,146 @@ paths:
         '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/GameSession' } } } }
         '403': { $ref: '#/components/responses/Forbidden' }
         '409': { $ref: '#/components/responses/Conflict' }
+  /sessions/{sessionId}/plot:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    put:
+      tags: [live]
+      summary: Replace the session plot and/or move the current scene (master only)
+      description: Scene status is recomputed from `current`. Moving the current scene re-points the compass (scene, objective, next unrevealed clue); clocks and spotlight are kept. Emits master event plot.updated.
+      operationId: savePlot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [revision, plot]
+              properties:
+                revision: { type: integer, minimum: 1 }
+                plot: { $ref: '#/components/schemas/Plot' }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/GameSession' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /sessions/{sessionId}/stage:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    put:
+      tags: [live]
+      summary: Show a scene card to the whole table, or clear it (master only)
+      description: Emits table event stage.updated. A staged image becomes readable by the players.
+      operationId: saveStage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [revision, stage]
+              properties:
+                revision: { type: integer, minimum: 1 }
+                stage:
+                  oneOf:
+                    - type: 'null'
+                    - type: object
+                      additionalProperties: false
+                      required: [title]
+                      properties:
+                        title: { type: string, minLength: 1, maxLength: 120 }
+                        text: { type: [string, 'null'], maxLength: 1500 }
+                        art: { $ref: '#/components/schemas/SceneArt' }
+                        image_id: { type: [string, 'null'], format: uuid }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/GameSession' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /campaigns/{campaignId}/images:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    post:
+      tags: [live]
+      summary: Upload a campaign image (master any kind; players portraits only)
+      description: JPEG, PNG or WebP up to 4 MB and 6000 px per side (12 MP). The server verifies the type, re-encodes to WebP (longest side 1024 px for portraits, 1600 px otherwise) and drops all metadata. At most 300 images per campaign (409 image.limit).
+      operationId: uploadImage
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [file, kind]
+              properties:
+                file: { type: string, format: binary }
+                kind: { enum: [portrait, scene, handout] }
+      responses:
+        '201': { description: Stored, content: { application/json: { schema: { $ref: '#/components/schemas/CampaignImage' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /images/{imageId}:
+    parameters: [{ name: imageId, in: path, required: true, schema: { type: string, format: uuid } }]
+    get:
+      tags: [live]
+      summary: Download a campaign image the actor may see
+      description: Masters see every image of their campaign. Players see character portraits, their own uploads, portraits of NPCs revealed in the open session, the staged scene image and images of clues revealed to the table or to them. Anything else is 404.
+      operationId: showImage
+      parameters:
+        - { name: If-None-Match, in: header, required: false, schema: { type: string } }
+      responses:
+        '200':
+          description: WebP bytes (Cache-Control private, immutable; nosniff; CSP sandbox)
+          headers:
+            ETag: { schema: { type: string } }
+          content:
+            image/webp:
+              schema: { type: string, format: binary }
+        '304': { description: Not modified }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaigns/{campaignId}/portraits/{kind}/{subjectId}:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+      - { name: kind, in: path, required: true, schema: { enum: [character, npc] } }
+      - { name: subjectId, in: path, required: true, schema: { type: string, format: uuid } }
+    put:
+      tags: [live]
+      summary: Set or clear the portrait of a character (master or its player) or NPC (master)
+      description: Emits portrait.updated to the table for characters and to the master for NPCs.
+      operationId: setPortrait
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [image_id]
+              properties:
+                image_id: { type: [string, 'null'], format: uuid, description: A portrait image of the same campaign }
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema: { type: object, properties: { kind: { enum: [character, npc] }, id: { type: string, format: uuid }, portrait_image_id: { type: [string, 'null'], format: uuid } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /campaigns/{campaignId}/prep/carry-over:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [world]
+      summary: What the next roteiro starts from (master only)
+      description: Unrevealed clues of the most recent session, unresolved Atlas threads, what each character wants, and the last roteiro title.
+      operationId: prepCarryOver
+      responses:
+        '200': { description: Carry-over, content: { application/json: { schema: { $ref: '#/components/schemas/PrepCarryOver' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
   /sessions/{sessionId}/roll-requests:
     parameters: [{ $ref: '#/components/parameters/SessionId' }]
     post:
@@ -1359,7 +1499,7 @@ paths:
                     suggestion_id: { type: [string, 'null'], format: uuid }
                     allows_choice: { type: boolean, description: Pool mode only; the roller may roll 1..pool dice }
                     attempts: { type: integer, minimum: 1, maximum: 5, default: 1 }
-                    secret: { type: boolean, default: false, description: Result only to the master and the roller }
+                    secret: { type: boolean, default: true, description: 'Result only to the master and the roller (default, owner decision 2026-11-22). false rolls at the table; a secret result can be revealed later.' }
                     expires_in_seconds: { type: [integer, 'null'], minimum: 30, maximum: 3600 }
       responses:
         '201': { description: Requested, content: { application/json: { schema: { $ref: '#/components/schemas/RollRequest' } } } }
@@ -1464,6 +1604,7 @@ paths:
                 revision: { type: integer, minimum: 0 }
                 resources: { type: array, maxItems: 8, items: { $ref: '#/components/schemas/ResourceTrack' } }
                 conditions: { type: array, maxItems: 12, items: { type: string, minLength: 1, maxLength: 40 } }
+                items: { type: array, maxItems: 40, items: { $ref: '#/components/schemas/LiveItem' }, description: Omitted keeps the current inventory }
       responses:
         '200': { description: Saved, content: { application/json: { schema: { type: object, properties: { subject: { type: object }, live: { $ref: '#/components/schemas/LiveState' } } } } } }
         '403': { $ref: '#/components/responses/Forbidden' }
@@ -1567,6 +1708,7 @@ paths:
                 title: { type: string, minLength: 1, maxLength: 120 }
                 body: { type: string, maxLength: 2000 }
                 scene: { type: [string, 'null'], maxLength: 120 }
+                image_id: { type: [string, 'null'], format: uuid, description: A campaign image shown with the clue (handout) }
       responses:
         '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Clue' } } } }
         '403': { $ref: '#/components/responses/Forbidden' }
@@ -1940,6 +2082,8 @@ components:
         initiative: { $ref: '#/components/schemas/Initiative' }
         revealed_npcs: { type: array, items: { $ref: '#/components/schemas/RevealedNpc' } }
         compass: { $ref: '#/components/schemas/Compass', description: Masters only }
+        plot: { $ref: '#/components/schemas/Plot', description: Masters only }
+        stage: { oneOf: [{ $ref: '#/components/schemas/Stage' }, { type: 'null' }], description: What the whole table sees now }
         last_seq: { type: integer }
         revision: { type: integer }
         started_at: { type: string, format: date-time }
@@ -1975,6 +2119,63 @@ components:
         id: { type: string, format: uuid }
         name: { type: string }
         summary: { type: string }
+        portrait_image_id: { type: [string, 'null'], format: uuid }
+    SceneArt:
+      description: Key of an original scene illustration shipped with the clients
+      enum: [bridge, forest, tavern, ruins, city, cave, sea, camp, road, castle, swamp, temple, null]
+    PlotScene:
+      type: object
+      required: [title]
+      properties:
+        id: { type: [string, 'null'], maxLength: 40, description: Assigned by the server when empty }
+        title: { type: string, minLength: 1, maxLength: 120 }
+        goal: { type: [string, 'null'], maxLength: 300 }
+        location: { type: [string, 'null'], maxLength: 120 }
+        read_aloud: { type: [string, 'null'], maxLength: 1500 }
+        npcs: { type: array, maxItems: 8, items: { type: string, minLength: 1, maxLength: 80 } }
+        art: { $ref: '#/components/schemas/SceneArt' }
+        image_id: { type: [string, 'null'], format: uuid }
+        complication: { type: [string, 'null'], maxLength: 500 }
+        status: { enum: [pending, current, done], description: Recomputed by the server from current }
+    Plot:
+      type: object
+      required: [scenes, current]
+      properties:
+        scenes: { type: array, maxItems: 16, items: { $ref: '#/components/schemas/PlotScene' } }
+        current: { type: [integer, 'null'], minimum: 0 }
+    Stage:
+      type: object
+      required: [title, text, art, image_id, shown_at]
+      properties:
+        title: { type: string }
+        text: { type: string }
+        art: { $ref: '#/components/schemas/SceneArt' }
+        image_id: { type: [string, 'null'], format: uuid }
+        shown_at: { type: string, format: date-time }
+    CampaignImage:
+      type: object
+      required: [id, kind, width, height]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { enum: [portrait, scene, handout] }
+        width: { type: integer }
+        height: { type: integer }
+    LiveItem:
+      type: object
+      required: [id, label, qty]
+      properties:
+        id: { type: string, maxLength: 40 }
+        label: { type: string, minLength: 1, maxLength: 80 }
+        qty: { type: integer, minimum: 0, maximum: 999 }
+        note: { type: [string, 'null'], maxLength: 200 }
+    PrepCarryOver:
+      type: object
+      required: [unrevealed_clues, open_threads, characters, last_roteiro_title]
+      properties:
+        unrevealed_clues: { type: array, items: { type: object, properties: { title: { type: string }, body: { type: string }, scene: { type: [string, 'null'] } } } }
+        open_threads: { type: array, items: { type: object, properties: { id: { type: string, format: uuid }, title: { type: string }, summary: { type: string }, thread_status: { enum: [open, advancing, resolved, null] } } } }
+        characters: { type: array, items: { type: object, properties: { id: { type: string, format: uuid }, name: { type: string }, concept: { type: [string, 'null'] }, motivation: { type: [string, 'null'] } } } }
+        last_roteiro_title: { type: [string, 'null'] }
     RollSpecInput:
       type: object
       required: [paths, dice]
@@ -2078,6 +2279,7 @@ components:
       properties:
         resources: { type: array, items: { $ref: '#/components/schemas/ResourceTrack' } }
         conditions: { type: array, items: { type: string } }
+        items: { type: array, items: { $ref: '#/components/schemas/LiveItem' } }
         revision: { type: integer }
     MasterNote:
       type: object
@@ -2111,6 +2313,7 @@ components:
         revealed_to: { enum: [table, user, null] }
         revealed_user_id: { type: [string, 'null'], format: uuid, description: Masters only }
         revealed_at: { type: [string, 'null'], format: date-time }
+        image_id: { type: [string, 'null'], format: uuid }
     RollSuggestion:
       type: object
       required: [id, campaign_character_id, character_name, player_user_id, paths, status]
@@ -2143,8 +2346,10 @@ components:
               controlled_by: { type: string, format: uuid }
               status: { type: string }
               preset_version_id: { type: string, format: uuid }
+              portrait_image_id: { type: [string, 'null'], format: uuid }
+              concept: { type: [string, 'null'], description: Sheet /identity/concept; only for the master and the character's controller }
               live: { oneOf: [{ $ref: '#/components/schemas/LiveState' }, { type: 'null' }] }
-        npcs: { type: array, items: { type: object }, description: Masters only (empty for players) }
+        npcs: { type: array, items: { type: object, properties: { id: { type: string, format: uuid }, name: { type: string }, preset_version_id: { type: string, format: uuid }, portrait_image_id: { type: [string, 'null'], format: uuid }, live: { oneOf: [{ $ref: '#/components/schemas/LiveState' }, { type: 'null' }] } } }, description: Masters only (empty for players) }
         requests: { type: array, items: { $ref: '#/components/schemas/RollRequest' } }
         rolls: { type: array, items: { $ref: '#/components/schemas/OfficialRoll' } }
         whispers: { type: array, items: { $ref: '#/components/schemas/Whisper' } }
@@ -2157,17 +2362,25 @@ components:
         strong_start: { type: string, maxLength: 1000 }
         scenes:
           type: array
-          maxItems: 12
+          maxItems: 16
           items:
             type: object
             required: [title, goal, clues]
             properties:
               title: { type: string, maxLength: 120 }
               goal: { type: string, maxLength: 300 }
+              location: { type: [string, 'null'], maxLength: 120 }
+              read_aloud: { type: [string, 'null'], maxLength: 1500 }
+              npcs: { type: array, maxItems: 8, items: { type: string, maxLength: 80 } }
+              art: { $ref: '#/components/schemas/SceneArt' }
+              image_id: { type: [string, 'null'], format: uuid }
+              complication: { type: [string, 'null'], maxLength: 500 }
               clues: { type: array, maxItems: 8, items: { type: object, required: [title, body], properties: { title: { type: string, maxLength: 120 }, body: { type: string, maxLength: 1000 } } } }
         npcs: { type: array, maxItems: 20, items: { type: object, required: [name, voice, wants, secret], properties: { name: { type: string }, voice: { type: string }, wants: { type: string }, secret: { type: string } } } }
         clocks: { type: array, maxItems: 6, items: { type: object, required: [label, segments], properties: { label: { type: string }, segments: { type: integer, minimum: 2, maximum: 12 } } } }
         wants: { type: array, maxItems: 12, items: { type: object, required: [character, text], properties: { character: { type: string }, text: { type: string } } } }
+        locations: { type: array, maxItems: 8, items: { type: object, required: [name, aspects], properties: { name: { type: string, maxLength: 80 }, aspects: { type: array, maxItems: 3, items: { type: string, maxLength: 120 } } } } }
+        rewards: { type: array, maxItems: 10, items: { type: string, maxLength: 200 } }
     Roteiro:
       type: object
       required: [id, campaign_id, title, content, revision]

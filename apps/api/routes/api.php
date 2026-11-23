@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Auth\PairingController;
 use App\Http\Controllers\Api\V1\CampaignCharacterController;
 use App\Http\Controllers\Api\V1\CampaignController;
 use App\Http\Controllers\Api\V1\LibraryController;
+use App\Http\Controllers\Api\V1\Live\ImageController;
 use App\Http\Controllers\Api\V1\Live\RollController;
 use App\Http\Controllers\Api\V1\Live\SessionController;
 use App\Http\Controllers\Api\V1\Live\TableController;
@@ -97,6 +98,14 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:novtt-api'])->group(f
     Route::get('sessions/{sessionId}/events', [SessionController::class, 'events'])->whereUuid('sessionId');
     Route::put('sessions/{sessionId}/compass', [SessionController::class, 'compass'])->whereUuid('sessionId');
     Route::put('sessions/{sessionId}/initiative', [SessionController::class, 'initiative'])->whereUuid('sessionId');
+    Route::put('sessions/{sessionId}/plot', [SessionController::class, 'plot'])->whereUuid('sessionId');
+    Route::put('sessions/{sessionId}/stage', [SessionController::class, 'stage'])->whereUuid('sessionId');
+
+    // Narrative table (SPEC-MVP-003): images, portraits and prep carry-over.
+    Route::post('campaigns/{campaignId}/images', [ImageController::class, 'upload'])->whereUuid('campaignId')->middleware('throttle:novtt-uploads');
+    Route::get('images/{imageId}', [ImageController::class, 'show']);
+    Route::put('campaigns/{campaignId}/portraits/{kind}/{subjectId}', [ImageController::class, 'setPortrait'])->whereUuid('campaignId')->whereIn('kind', ['character', 'npc']);
+    Route::get('campaigns/{campaignId}/prep/carry-over', [WorldController::class, 'carryOver'])->whereUuid('campaignId');
 
     Route::post('sessions/{sessionId}/roll-requests', [RollController::class, 'request'])->whereUuid('sessionId');
     Route::post('roll-requests/{requestId}/rolls', [RollController::class, 'roll'])->middleware('throttle:novtt-rolls');

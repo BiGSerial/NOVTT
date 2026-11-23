@@ -35,10 +35,10 @@ final class DemoController
     {
         $data = $request->json()->all();
         $role = $data['role'] ?? null;
-        if (array_diff(array_keys($data), ['role']) !== [] || !in_array($role, ['master', 'player', 'player2', 'player3'], true)) {
+        if (array_diff(array_keys($data), ['role']) !== [] || ! in_array($role, ['master', 'player', 'player2', 'player3', 'player4', 'player5'], true)) {
             throw ApiProblem::validation(new ValidationResult([new ValidationIssue('demo.invalid_role', Severity::Error, [], ['/role'])]), 'request.invalid');
         }
-        if (!$request->hasSession()) {
+        if (! $request->hasSession()) {
             // Only first-party origins (SANCTUM_STATEFUL_DOMAINS) get a session cookie.
             throw new ApiProblem(400, 'demo.stateful_origin_required');
         }
@@ -55,7 +55,7 @@ final class DemoController
     public function logout(Request $request): JsonResponse
     {
         Auth::guard('web')->logout();
-        if (!$request->hasSession()) {
+        if (! $request->hasSession()) {
             return new JsonResponse(null, 204);
         }
         $request->session()->invalidate();

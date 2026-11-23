@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 /** Prepared clue; revealed to the table or whispered to one player. */
-#[Fillable(['campaign_id', 'session_id', 'scene', 'title', 'body', 'revealed_to', 'revealed_user_id', 'revealed_at'])]
+#[Fillable(['campaign_id', 'session_id', 'scene', 'title', 'body', 'revealed_to', 'revealed_user_id', 'revealed_at', 'image_id'])]
 class Clue extends Model
 {
     use HasUuids;

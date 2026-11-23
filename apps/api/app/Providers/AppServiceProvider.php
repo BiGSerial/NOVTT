@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('novtt-imports', static fn (Request $request): Limit => Limit::perMinute(10)->by((string) ($request->user()?->getAuthIdentifier() ?? $request->ip())));
         // Official rolls and whispers: generous for play, bounded against scripted abuse.
         RateLimiter::for('novtt-rolls', static fn (Request $request): Limit => Limit::perMinute(40)->by('u:'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
+        RateLimiter::for('novtt-uploads', static fn (Request $request): Limit => Limit::perMinute(20)->by('u:'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
         RateLimiter::for('novtt-whispers', static fn (Request $request): Limit => Limit::perMinute(30)->by('u:'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
         // Credential stuffing and pairing-code abuse: per IP, and per email for sign-in.
         RateLimiter::for('novtt-auth', static fn (Request $request): array => [

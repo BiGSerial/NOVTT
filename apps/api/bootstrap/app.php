@@ -24,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
         // Revoked paired devices lose their session (ADR 0011).
         $middleware->api(append: [EnsurePairedDeviceActive::class]);
+        // The API never redirects guests (there is no login page): <img> requests for campaign
+        // images without a session get a 401 problem instead of a redirect error.
+        $middleware->redirectGuestsTo(static fn (Request $request): ?string => $request->is('api/*') ? null : '/');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
