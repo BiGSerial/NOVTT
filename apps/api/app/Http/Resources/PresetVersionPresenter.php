@@ -21,6 +21,40 @@ final class PresetVersionPresenter
             'display_name' => $definition->display_name,
             'status' => $version->status->value,
             'canonical' => $definition->owner_user_id === null,
+        ] + self::metadata($version);
+    }
+
+    /**
+     * Identity, rules revision, licence, rights and coverage shown to the user before choosing a
+     * preset (ADR-002 criterion 5). manifest/1 carries no rights metadata: those fields are null.
+     *
+     * @return array<string, mixed>
+     */
+    public static function metadata(PresetVersion $version): array
+    {
+        $manifest = (array) $version->manifest;
+        $v2 = ($manifest['contract'] ?? null) === 'novtt.preset-manifest/2';
+        $license = $v2 ? (array) $manifest['license'] : ['identifier' => is_string($manifest['license'] ?? null) ? $manifest['license'] : null];
+        $taxonomy = [];
+        foreach ((array) ($version->compendium['taxonomy'] ?? []) as $kind) {
+            $taxonomy[] = ['kind' => $kind['kind'], 'labels' => (object) $kind['labels'], 'parent_kind' => $kind['parent_kind'] ?? null];
+        }
+
+        return [
+            'rules_revision' => $manifest['rules_revision'] ?? null,
+            'source_version' => $manifest['source_version'] ?? null,
+            'errata_reference' => $manifest['errata_reference'] ?? null,
+            'locale' => $manifest['locale'] ?? null,
+            'license' => [
+                'identifier' => $license['identifier'] ?? null,
+                'attribution' => $license['attribution'] ?? null,
+                'source_url' => $license['source_url'] ?? null,
+            ],
+            'rights_status' => $version->rights_status,
+            'source_authenticity' => $v2 ? ($manifest['provenance']['source_authenticity'] ?? null) : null,
+            'coverage' => $manifest['coverage'] ?? null,
+            'limitations' => array_values((array) ($manifest['limitations'] ?? [])),
+            'taxonomy' => $taxonomy,
         ];
     }
 

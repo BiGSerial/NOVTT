@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Application\Idempotency;
 use App\Application\PresetImporter;
+use Novtt\Engine\Presets\PublicationGate;
 use App\Domain\PresetVersionStatus;
 use App\Http\Problems\ApiProblem;
 use App\Http\Resources\PresetVersionPresenter;
@@ -41,8 +42,10 @@ final class PresetController extends ApiController
                 });
             })
             ->where(function (Builder $q): void {
-                // Canonical entries must be published; personal entries are listed in any status.
-                $q->where('status', PresetVersionStatus::Published)
+                // Canonical entries must be published with approved rights (PublicationGate);
+                // quarantined or retired versions leave the catalogue. Personal entries are listed
+                // to their owner in any status.
+                $q->where(fn (Builder $c) => $c->where('status', PresetVersionStatus::Published)->whereIn('rights_status', PublicationGate::PUBLISHABLE))
                     ->orWhereHas('definition', fn (Builder $d) => $d->whereNotNull('owner_user_id'));
             })
             ->orderBy('id')
