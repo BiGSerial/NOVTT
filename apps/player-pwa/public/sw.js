@@ -67,7 +67,8 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  if (!/^\/assets\/[a-zA-Z0-9._-]+\.(js|css)$/.test(url.pathname) &&
+  // Fingerprinted build assets, including the lazily loaded 3D dice chunks and physics WebAssembly.
+  if (!/^\/assets\/[a-zA-Z0-9._-]+\.(js|css|wasm)$/.test(url.pathname) &&
       !PUBLIC_SHELL.includes(url.pathname)) return
 
   event.respondWith((async () => {

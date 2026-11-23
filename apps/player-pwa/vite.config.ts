@@ -1,8 +1,10 @@
 import { createHash } from 'node:crypto'
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { defineConfig, type Plugin, type ResolvedConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
+import type { Plugin, ResolvedConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import wasm from 'vite-plugin-wasm'
 
 function listFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap(entry =>
@@ -37,7 +39,13 @@ function serviceWorkerBuildId(): Plugin {
 const apiProxy = process.env.NOVTT_API_PROXY ?? 'http://127.0.0.1:8000'
 
 export default defineConfig({
-  plugins: [vue(), serviceWorkerBuildId()],
+  plugins: [vue(), wasm(), serviceWorkerBuildId()],
+  // Top-level await (WebAssembly instantiation in the lazily loaded physics chunk).
+  build: { target: 'es2022' },
+  // The Rapier package only declares "module"; let the Node test runner resolve and inline it.
+  resolve: { mainFields: ['browser', 'module', 'jsnext:main', 'jsnext'] },
+  ssr: { resolve: { mainFields: ['module'] } },
+  test: { server: { deps: { inline: ['@dimforge/rapier3d-deterministic'] } } },
   server: {
     // The demo page imports the framework-free master review panel.
     fs: { allow: ['.', '../master-web/resources/js'] },

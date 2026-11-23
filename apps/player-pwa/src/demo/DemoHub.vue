@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { api, ApiError, ensureCsrfCookie } from '../api/client'
+import DiceTray from '../components/DiceTray.vue'
+import { subscribeRolls } from '../dice/mirror'
+import type { RollAnimationRecord } from '../dice/record'
 import { t } from '../i18n/messages'
 import { ReviewPanel, type ChangeRequestView, type Decision, type ReviewApi } from '../../../master-web/resources/js/review-panel'
 
@@ -124,7 +127,16 @@ async function approveCharacter(): Promise<void> {
   }
 }
 
-onMounted(refresh)
+// Rolls made by the player in another window of this browser replay here with the same seed,
+// results and skin, so the master sees the same animation (local mirror; no server involved).
+const mirrored = shallowRef<RollAnimationRecord | null>(null)
+let unsubscribe: () => void = () => {}
+
+onMounted(() => {
+  void refresh()
+  unsubscribe = subscribeRolls(record => { mirrored.value = record })
+})
+onBeforeUnmount(() => unsubscribe())
 </script>
 
 <template>
@@ -168,6 +180,12 @@ onMounted(refresh)
             <p v-if="!state.active_change_request_id">Nenhuma proposta aguardando revisão.</p>
             <div v-show="hasReview" ref="reviewRoot"></div>
             <button type="button" class="secondary" :disabled="busy" @click="refresh">Atualizar</button>
+          </section>
+          <section class="panel" aria-labelledby="mirror-title">
+            <h2 id="mirror-title">Dados do jogador</h2>
+            <p class="help">Abra os dados livres (<a href="/">/</a>) em outra janela e role: a mesma animação aparece aqui. LOCAL · NÃO OFICIAL.</p>
+            <p v-if="!mirrored">Nenhuma rolagem recebida ainda.</p>
+            <DiceTray :record="mirrored" label="Espelho da mesa do jogador" />
           </section>
           <section v-if="character" class="panel" aria-labelledby="sheet-title">
             <h2 id="sheet-title">Ficha oficial de {{ character.name }}</h2>
