@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://novtt.invalid/contracts/events/session-event.v1.schema.json",
+  "title": "novtt.session-event/1",
+  "description": "One authoritative session event (SPEC-MVP-002 LT-03). Delivered on a private Reverb channel as event 'session.event' and by GET /sessions/{id}/events. seq is strictly increasing per session; a participant only sees the events of its audiences, so gaps are normal: refetch after the last seen seq when unsure. Consumers MUST deduplicate by seq.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "session_id", "seq", "type", "occurred_at", "payload"],
+  "properties": {
+    "contract": { "const": "novtt.session-event/1" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "seq": { "type": "integer", "minimum": 1 },
+    "type": {
+      "enum": [
+        "session.status",
+        "roll.requested", "roll.request_updated", "roll.resolved", "roll.revealed",
+        "suggestion.created", "suggestion.resolved",
+        "live.updated", "compass.updated", "initiative.updated",
+        "note.saved", "note.deleted",
+        "whisper.received",
+        "clue.saved", "clue.revealed",
+        "npc.revealed"
+      ]
+    },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "payload": { "type": "object", "description": "Shape by type: roll.* → OfficialRoll / RollRequest (openapi.v1.yaml); whisper.received → Whisper; note.* → MasterNote; clue.* → Clue; live.updated → {subject, live}; compass.updated → {revision, compass}; initiative.updated → {revision, initiative}; session.status → {status, title}; npc.revealed → RevealedNpc; suggestion.* → RollSuggestion or {id, status, roll_request_id}." }
+  }
+}
