@@ -20,10 +20,10 @@
         "whisper.received",
         "clue.saved", "clue.revealed",
         "npc.revealed",
-        "plot.updated", "stage.updated", "portrait.updated"
+        "plot.updated", "stage.updated", "portrait.updated", "atmosphere.updated"
       ]
     },
     "occurred_at": { "type": "string", "format": "date-time" },
-    "payload": { "type": "object", "description": "Shape by type: roll.* → OfficialRoll / RollRequest (openapi.v1.yaml); whisper.received → Whisper; note.* → MasterNote; clue.* → Clue; live.updated → {subject, live}; compass.updated → {revision, compass}; initiative.updated → {revision, initiative}; session.status → {status, title}; npc.revealed → RevealedNpc; plot.updated → {revision, plot, compass} (master); stage.updated → {revision, stage} (table); portrait.updated → {kind, id, portrait_image_id}; suggestion.* → RollSuggestion or {id, status, roll_request_id}." }
+    "payload": { "type": "object", "description": "Shape by type: roll.* → OfficialRoll / RollRequest (openapi.v1.yaml); whisper.received → Whisper; note.* → MasterNote; clue.* → Clue; live.updated → {subject, live}; compass.updated → {revision, compass}; initiative.updated → {revision, initiative}; session.status → {status, title}; npc.revealed → RevealedNpc; plot.updated → {revision, plot, compass} (master); stage.updated → {revision, stage} (table); atmosphere.updated → Atmosphere (table); portrait.updated → {kind, id, portrait_image_id}; suggestion.* → RollSuggestion or {id, status, roll_request_id}." }
   }
 }

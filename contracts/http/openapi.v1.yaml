@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.3.0-presets001
+  version: 1.4.0-atmosphere
   license:
     name: MIT
     identifier: MIT
@@ -1407,6 +1407,37 @@ paths:
         '403': { $ref: '#/components/responses/Forbidden' }
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationFailed' }
+  /sessions/{sessionId}/atmosphere:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    put:
+      tags: [live]
+      summary: Set the table atmosphere (time of day, weather, time flow; master only)
+      description: |
+        SPEC-MVP-003 NT-10. Replaces the whole atmosphere and emits table event atmosphere.updated.
+        The atmosphere has its own revision, so it never conflicts with plot, stage or compass
+        edits guarded by the session revision. While time_scale > 0 clients advance the hour
+        locally: (hour + time_scale × minutes since set_at / 60) mod 24.
+      operationId: saveAtmosphere
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [hour, weather, intensity, time_scale, transition_seconds]
+              properties:
+                hour: { type: number, minimum: 0, exclusiveMaximum: 24, multipleOf: 0.25 }
+                weather: { $ref: '#/components/schemas/Weather' }
+                intensity: { type: number, minimum: 0, maximum: 1, description: Stored rounded to 2 decimals }
+                time_scale: { type: integer, minimum: 0, maximum: 120, description: Game minutes per real minute; 0 freezes time }
+                transition_seconds: { type: integer, minimum: 0, maximum: 30, description: How long clients animate the change }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/Atmosphere' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
   /campaigns/{campaignId}/images:
     parameters: [{ $ref: '#/components/parameters/CampaignId' }]
     post:
@@ -2218,6 +2249,7 @@ components:
         compass: { $ref: '#/components/schemas/Compass', description: Masters only }
         plot: { $ref: '#/components/schemas/Plot', description: Masters only }
         stage: { oneOf: [{ $ref: '#/components/schemas/Stage' }, { type: 'null' }], description: What the whole table sees now }
+        atmosphere: { oneOf: [{ $ref: '#/components/schemas/Atmosphere' }, { type: 'null' }], description: Time of day and weather for the whole table; null until the master sets it }
         last_seq: { type: integer }
         revision: { type: integer }
         started_at: { type: string, format: date-time }
@@ -2286,6 +2318,19 @@ components:
         art: { $ref: '#/components/schemas/SceneArt' }
         image_id: { type: [string, 'null'], format: uuid }
         shown_at: { type: string, format: date-time }
+    Weather:
+      enum: [clear, clouds, rain, storm, fog, snow]
+    Atmosphere:
+      type: object
+      required: [hour, weather, intensity, time_scale, transition_seconds, set_at, revision]
+      properties:
+        hour: { type: number, minimum: 0, exclusiveMaximum: 24, description: Hour of day when set_at was recorded }
+        weather: { $ref: '#/components/schemas/Weather' }
+        intensity: { type: number, minimum: 0, maximum: 1 }
+        time_scale: { type: integer, minimum: 0, maximum: 120 }
+        transition_seconds: { type: integer, minimum: 0, maximum: 30 }
+        set_at: { type: string, format: date-time }
+        revision: { type: integer, minimum: 1, description: Increments on every save; independent of the session revision }
     CampaignImage:
       type: object
       required: [id, kind, width, height]

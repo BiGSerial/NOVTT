@@ -83,6 +83,18 @@ master-only).
 Display type Cinzel, story text Alegreya, UI Alegreya Sans (bundled, OFL). Panels with ornamental
 borders, parchment handouts, themes recolour art and UI. Reduced motion honoured.
 
+### NT-10 Atmosphere (owner request 2026-11-23)
+The master sets the table atmosphere: hour of day (0–24 in quarter hours), weather (`clear`,
+`clouds`, `rain`, `storm`, `fog`, `snow`), intensity (0–1), time flow (`time_scale`, game minutes
+per real minute, 0 = frozen) and how long clients animate the change (`transition_seconds`, 0–30).
+`PUT /sessions/{id}/atmosphere` (master only, not on ended sessions) stores it on the session with
+its own `revision` and `set_at`, and emits the table event `atmosphere.updated`; the session
+snapshot carries it for every member (null until set). The server stores parameters only: sky,
+light, particles and animation are rendered by each client from them, and while `time_scale > 0`
+clients advance the hour from `set_at` without further requests. Clients MUST honour reduced
+motion (no particles or animated transitions) and SHOULD keep rendering cheap (bounded particles,
+paused when hidden). The atmosphere has no rules effect.
+
 ## Acceptance (end-to-end, demo data: 5 player characters, 10 NPCs, 5-scene roteiro)
 
 1. A request is private by default: the roller and the master see the same faces; another player
@@ -95,8 +107,9 @@ borders, parchment handouts, themes recolour art and UI. Reduced motion honoured
 6. A paired tablet follows the master's selection with the same inspector.
 7. Image upload rejects non-images and oversize files; players cannot fetch NPC portraits before
    the NPC is introduced, nor scene images before they are staged.
+8. The master changes the atmosphere and every player's screen follows it; players cannot change it.
 
-`sh scripts/dev.sh e2e` checks 1–4 and 6; API tests check 1, 3, 7 and the plot/stage rules.
+`sh scripts/dev.sh e2e` checks 1–4 and 6; API tests check 1, 3, 7, 8 (server side) and the plot/stage rules.
 
 ## Open
 
