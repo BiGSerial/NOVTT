@@ -95,7 +95,9 @@ await bruno.locator('.result-card').waitFor({ timeout: 20000 })
 log('bruno sees revealed:', (await bruno.locator('.result-card').textContent()).replace(/\s+/g, ' '))
 await closeCard(bruno)
 
-// Walk the plot: next scene, shown to the players.
+// Walk the plot: next scene, shown to the players (start from the first scene: reruns leave the demo at the end).
+await master.locator('.scene-steps button').first().click()
+await master.waitForFunction(() => !!document.querySelector('.scene-actions')?.textContent?.includes('Próxima cena'), null, { timeout: 8000 })
 const before = await master.locator('.scene-title').textContent()
 await master.locator('.scene-actions').getByRole('button', { name: /Próxima cena/ }).click()
 await master.waitForFunction(t => document.querySelector('.scene-title')?.textContent !== t, before, { timeout: 8000 })
