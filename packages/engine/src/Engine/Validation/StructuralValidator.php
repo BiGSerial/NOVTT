@@ -13,9 +13,10 @@ interface StructuralValidator
 {
     /**
      * @param array<string, mixed>|list<mixed>|scalar|null $document decoded JSON (assoc arrays)
-     * @param array<string, mixed> $schema decoded JSON Schema
+     * @param array<string, mixed>|object $schema decoded JSON Schema; pass an object tree (json_decode
+     *        without assoc) whenever available so `{}` and `[]` keep their meaning
      */
-    public function validate(mixed $document, array $schema): ValidationResult;
+    public function validate(mixed $document, array|object $schema): ValidationResult;
 
     /**
      * Validates against a versioned NOVTT contract, e.g. "novtt.sheet-ui/1".

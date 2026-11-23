@@ -39,6 +39,18 @@ class PresetVersion extends Model
         return $this->belongsTo(PresetDefinition::class, 'definition_id');
     }
 
+    /** The sheet JSON Schema as an object tree, exactly as imported (keeps {} vs []). */
+    public function sheetSchemaObject(): object
+    {
+        return json_decode((string) $this->getRawOriginal('sheet_schema'), false, 64, JSON_THROW_ON_ERROR);
+    }
+
+    /** @return array<string, mixed> */
+    public function sheetSchemaArray(): array
+    {
+        return json_decode((string) $this->getRawOriginal('sheet_schema'), true, 64, JSON_THROW_ON_ERROR);
+    }
+
     public function isCanonical(): bool
     {
         return $this->definition->owner_user_id === null;

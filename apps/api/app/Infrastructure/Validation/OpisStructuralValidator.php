@@ -25,13 +25,17 @@ final class OpisStructuralValidator implements StructuralValidator
     {
     }
 
-    public function validate(mixed $document, array $schema): ValidationResult
+    public function validate(mixed $document, array|object $schema): ValidationResult
     {
-        $schema['$schema'] ??= 'https://json-schema.org/draft/2020-12/schema';
-        unset($schema['$id']);
-        $schemaObject = JsonDocument::toJsonValue($schema, ["type" => "object", "additionalProperties" => ["type" => ["object", "boolean"]]]);
+        $assoc = is_array($schema) ? $schema : json_decode(json_encode($schema, JSON_THROW_ON_ERROR), true, 64, JSON_THROW_ON_ERROR);
+        $schemaObject = is_object($schema)
+            ? json_decode(json_encode($schema, JSON_THROW_ON_ERROR), false, 64, JSON_THROW_ON_ERROR)
+            : JsonDocument::toJsonValue($schema, ['type' => 'object', 'additionalProperties' => ['type' => ['object', 'boolean']]]);
+        // Never let a preset schema pick its own identity or dialect.
+        unset($schemaObject->{'$id'});
+        $schemaObject->{'$schema'} = 'https://json-schema.org/draft/2020-12/schema';
 
-        return $this->run(JsonDocument::toJsonValue($document, $schema), $schemaObject);
+        return $this->run(JsonDocument::toJsonValue($document, $assoc), $schemaObject);
     }
 
     public function validateContract(mixed $document, string $contract): ValidationResult
