@@ -84,7 +84,7 @@ function roll(): void {
       </div>
       <p v-if="error" role="alert">{{ error }}</p>
     </section>
-    <DiceTray :record="record" :loader="loader" :feedback="feedback" :warm-skin="skin" label="Mesa de dados livres" />
+    <DiceTray :record="record" :loader="loader" :feedback="feedback" :warm-skin="skin" surface="overlay" label="Resultado dos dados livres" />
     <SkinPicker v-model="skin" />
     <p class="footnote">Rolagens locais não são válidas em sessões mestradas.</p>
   </main>

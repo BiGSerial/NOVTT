@@ -1,6 +1,6 @@
 import { dieDef, type DieType } from './geometry'
 import { fromUnitVectors, qmul, rotate, UP, v, yawBetween, type Quat, type Vec3 } from './math'
-import { TABLE } from './sim'
+import { TABLE, type Table } from './sim'
 
 export interface Pose { p: Vec3; q: Quat }
 
@@ -8,6 +8,8 @@ export interface Pose { p: Vec3; q: Quat }
 const SCREEN_UP = v(0, 0, -1)
 const SPACING = 2.4
 const PAIR_SPACING = 2.15
+/** Distance from the player's edge to the row's centre line. */
+export const ROW_INSET = 1.35
 
 /**
  * Final presentation: dice are pulled to a row at the player's edge (bottom of the screen),
@@ -15,7 +17,7 @@ const PAIR_SPACING = 2.15
  * with the number upright. Dice of the same group (a d100 pair) stay side by side, tens first.
  * Returns the target pose per physical die and the left-to-right order of the groups.
  */
-export function arrange(dice: { shape: DieType; face: number; group: number }[], finals: Pose[]): { targets: Pose[]; order: number[] } {
+export function arrange(dice: { shape: DieType; face: number; group: number }[], finals: Pose[], table: Table = TABLE, rowInset = ROW_INSET): { targets: Pose[]; order: number[] } {
   const groups = [...new Set(dice.map(d => d.group))]
   const meanX = (g: number) => {
     const xs = dice.flatMap((d, i) => (d.group === g ? [finals[i].p.x] : []))
@@ -37,7 +39,7 @@ export function arrange(dice: { shape: DieType; face: number; group: number }[],
   }
   // Shrink the gaps if the row would overflow the table (6 large dice on a narrow table).
   const reach = Math.max(...dice.map(d => dieDef(d.shape).radius))
-  const room = TABLE.halfX - 0.25 - reach
+  const room = table.halfX - 0.25 - reach
   const squeeze = x / 2 > room ? room / (x / 2) : 1
   const offset = (x * squeeze) / 2
   const targets: Pose[] = new Array(dice.length)
@@ -48,7 +50,7 @@ export function arrange(dice: { shape: DieType; face: number; group: number }[],
     // 1) Settle exactly on the result; 2) yaw the label upright for the viewer.
     const flat = qmul(fromUnitVectors(rotate(q, feature.normal), UP), q)
     const upright = qmul(yawBetween(rotate(flat, feature.up), SCREEN_UP), flat)
-    targets[i] = { p: v(xs[slot] * squeeze - offset, feature.dist, TABLE.halfZ - 1.35), q: upright }
+    targets[i] = { p: v(xs[slot] * squeeze - offset, feature.dist, table.halfZ - rowInset), q: upright }
   })
   return { targets, order }
 }

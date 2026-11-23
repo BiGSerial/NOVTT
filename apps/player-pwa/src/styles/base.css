@@ -50,6 +50,13 @@ legend { font-weight: 800; padding: 0 6px; }
 .dice-stage { position: relative; width: 100%; aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden; background: #0b1411; }
 .dice-stage canvas { display: block; width: 100%; height: 100%; }
 .dice-stage .skip { position: absolute; right: 12px; top: 12px; width: auto; padding: 8px 14px; min-height: 40px; font-size: 15px; background: rgba(17, 24, 39, .85); color: #f9fafb; border: 1px solid #a5b4fc; }
+.dice-overlay { position: fixed; inset: 0; z-index: 50; pointer-events: none; visibility: hidden; opacity: 1; transition: opacity .45s ease; }
+.dice-overlay.covering { visibility: visible; }
+.dice-overlay.fading { opacity: 0; }
+.dice-overlay canvas { display: block; width: 100%; height: 100%; }
+.dice-overlay .skip { pointer-events: auto; position: absolute; right: max(12px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top)); width: auto; padding: 8px 14px; min-height: 44px; font-size: 15px; background: rgba(17, 24, 39, .85); color: #f9fafb; border: 1px solid #a5b4fc; }
+.dice-overlay .stage-note { position: absolute; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); transform: translateX(-50%); margin: 0; padding: 8px 14px; border-radius: 999px; background: rgba(17, 24, 39, .85); color: #e5e7eb; }
+@media (prefers-reduced-motion: reduce) { .dice-overlay { transition: none; } }
 .dice-stage .stage-note { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: #cbd5e1; }
 .dice-results { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; margin: 16px 0 4px; }
 .dice-results li { min-width: 52px; padding: 10px 14px; text-align: center; font-size: 24px; font-weight: 800; border: 1px solid #374151; border-radius: 12px; background: #1f2937; }

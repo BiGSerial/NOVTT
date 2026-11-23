@@ -2,7 +2,7 @@ import * as RAPIER from '@dimforge/rapier3d-deterministic'
 import { describe, expect, it } from 'vitest'
 import { DIE_TYPES, dieDef, SIDES, type DieType } from '../src/dice/geometry'
 import { dot, length, qmul, rotate, sub } from '../src/dice/math'
-import { simulateRoll } from '../src/dice/sim'
+import { overlayTable, simulateRoll } from '../src/dice/sim'
 import { relabel, symmetryTable } from '../src/dice/symmetry'
 import { detectImpacts } from '../src/dice/impacts'
 
@@ -92,5 +92,21 @@ describe('dice simulation', () => {
     console.info(`6 dice: p50 ${p50.toFixed(1)} ms, p95 ${p95.toFixed(1)} ms, animation ${Math.min(...lengths).toFixed(2)}–${Math.max(...lengths).toFixed(2)} s`)
     expect(p95).toBeLessThan(250)
     expect(Math.max(...lengths)).toBeLessThanOrEqual(6.1)
+  })
+
+  it('throws on a portrait overlay table stay inside the screen and settle flat', () => {
+    const table = overlayTable(390, 844)
+    const dice = ['d20', 'd12', 'd10', 'd8', 'd6', 'd4'] as const
+    for (let seed = 0; seed < 20; seed++) {
+      const r = simulateRoll(RAPIER, dice, 300 + seed, table)
+      const n = dice.length
+      for (let f = 0; f < r.frames; f++) {
+        for (let i = 0; i < n; i++) {
+          const o = (f * n + i) * 7
+          expect(Math.abs(r.poses[o])).toBeLessThan(table.halfX + 0.05)
+          expect(Math.abs(r.poses[o + 2])).toBeLessThan(table.halfZ + 0.05)
+        }
+      }
+    }
   })
 })
