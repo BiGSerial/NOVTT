@@ -6,6 +6,7 @@ namespace App\Live;
 
 use App\Http\Problems\ApiProblem;
 use App\Models\PresetVersion;
+use Novtt\Engine\Presets\SchemaNavigator;
 use Novtt\Engine\Sheets\JsonPointer;
 use Novtt\Engine\Validation\Severity;
 use Novtt\Engine\Validation\ValidationIssue;
@@ -22,6 +23,9 @@ final class SheetCombination
 
     /** @var array<string, array<string, array{label: string, widget: string}>> */
     private array $fields = [];
+
+    /** @var array<string, SchemaNavigator> */
+    private array $schemas = [];
 
     /**
      * @param  list<string>  $paths
@@ -46,7 +50,12 @@ final class SheetCombination
                 throw self::invalid("/paths/{$i}");
             }
             $value = self::read($sheet, $pointer->segments);
-            $components[] = ['path' => $pointer->toString(), 'label' => $field['label'], 'value' => is_int($value) ? $value : 0];
+            if (! is_int($value)) {
+                // A value never written keeps the preset's default (then minimum), like the engine.
+                $node = $this->schema($presetVersionId)->at($pointer) ?? [];
+                $value = is_int($node['default'] ?? null) ? $node['default'] : (is_int($node['minimum'] ?? null) ? $node['minimum'] : 0);
+            }
+            $components[] = ['path' => $pointer->toString(), 'label' => $field['label'], 'value' => $value];
         }
 
         return $components;
@@ -73,6 +82,13 @@ final class SheetCombination
         }
 
         return $this->fields[$presetVersionId] = $fields;
+    }
+
+    private function schema(string $presetVersionId): SchemaNavigator
+    {
+        return $this->schemas[$presetVersionId] ??= new SchemaNavigator(
+            json_decode((string) PresetVersion::query()->whereKey($presetVersionId)->firstOrFail(['id', 'sheet_schema'])->getRawOriginal('sheet_schema'), true, 64, JSON_THROW_ON_ERROR),
+        );
     }
 
     /** @param list<string> $tokens */
