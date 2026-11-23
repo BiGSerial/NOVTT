@@ -4,8 +4,8 @@ import { describeDice, faceCounts } from '../../live/dice'
 import type { OfficialRoll } from '../../live/types'
 
 /**
- * The official result, brought to the front once the dice settle (SPEC-MVP-002 D4). It docks
- * under the dice (which stay on the table) instead of covering them, and leaves on tap / Esc or
+ * The official result, brought to the front once the dice settle (SPEC-MVP-002 D4). It sits in
+ * the centre of the screen, above the row where the dice rest, and leaves on tap / Esc or
  * after a while. Who saw it is part of the message: "só você e o mestre" for private rolls.
  */
 const props = defineProps<{ roll: OfficialRoll | null; meId?: string }>()
