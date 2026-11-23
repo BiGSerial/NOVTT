@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1.0",
+  "id": "dnd-5e-2024",
+  "display_name": "5E revisada 2024 (manifesto de referência)",
+  "family_id": "dnd-5e",
+  "rules_revision": "2024",
+  "source_version": "SRD 5.2.1",
+  "errata_reference": null,
+  "preset_version": "0.1.0",
+  "locale": "pt-BR",
+  "license": {
+    "identifier": "CC-BY-4.0",
+    "source_url": "https://www.dndbeyond.com/srd",
+    "rights_status": "draft"
+  },
+  "capabilities": {
+    "character_creation": true,
+    "character_progression": true,
+    "dice_resolution": true,
+    "inventory": true,
+    "resource_tracking": true
+  },
+  "publication": {"public": false}
+}

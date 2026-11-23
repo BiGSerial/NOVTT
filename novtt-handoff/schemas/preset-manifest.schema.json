@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://novtt.example/schemas/preset-manifest.schema.json",
+  "title": "NOVTT Preset Manifest v0.1 (metadata only)",
+  "description": "Contrato inicial de manifesto. Não é schema completo de regras executáveis.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "display_name", "family_id", "rules_revision", "preset_version", "license", "capabilities", "publication"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "display_name": {"type": "string", "minLength": 1, "maxLength": 120},
+    "family_id": {"type": "string", "minLength": 2},
+    "rules_revision": {"type": "string", "minLength": 1},
+    "source_version": {"type": ["string", "null"]},
+    "errata_reference": {"type": ["string", "null"]},
+    "preset_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$"},
+    "locale": {"type": "string", "pattern": "^[a-z]{2}(?:-[A-Z]{2})?$"},
+    "license": {
+      "type": "object", "additionalProperties": false,
+      "required": ["identifier", "source_url", "rights_status"],
+      "properties": {
+        "identifier": {"type": "string", "minLength": 1},
+        "source_url": {"type": "string", "format": "uri"},
+        "rights_status": {"enum": ["draft", "rights_review", "approved", "quarantined", "published", "retired"]},
+        "attribution": {"type": "string"}
+      }
+    },
+    "capabilities": {
+      "type": "object", "additionalProperties": {"type": "boolean"},
+      "required": ["character_creation", "character_progression", "dice_resolution"]
+    },
+    "publication": {"type": "object", "additionalProperties": false,
+      "required": ["public"], "properties": {"public": {"type": "boolean"}}}
+  },
+  "allOf": [
+    {"if": {"properties": {"publication": {"properties": {"public": {"const": true}}, "required": ["public"]}}},
+     "then": {"properties": {"license": {"properties": {"rights_status": {"enum": ["approved", "published"]}, "attribution": {"minLength": 1}}, "required": ["attribution"]}}}}
+  ]
+}
