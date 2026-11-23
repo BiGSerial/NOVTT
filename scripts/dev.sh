@@ -50,6 +50,12 @@ case "${1:-help}" in
     docker run --rm --network container:novtt-player-1 -v "$PWD/scripts/e2e":/e2e:ro -v "$PWD/e2e-output":/out \
       mcr.microsoft.com/playwright:v1.65.1-noble sh -c "cd /tmp && npm i -s playwright@1.65.1 >/dev/null 2>&1 && cp /e2e/live-table.mjs . && node live-table.mjs; status=\$?; chown -R $(id -u):$(id -g) /out; exit \$status"
     ;;
+  e2e-atmosphere)
+    # Weather and time of day set by the master and seen by a player (needs: sh scripts/dev.sh demo).
+    mkdir -p e2e-output
+    docker run --rm --network container:novtt-player-1 -v "$PWD/scripts/e2e":/e2e:ro -v "$PWD/e2e-output":/out \
+      mcr.microsoft.com/playwright:v1.65.1-noble sh -c "cd /tmp && npm i -s playwright@1.65.1 >/dev/null 2>&1 && cp /e2e/atmosphere.mjs . && node atmosphere.mjs; status=\$?; chown -R $(id -u):$(id -g) /out; exit \$status"
+    ;;
   e2e-presets)
     # Guided creation on the demo preset, master review and activation (needs: sh scripts/dev.sh demo-reset).
     mkdir -p e2e-output
@@ -61,5 +67,5 @@ case "${1:-help}" in
   infra) require_db_password; docker compose --profile infra up -d postgres redis ;;
   down) docker compose --profile infra --profile player --profile api down ;;
   logs) docker compose --profile infra --profile player --profile api logs -f ;;
-  *) echo "Uso: sh scripts/dev.sh {setup|test|engine|api|api-test|player|demo|demo-reset|e2e|e2e-presets|infra|down|logs}"; exit 2 ;;
+  *) echo "Uso: sh scripts/dev.sh {setup|test|engine|api|api-test|player|demo|demo-reset|e2e|e2e-atmosphere|e2e-presets|infra|down|logs}"; exit 2 ;;
 esac
