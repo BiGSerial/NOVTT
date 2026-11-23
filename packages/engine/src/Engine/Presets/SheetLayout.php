@@ -15,7 +15,7 @@ use Novtt\Engine\Sheets\JsonPointer;
 final readonly class SheetLayout
 {
     /**
-     * @param array<string, array{section: string, access: FieldAccess, kind: 'field'|'collection', item_fields: array<string, FieldAccess>}> $elements keyed by pointer
+     * @param array<string, array{section: string, access: FieldAccess, kind: 'field'|'collection', item_fields: array<string, FieldAccess>, max_items: int|null}> $elements keyed by pointer
      * @param array<string, string> $sectionLabels
      */
     private function __construct(public array $elements, public array $sectionLabels)
@@ -44,6 +44,7 @@ final readonly class SheetLayout
                     'access' => $access,
                     'kind' => $element['kind'] === 'collection' ? 'collection' : 'field',
                     'item_fields' => $itemFields,
+                    'max_items' => isset($element['max_items']) ? (int) $element['max_items'] : null,
                 ];
             }
         }
@@ -51,7 +52,7 @@ final readonly class SheetLayout
         return new self($elements, $labels);
     }
 
-    /** @return array{section: string, access: FieldAccess, kind: 'field'|'collection', item_fields: array<string, FieldAccess>}|null */
+    /** @return array{section: string, access: FieldAccess, kind: 'field'|'collection', item_fields: array<string, FieldAccess>, max_items: int|null}|null */
     public function element(JsonPointer $path): ?array
     {
         return $this->elements[$path->toString()] ?? null;
