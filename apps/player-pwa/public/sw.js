@@ -6,7 +6,7 @@
 const BUILD_ID = '__BUILD_ID__'
 const CACHE_PREFIX = 'novtt-player-shell-'
 const CACHE_NAME = CACHE_PREFIX + BUILD_ID
-const PUBLIC_SHELL = ['/', '/manifest.webmanifest', '/icons/novtt-192.svg', '/icons/novtt-512.svg']
+const PUBLIC_SHELL = ['/', '/manifest.webmanifest', '/icons/novtt-icon.svg', '/icons/novtt-192.png', '/icons/novtt-512.png']
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {

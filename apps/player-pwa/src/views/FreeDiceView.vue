@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BrandMark from '../components/BrandMark.vue'
 import { computed, ref, shallowRef, watch } from 'vue'
 import DiceTray from '../components/DiceTray.vue'
 import SkinPicker from '../components/SkinPicker.vue'
@@ -57,7 +58,7 @@ function roll(): void {
 <template>
   <main class="page dice-page">
     <header>
-      <p class="eyebrow">NOVTT PLAYER</p>
+      <BrandMark />
       <h1>Dados livres</h1>
       <p>Role dados sem precisar entrar em uma campanha.</p>
     </header>
