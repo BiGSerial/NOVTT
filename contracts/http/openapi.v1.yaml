@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.2.0-mvp003
+  version: 1.3.0-presets001
   license:
     name: MIT
     identifier: MIT
@@ -10,6 +10,12 @@ info:
     characters, NPCs, drafts and master review of sheet changes. 1.1 adds the live table
     (SPEC-MVP-002): accounts, paired devices, sessions and their event stream, master roll
     requests and official rolls, live state, notes, whispers, clues, Roteiro and Atlas.
+    1.3 adds the preset engine (ADR 0012): manifest/2 and rules/2 packages with an optional
+    compendium, rights status in the catalogue, derived values, creation progress and decision
+    trace on characters, the creation gate on approval and the live-session lock on proposals.
+    Rights review (`novtt:preset:rights`) and canonical publication (`novtt:preset:publish`) are
+    team CLI commands with no HTTP route; canonical publication fails with `preset.rights_blocked`
+    unless the package passes the rights gate.
     Realtime: committed session events are also pushed on private Reverb channels
     (`campaign.{id}`, `campaign.{id}.master`, `user.{id}`; event `session.event`,
     contracts/events/session-event.v1.schema.json), authorized at /api/broadcasting/auth.
@@ -537,6 +543,7 @@ paths:
     post:
       tags: [review]
       summary: Approve the character into the campaign (master). Requires its initial proposal to be applied.
+      description: For rules/2 presets every creation step must be complete, otherwise 422 `character.creation_incomplete` (with `steps`).
       operationId: approveCampaignCharacter
       responses:
         '200':
@@ -546,6 +553,7 @@ paths:
               schema: { $ref: '#/components/schemas/CampaignCharacter' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
   /campaign-characters/{campaignCharacterId}/grants:
     parameters: [{ $ref: '#/components/parameters/CampaignCharacterId' }]
     get:
@@ -727,6 +735,10 @@ paths:
     post:
       tags: [review]
       summary: Submit the current draft as a proposal. At most one active proposal per character.
+      description: |
+        The author is always the authenticated actor. When the preset sets
+        `governance.lock_during_session` and the campaign has an active live session, players get
+        409 `character.locked_by_session` (drafts stay editable).
       operationId: submitChangeRequest
       parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
       requestBody:
@@ -1887,22 +1899,57 @@ components:
       type: object
       additionalProperties: false
       required: [manifest, sheet_schema, sheet_ui, rules]
+      description: Each part is validated against the contract named by its own `contract` value.
       properties:
-        manifest: { $ref: '../presets/preset-manifest.v1.schema.json' }
+        manifest:
+          oneOf:
+            - $ref: '../presets/preset-manifest.v2.schema.json'
+            - $ref: '../presets/preset-manifest.v1.schema.json'
         sheet_schema: { type: object, description: JSON Schema Draft 2020-12 for the sheet document }
         sheet_ui: { $ref: '../presets/sheet-ui.v1.schema.json' }
-        rules: { $ref: '../presets/rules.v1.schema.json' }
+        rules:
+          oneOf:
+            - $ref: '../presets/rules.v2.schema.json'
+            - $ref: '../presets/rules.v1.schema.json'
+        compendium: { $ref: '../presets/compendium.v1.schema.json' }
     PresetVersionSummary:
       type: object
-      required: [id, family_id, variant_id, version, display_name, status, canonical]
+      required: [id, family_id, variant_id, version, display_name, status, canonical, rights_status, license, limitations, taxonomy]
+      description: |
+        Canonical entries appear in the catalogue only when `status` is `published` and
+        `rights_status` is `approved` or `published`. Fields from manifest/2 are null for manifest/1.
       properties:
         id: { type: string, format: uuid }
         family_id: { type: string }
         variant_id: { type: string }
-        version: { type: string }
+        version: { type: string, description: Technical version of the encoding (SemVer) }
         display_name: { type: string }
         status: { enum: [draft, structurally_valid, engine_compatible, reviewed, published] }
         canonical: { type: boolean }
+        rules_revision: { type: [string, 'null'], description: Edition/revision of the game rules }
+        source_version: { type: [string, 'null'] }
+        errata_reference: { type: [string, 'null'] }
+        locale: { type: [string, 'null'] }
+        license:
+          type: object
+          properties:
+            identifier: { type: [string, 'null'] }
+            attribution: { type: [string, 'null'] }
+            source_url: { type: [string, 'null'] }
+        rights_status: { enum: [draft, rights_review, approved, quarantined, published, retired] }
+        source_authenticity: { enum: [official, licensed, community, original, null] }
+        coverage: { enum: [schema_only, character_creation, progression, playable_core, full_licensed_scope, null] }
+        limitations: { type: array, items: { type: string } }
+        taxonomy:
+          type: array
+          description: Category names of this preset's compendium (e.g. its own word for class or lineage).
+          items:
+            type: object
+            required: [kind, labels]
+            properties:
+              kind: { type: string }
+              labels: { type: object, additionalProperties: { type: string } }
+              parent_kind: { type: [string, 'null'] }
     PresetVersion:
       allOf:
         - $ref: '#/components/schemas/PresetVersionSummary'
@@ -1914,7 +1961,10 @@ components:
             validation_report: { $ref: '../sheets/validation-result.v1.schema.json' }
             sheet_schema: { type: object }
             sheet_ui: { $ref: '../presets/sheet-ui.v1.schema.json' }
-            rules: { $ref: '../presets/rules.v1.schema.json' }
+            rules:
+              oneOf:
+                - $ref: '../presets/rules.v2.schema.json'
+                - $ref: '../presets/rules.v1.schema.json'
     Campaign:
       type: object
       required: [id, name, status, revision, preset_version_id, role]
@@ -1963,7 +2013,53 @@ components:
         sheet_revision: { type: integer }
         player_user_id: { type: string, format: uuid }
         in_custody: { type: boolean }
-        sheet: { type: object, description: Official sheet with every field the actor may not read removed }
+        preset_version_id: { type: string, format: uuid }
+        sheet:
+          type: object
+          description: |
+            Official sheet with every field the actor may not read removed. Derived values declared
+            by the preset are computed on read and written at their paths; they are never stored.
+        decision_trace:
+          type: array
+          description: How each readable derived value was computed (base formula, effects, result).
+          items:
+            type: object
+            required: [derived, path, base, modifiers, value]
+            properties:
+              derived: { type: string }
+              path: { type: string }
+              base: {}
+              value: {}
+              modifiers:
+                type: array
+                items:
+                  type: object
+                  required: [effect, mode, value, source, applied]
+                  properties:
+                    effect: { type: string }
+                    mode: { enum: [add, set] }
+                    value: {}
+                    source: { type: object }
+                    applied: { type: boolean }
+        creation:
+          type: object
+          description: Present for rules/2 presets. Creation steps in order; approval requires `complete`.
+          required: [complete, steps, issues]
+          properties:
+            complete: { type: boolean }
+            steps:
+              type: array
+              items:
+                type: object
+                required: [id, available, complete, missing, condition_met, issues]
+                properties:
+                  id: { type: string }
+                  available: { type: boolean }
+                  complete: { type: boolean }
+                  missing: { type: array, items: { type: string } }
+                  condition_met: { type: boolean }
+                  issues: { type: integer }
+            issues: { type: array, items: { type: object } }
     Grant:
       type: object
       required: [id, budget_id, amount, created_at]
