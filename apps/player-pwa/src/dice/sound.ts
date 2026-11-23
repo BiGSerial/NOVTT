@@ -20,6 +20,11 @@ function context(): AudioContext | null {
   return ctx
 }
 
+/** The shared Web Audio context (null without Web Audio); also used by the weather (thunder). */
+export function audioContext(): AudioContext | null {
+  return context()
+}
+
 /** Must be called from the user gesture (click) so browsers allow audio. */
 export function unlockAudio(): void {
   const c = context()
