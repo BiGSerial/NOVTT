@@ -28,7 +28,14 @@ Depois do login, tudo passa pelas rotas, policies, idempotência e auditoria rea
 O seed também cria **A Ponte de Vau Cinzento (demo)** no preset original `novtt-mesa`: mestre,
 três jogadores (`player`, `player2`, `player3` no login de demo) com Lyra, Bram e Nix aprovados,
 três PdMs com vida, um roteiro (que semeia bússola, relógios e pistas ao iniciar a sessão), Atlas e
-uma nota fixada. Abra uma janela por papel (janela anônima ou outro navegador para cada um).
+uma nota fixada. Abra uma janela por papel (janela anônima ou outro navegador para cada um):
+
+- `http://localhost:5173/` → **Mestre** (mesa do mestre no desktop) ou **Lyra / Bram / Nix** (celular).
+- `http://localhost:5173/#/tablet` num tablet (ou outra janela): mostra um código; o mestre toca em
+  **Parear tablet** e digita o código. O fichário segue a seleção do mestre.
+- `sh scripts/dev.sh e2e`: abre mestre, jogadora e tablet num Chromium headless e confere que as
+  telas mostram o mesmo resultado oficial, que a rolagem secreta não vaza, que o sussurro chega só
+  à destinatária e que o pareamento funciona. Capturas em `e2e-output/`.
 
 ## Travas de segurança
 

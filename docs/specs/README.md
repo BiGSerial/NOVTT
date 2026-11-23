@@ -26,7 +26,7 @@ MUST / MUST NOT = requirement. SHOULD = preferred with documented reason to devi
 | Spec | Scope | Status |
 | --- | --- | --- |
 | [SPEC-SPRINT-001](SPEC-SPRINT-001-approved.md) | Frozen Sprint 001 scope, authorization, sheet review, atomic approval | ACCEPTED / IMPLEMENTED (API, PWA, master review panel; not VERIFIED: Android and manual a11y pending) |
-| [SPEC-MVP-002](SPEC-MVP-002-live-table.md) | Live table PoC: sessions, realtime, official rolls with 3D dice, master table, tablet pairing, Roteiro, Atlas | ACCEPTED (owner 2026-11-22) / IMPLEMENTED: API; clients in progress |
+| [SPEC-MVP-002](SPEC-MVP-002-live-table.md) | Live table PoC: sessions, realtime, official rolls with 3D dice, master table, tablet pairing, Roteiro, Atlas | ACCEPTED (owner 2026-11-22) / IMPLEMENTED: API and web clients (master desktop, player phone, paired tablet, Roteiro, Atlas); Android native pending |
 | [SPEC-PRESET-AUTHORING-001](SPEC-PRESET-AUTHORING-001.md) | Preset families, variants, personal library, canonical publication, human/AI guidance | ACCEPTED / IMPLEMENTED for the v1 subset (`docs/presets/PRESET_MANUAL.md`) |
 
 **Status clarification:** The prior SPEC-005 remains PROPOSED only for details **not explicitly accepted** in the two specifications above. For overlapping requirements, these newer owner-approved specifications govern, subject to accepted ADRs. The candidate Sangue-Suga V20 preset has not been integrated or validated against the engine. Do not infer VERIFIED status from documentation.

@@ -44,10 +44,16 @@ case "${1:-help}" in
     NOVTT_DEMO_MODE=true docker compose --profile api exec -T api php artisan migrate:fresh --force
     NOVTT_DEMO_MODE=true docker compose --profile api exec -T api php artisan novtt:demo:seed
     ;;
+  e2e)
+    # Browser end-to-end of the live table against the running demo (sh scripts/dev.sh demo).
+    mkdir -p e2e-output
+    docker run --rm --network container:novtt-player-1 -v "$PWD/scripts/e2e":/e2e:ro -v "$PWD/e2e-output":/out \
+      mcr.microsoft.com/playwright:v1.65.1-noble sh -c "cd /tmp && npm i -s playwright@1.65.1 >/dev/null 2>&1 && cp /e2e/live-table.mjs . && node live-table.mjs; status=\$?; chown -R $(id -u):$(id -g) /out; exit \$status"
+    ;;
   engine) docker compose --profile test run --build --rm engine ;;
   player) docker compose --profile player up player ;;
   infra) require_db_password; docker compose --profile infra up -d postgres redis ;;
   down) docker compose --profile infra --profile player --profile api down ;;
   logs) docker compose --profile infra --profile player --profile api logs -f ;;
-  *) echo "Uso: sh scripts/dev.sh {setup|test|engine|api|api-test|player|demo|demo-reset|infra|down|logs}"; exit 2 ;;
+  *) echo "Uso: sh scripts/dev.sh {setup|test|engine|api|api-test|player|demo|demo-reset|e2e|infra|down|logs}"; exit 2 ;;
 esac

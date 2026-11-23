@@ -1,7 +1,7 @@
 # SPEC-MVP-002: Mesa ao vivo (prova de conceito funcional)
 
 Status: ACCEPTED (owner, 2026-11-22: "o protótipo está bom; quero ver um MVP funcional com todas as
-funcionalidades e interatividades"); implementation status: PLANNED
+funcionalidades e interatividades"); implementation status: IMPLEMENTED (API + web clients, local Docker); NOT VERIFIED on real devices or Android
 Authority: SPEC-MVP-001, SPEC-002, SPEC-003, ADR 0004, ADR 0006, ADR 0011.
 Prototype (approved look and flow): https://claude.ai/artifact/98nL3Haurj6Jjk8fWhMtcu
 
