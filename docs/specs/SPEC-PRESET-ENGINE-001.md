@@ -30,12 +30,12 @@ MUST NOT: publish third-party proprietary names, text or art without recorded ri
 | Test | Covered by |
 |---|---|
 | 1. Pool creation 7/5/3, attributes start at 1, over-budget rejected, derived read-only and recomputed | `PresetEngineAcceptanceTest` (test_priority_*, test_allocating_*, test_a_derived_*) |
-| 2. Steps identity → origin → attributes → review, choice prerequisite, incomplete does not activate | `PresetEngineAcceptanceTest` (choices, steps); API creation gate test |
-| 3. XP purchase `current × 4` = 12, insufficient blocks, no double debit, rejection does not debit, approval atomic with audit | `PresetEngineAcceptanceTest`; API feature and concurrency tests |
-| 4. XP/milestone unlocks level and benefits; a newer revision does not change the pinned snapshot | `PresetEngineAcceptanceTest` (levels, milestones, revision isolation); API pinning test |
+| 2. Steps identity → origin → attributes → review, choice prerequisite, incomplete does not activate | `PresetEngineAcceptanceTest` (choices, steps); `PresetEngineApiTest::test_an_incomplete_character_is_not_activated_and_a_complete_one_is` |
+| 3. XP purchase `current × 4` = 12, insufficient blocks, no double debit, rejection does not debit, approval atomic with audit | `PresetEngineAcceptanceTest`; `PresetEngineApiTest` (rejection, approval, insufficient balance); `ExperiencePurchaseConcurrencyTest` |
+| 4. XP/milestone unlocks level and benefits; a newer revision does not change the pinned snapshot | `PresetEngineAcceptanceTest` (levels, milestones, revision isolation); `PresetProgressionRightsApiTest` (levels, pinning) |
 | 5. `1d20+5`, `5d10` with variable difficulty and cancelling 1s by strategies; deterministic tests, secure production randomness | `ResolutionStrategyTest` |
-| 6. Player cannot alter a locked/active sheet outside policy; master cannot forge the player; history records origin and snapshot | API feature tests |
-| 7. Rights: not approved, CC BY without attribution, quarantined | `PresetPackageTest`; API catalogue tests |
+| 6. Player cannot alter a locked/active sheet outside policy; master cannot forge the player; history records origin and snapshot | `PresetEngineApiTest` (writes outside proposals, author identity, session lock, history) |
+| 7. Rights: not approved, CC BY without attribution, quarantined | `PresetPackageTest`; `PresetProgressionRightsApiTest` (refused publication, quarantine, rights command) |
 | 8. Schemas and examples validate; suites pass; docs explain authoring | `PresetPackageTest`, `ContractSchemasTest`, CI |
 
 ## Entitlements boundary (PE-11)
