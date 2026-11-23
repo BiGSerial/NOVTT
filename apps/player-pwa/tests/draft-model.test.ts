@@ -4,6 +4,18 @@ import { DraftModel } from '../src/sheets/draft'
 describe('DraftModel', () => {
   const official = { attributes: { might: 2 }, merits: [{ id: 'm1', name: 'A', cost: 1 }] }
 
+  it('never reuses an operation id when reopening a saved draft with gaps', () => {
+    const saved = { contract: 'novtt.sheet-change-set/1' as const, base_sheet_revision: 0, operations: [
+      { id: 'op6', type: 'set_field' as const, path: '/skills/lore', value: 3, expected: null },
+      { id: 'op7', type: 'set_field' as const, path: '/attributes/wits', value: 2, expected: 1 },
+    ] }
+    const draft = new DraftModel({ attributes: { wits: 1 } }, 0, saved)
+    for (const path of ['/attributes/might', '/attributes/agility', '/skills/climb']) draft.setField(path, 2)
+    const ids = draft.changeSet.operations.map(o => o.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(ids).toEqual(['op6', 'op7', 'op8', 'op9', 'op10'])
+  })
+
   it('keeps one operation per field and records the value the author saw', () => {
     const draft = new DraftModel(official, 3)
     draft.setField('/attributes/might', 3)

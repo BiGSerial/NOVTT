@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { t } from '../i18n/messages'
 import type { DraftModel } from '../sheets/draft'
 import { segments } from '../sheets/pointer'
@@ -13,8 +13,33 @@ const props = defineProps<{
   issues: ValidationIssue[]
   revision: number
   readonly?: boolean
+  /** Budget id → player-facing label (preset rules). Raw ids are never shown. */
+  budgetLabels?: Record<string, string>
 }>()
 const emit = defineEmits<{ changed: [] }>()
+
+// DraftModel is a plain class; this counter makes reads reactive without remounting the form,
+// so keyboard focus stays on the control the player is using.
+const version = ref(0)
+function valueOf(path: string): unknown {
+  void version.value
+  return props.draft.value(path)
+}
+function itemsOf(path: string) {
+  void version.value
+  return props.draft.items(path)
+}
+function changed(): void {
+  version.value++
+  emit('changed')
+}
+
+function message(issue: ValidationIssue): string {
+  if (issue.rule_id === 'budget.insufficient') {
+    return t(issue.rule_id, { ...issue.params, budget_label: props.budgetLabels?.[String(issue.params.budget)] ?? null })
+  }
+  return t(issue.rule_id, issue.params)
+}
 
 type SchemaNode = { type?: string; minimum?: number; maximum?: number; maxLength?: number; enum?: Scalar[]; properties?: Record<string, SchemaNode>; items?: SchemaNode }
 
@@ -47,12 +72,18 @@ function editable(section: (typeof props.ui.sections)[number], element: FieldEle
   return !props.readonly && canPropose(accessOf(props.ui, section, element))
 }
 
+/** True when all editable elements of the section need the master's approval: say it once. */
+function sectionNeedsApproval(section: (typeof props.ui.sections)[number], elements: (FieldElement | CollectionElement)[]): boolean {
+  const editableOnes = elements.filter(e => editable(section, e))
+  return editableOnes.length > 0 && editableOnes.every(e => accessOf(props.ui, section, e) === 'approval_required')
+}
+
 function setField(path: string, raw: string | number | boolean): void {
   const n = node(path)
   let value: Scalar = raw as Scalar
   if (n.type === 'integer' || n.type === 'number') value = raw === '' ? null : Number(raw)
   props.draft.setField(path, value)
-  emit('changed')
+  changed()
 }
 
 function describedBy(path: string, hasHelp: boolean): string | undefined {
@@ -73,11 +104,11 @@ function addItem(element: CollectionElement): void {
   }
   props.draft.addItem(element.path, value)
   newItem.set(element.path, {})
-  emit('changed')
+  changed()
 }
 function removeItem(path: string, id: string): void {
   props.draft.removeItem(path, id)
-  emit('changed')
+  changed()
 }
 function display(value: unknown): string {
   return value === undefined || value === null || value === '' ? '—' : String(value)
@@ -90,15 +121,16 @@ function display(value: unknown): string {
       <h2 id="error-summary-title">Há {{ issues.length }} {{ issues.length === 1 ? 'problema' : 'problemas' }} no rascunho</h2>
       <ul>
         <li v-for="(issue, index) in issues" :key="index">
-          <a v-if="issue.paths[0]" :href="`#${fieldId(issue.paths[0])}`">{{ t(issue.rule_id, issue.params) }}</a>
-          <span v-else>{{ t(issue.rule_id, issue.params) }}</span>
+          <a v-if="issue.paths[0]" :href="`#${fieldId(issue.paths[0])}`">{{ message(issue) }}</a>
+          <span v-else>{{ message(issue) }}</span>
         </li>
       </ul>
     </div>
-    <p v-for="(issue, index) in general" :key="`g${index}`" class="sr-only">{{ t(issue.rule_id, issue.params) }}</p>
+    <p v-for="(issue, index) in general" :key="`g${index}`" class="sr-only">{{ message(issue) }}</p>
 
     <fieldset v-for="{ section, elements } in visibleSections" :key="section.id" class="section">
       <legend>{{ section.label }}</legend>
+      <p v-if="sectionNeedsApproval(section, elements)" class="help approval-note">Mudanças nesta seção passam pela aprovação do mestre.</p>
       <template v-for="element in elements" :key="element.path">
         <div v-if="element.kind === 'field'" class="field" :class="{ invalid: errorsFor(element.path).length }">
           <template v-if="editable(section, element)">
@@ -106,7 +138,7 @@ function display(value: unknown): string {
               v-if="element.widget === 'dot_rating'"
               :id="fieldId(element.path)"
               :label="element.label"
-              :model-value="(draft.value(element.path) as number | null) ?? null"
+              :model-value="(valueOf(element.path) as number | null) ?? null"
               :min="node(element.path).minimum ?? 0"
               :max="node(element.path).maximum ?? 5"
               :described-by="describedBy(element.path, !!element.description)"
@@ -118,7 +150,7 @@ function display(value: unknown): string {
               <textarea
                 v-if="element.widget === 'textarea'"
                 :id="fieldId(element.path)"
-                :value="(draft.value(element.path) as string) ?? ''"
+                :value="(valueOf(element.path) as string) ?? ''"
                 :maxlength="node(element.path).maxLength"
                 :aria-invalid="errorsFor(element.path).length ? 'true' : undefined"
                 :aria-describedby="describedBy(element.path, !!element.description)"
@@ -128,7 +160,7 @@ function display(value: unknown): string {
                 v-else-if="element.widget === 'boolean'"
                 :id="fieldId(element.path)"
                 type="checkbox"
-                :checked="draft.value(element.path) === true"
+                :checked="valueOf(element.path) === true"
                 :aria-describedby="describedBy(element.path, !!element.description)"
                 @change="setField(element.path, ($event.target as HTMLInputElement).checked)"
               />
@@ -140,29 +172,29 @@ function display(value: unknown): string {
                 :min="node(element.path).minimum"
                 :max="node(element.path).maximum"
                 :maxlength="node(element.path).maxLength"
-                :value="(draft.value(element.path) as string | number) ?? ''"
+                :value="(valueOf(element.path) as string | number) ?? ''"
                 :aria-invalid="errorsFor(element.path).length ? 'true' : undefined"
                 :aria-describedby="describedBy(element.path, !!element.description)"
                 @change="setField(element.path, ($event.target as HTMLInputElement).value)"
               />
             </template>
             <p v-if="element.description" :id="fieldId(element.path, '-help')" class="help">{{ element.description }}</p>
-            <p v-if="accessOf(ui, section, element) === 'approval_required'" class="help">Alterações neste campo passam pela aprovação do mestre.</p>
+            <p v-if="accessOf(ui, section, element) === 'approval_required' && !sectionNeedsApproval(section, elements)" class="help">Alterações neste campo passam pela aprovação do mestre.</p>
           </template>
           <dl v-else class="readonly">
             <dt :id="fieldId(element.path)">{{ element.label }}</dt>
-            <dd>{{ display(draft.value(element.path)) }}</dd>
+            <dd>{{ display(valueOf(element.path)) }}</dd>
           </dl>
           <p v-for="(issue, index) in errorsFor(element.path)" :id="index === 0 ? fieldId(element.path, '-error') : undefined" :key="index" class="error">
-            {{ t(issue.rule_id, issue.params) }}
+            {{ message(issue) }}
           </p>
         </div>
 
         <div v-else class="collection" :id="fieldId(element.path)">
-          <h3>{{ element.label }}</h3>
-          <p v-if="draft.items(element.path).length === 0" class="help">Nenhum item.</p>
+          <h3 :class="{ 'sr-only': element.label === section.label }">{{ element.label }}</h3>
+          <p v-if="itemsOf(element.path).length === 0" class="help">Nenhum item.</p>
           <ul>
-            <li v-for="item in draft.items(element.path)" :key="item.id">
+            <li v-for="item in itemsOf(element.path)" :key="item.id">
               <span v-for="f in element.item_fields" :key="f.field" class="item-field">
                 <span class="sr-only">{{ f.label }}: </span>{{ display(item[f.field]) }}
               </span>
@@ -177,7 +209,7 @@ function display(value: unknown): string {
             </label>
             <button type="button" @click="addItem(element)">Adicionar</button>
           </fieldset>
-          <p v-for="(issue, index) in errorsFor(element.path)" :key="index" class="error">{{ t(issue.rule_id, issue.params) }}</p>
+          <p v-for="(issue, index) in errorsFor(element.path)" :key="index" class="error">{{ message(issue) }}</p>
         </div>
       </template>
     </fieldset>

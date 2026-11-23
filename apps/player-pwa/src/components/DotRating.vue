@@ -56,14 +56,14 @@ function optionLabel(value: number): string {
         type="button"
         role="radio"
         class="dot"
-        :class="{ filled: value !== 0 && value <= current, zero: value === 0 }"
+        :class="{ filled: value !== 0 && value <= current, zero: value === 0, selected: value === 0 && current === 0 }"
         :aria-checked="value === current ? 'true' : 'false'"
         :aria-label="optionLabel(value)"
         :tabindex="value === current ? 0 : -1"
         :disabled="disabled"
         @click="choose(value)"
         @keydown="onKey($event, index)"
-      />
+      ><span v-if="value === 0" aria-hidden="true">0</span></button>
       <span class="dot-value" aria-hidden="true">{{ current }}</span>
     </div>
   </div>

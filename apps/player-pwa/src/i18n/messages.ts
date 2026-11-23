@@ -8,7 +8,8 @@ const messages: Record<string, (p: Params) => string> = {
   'op.item_not_found': () => 'O item não existe mais.',
   'op.item_exists': () => 'Já existe um item com este identificador.',
   'op.collection_full': p => `Limite de ${p.max_items} itens atingido.`,
-  'budget.insufficient': p => `Pontos insuficientes em “${p.budget}”: precisa de ${p.required}, há ${p.available}.`,
+  // The budget id is an internal code: show the preset's label, or nothing.
+  'budget.insufficient': p => `Saldo insuficiente${p.budget_label ? ` em ${p.budget_label}` : ''}: precisa de ${p.required}, resta${Number(p.available) === 1 ? '' : 'm'} ${p.available}.`,
   'budget.no_cost_rule_for_phase': () => 'Este valor não pode mudar nesta fase do personagem.',
   'limit.phase_max': p => `O máximo nesta fase é ${p.max}.`,
   'dependency.unmet': () => 'Este valor depende de outro campo que ainda não foi preenchido.',
@@ -16,6 +17,7 @@ const messages: Record<string, (p: Params) => string> = {
   'schema.minimum': p => `O mínimo é ${p.min ?? p.minimum ?? ''}.`.replace(' .', '.'),
   'schema.maxLength': p => `Use no máximo ${p.max ?? ''} caracteres.`,
   'schema.type': () => 'Tipo de valor inválido.',
+  'change_set.invalid': () => 'O rascunho ficou inconsistente. Recarregue a página e tente de novo.',
   'draft.stale': () => 'A ficha oficial mudou. Revise o rascunho antes de enviar.',
   'draft.version_conflict': () => 'O rascunho foi alterado em outra janela. Recarregue.',
   'change_request.active_exists': () => 'Já existe uma proposta em análise para este personagem.',

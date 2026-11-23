@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, shallowRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { api, ApiError } from '../api/client'
 import SheetEditor from '../components/SheetEditor.vue'
 import { t } from '../i18n/messages'
@@ -9,7 +9,7 @@ import type { ChangeSet, Sheet, SheetUi, ValidationIssue, ValidationResult } fro
 const props = defineProps<{ characterId: string; fetcher?: typeof fetch }>()
 
 interface Character { id: string; name: string; status: string; sheet_revision: number; preset_version_id: string; sheet: Sheet }
-interface PresetVersion { sheet_ui: SheetUi; sheet_schema: Record<string, unknown> }
+interface PresetVersion { sheet_ui: SheetUi; sheet_schema: Record<string, unknown>; rules?: { budgets?: { id: string; label: string }[] } }
 interface Draft { draft_version: number; base_sheet_revision: number; change_set: ChangeSet; validation: ValidationResult }
 
 const character = ref<Character | null>(null)
@@ -20,7 +20,13 @@ const issues = ref<ValidationIssue[]>([])
 const status = ref('')
 const failure = ref('')
 const busy = ref(false)
-const tick = ref(0)
+const size = ref(0)
+const AUTOSAVE_MS = 600
+let autosave: ReturnType<typeof setTimeout> | undefined
+let saving: Promise<boolean> | null = null
+let again = false
+
+const budgetLabels = computed(() => Object.fromEntries((preset.value?.rules?.budgets ?? []).map(b => [b.id, b.label])))
 
 const pendingKey = `novtt.submit.${props.characterId}`
 
@@ -34,6 +40,7 @@ async function load(): Promise<void> {
       draftVersion.value = d.draft_version
       issues.value = d.validation.issues
       draft.value = new DraftModel(c.sheet, d.base_sheet_revision, d.change_set)
+      size.value = draft.value.size
     } catch (error) {
       if (!(error instanceof ApiError) || error.status !== 404) throw error
       draft.value = new DraftModel(c.sheet, c.sheet_revision)
@@ -43,10 +50,36 @@ async function load(): Promise<void> {
   }
 }
 
-async function save(): Promise<boolean> {
+/**
+ * Each edit is saved (and validated by the server) shortly after the player stops, so errors and
+ * their fixes show up without pressing a button. Saves are serialized: draft_version is a
+ * compare-and-set, and a second edit during a save triggers exactly one more save.
+ */
+function onChanged(): void {
+  size.value = draft.value?.size ?? 0
+  clearTimeout(autosave)
+  autosave = setTimeout(() => void save(), AUTOSAVE_MS)
+}
+
+function save(): Promise<boolean> {
+  clearTimeout(autosave)
+  if (saving) {
+    again = true
+    return saving
+  }
+  saving = persist().finally(() => {
+    saving = null
+    if (again) {
+      again = false
+      void save()
+    }
+  })
+  return saving
+}
+
+async function persist(): Promise<boolean> {
   if (!draft.value) return false
-  busy.value = true
-  status.value = 'Salvando rascunho…'
+  status.value = ''
   try {
     const saved = await api<Draft>('PUT', `/campaign-characters/${props.characterId}/draft`, { draft_version: draftVersion.value, change_set: draft.value.changeSet }, { fetcher: props.fetcher })
     draftVersion.value = saved.draft_version
@@ -63,6 +96,7 @@ async function save(): Promise<boolean> {
 }
 
 async function submit(): Promise<void> {
+  if (saving) await saving
   if (!(await save())) return
   // One idempotency key per intent, kept until the server confirms (ADR 0003).
   let key = sessionStorage.getItem(pendingKey)
@@ -77,6 +111,7 @@ async function submit(): Promise<void> {
     status.value = 'Proposta enviada ao mestre.'
     draftVersion.value = 0
     draft.value = new DraftModel(character.value!.sheet, character.value!.sheet_revision)
+    size.value = 0
   } catch (error) {
     status.value = t(error instanceof ApiError ? error.code : 'network.error')
     if (error instanceof ApiError && error.status !== 0) sessionStorage.removeItem(pendingKey)
@@ -86,6 +121,7 @@ async function submit(): Promise<void> {
 }
 
 onMounted(load)
+onBeforeUnmount(() => clearTimeout(autosave))
 </script>
 
 <template>
@@ -97,17 +133,17 @@ onMounted(load)
         <h1>{{ character.name }}</h1>
       </header>
       <SheetEditor
-        :key="tick"
         :ui="preset.sheet_ui"
         :schema="preset.sheet_schema"
         :draft="draft"
         :issues="issues"
         :revision="character.sheet_revision"
-        @changed="tick++"
+        :budget-labels="budgetLabels"
+        @changed="onChanged"
       />
       <div class="actions">
         <button type="button" class="secondary" :disabled="busy" @click="save">Salvar rascunho</button>
-        <button type="button" :disabled="busy || draft.size === 0" @click="submit">Enviar para o mestre</button>
+        <button type="button" :disabled="busy || size === 0" @click="submit">Enviar para o mestre</button>
       </div>
       <p class="status" role="status" aria-live="polite">{{ status }}</p>
     </template>

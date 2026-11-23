@@ -15,7 +15,9 @@ export class DraftModel {
   constructor(private readonly official: Sheet, private readonly baseRevision: number, initial?: ChangeSet) {
     if (initial) {
       this.operations = [...initial.operations]
-      this.sequence = this.operations.length
+      // Continue after the highest saved id: removed operations leave gaps (op6, op7…), so the
+      // count would reuse an id still in the set and the server rejects duplicate ids.
+      this.sequence = this.operations.reduce((max, o) => Math.max(max, Number(/^op(\d+)$/.exec(o.id)?.[1] ?? 0)), 0)
     }
   }
 
@@ -79,7 +81,8 @@ export class DraftModel {
   }
 
   private nextId(): string {
-    this.sequence += 1
+    do this.sequence += 1
+    while (this.operations.some(o => o.id === `op${this.sequence}`))
     return `op${this.sequence}`
   }
 }
