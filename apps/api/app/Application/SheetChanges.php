@@ -13,6 +13,7 @@ use App\Models\CharacterGrant;
 use App\Models\PresetVersion;
 use App\Models\User;
 use Novtt\Engine\Presets\SheetLayout;
+use Novtt\Engine\Rules\Mechanics;
 use Novtt\Engine\Sheets\Actor;
 use Novtt\Engine\Sheets\ChangeOperation;
 use Novtt\Engine\Sheets\ChangeOutcome;
@@ -48,6 +49,17 @@ final class SheetChanges
         }
 
         return $this->engines[$presetVersionId];
+    }
+
+    public function mechanics(string $presetVersionId): Mechanics
+    {
+        return $this->engine($presetVersionId)->mechanics();
+    }
+
+    /** Whether the pinned version uses novtt.rules/2 (creation steps, derived values, governance). */
+    public function usesRulesV2(string $presetVersionId): bool
+    {
+        return ($this->mechanics($presetVersionId)->rules()['contract'] ?? null) === 'novtt.rules/2';
     }
 
     public function layout(CampaignCharacter $character): SheetLayout

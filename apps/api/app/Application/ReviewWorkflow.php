@@ -13,6 +13,7 @@ use App\Infrastructure\Validation\JsonDocument;
 use App\Models\CampaignCharacter;
 use App\Models\ChangeOperation as ChangeOperationRow;
 use App\Models\ChangeRequest;
+use App\Models\GameSession;
 use App\Models\CharacterDraft;
 use App\Models\CharacterGrant;
 use App\Models\CharacterSheetRevision;
@@ -108,6 +109,9 @@ final readonly class ReviewWorkflow
             throw ApiProblem::conflict('draft.stale', $character->sheet_revision, 'Rebase the draft before submitting.');
         }
         $role = $this->changes->actorFor($actor, $character);
+        if ($role === Actor::Player) {
+            $this->assertNotLockedBySession($character);
+        }
         $outcome = $this->changes->evaluate($character, $set->operations, $role);
         if (!$outcome->result->isValid()) {
             throw ApiProblem::validation($this->changes->filterFor($outcome->result, $character, $role));
@@ -256,7 +260,8 @@ final readonly class ReviewWorkflow
         $request->update($finalized + ['status' => ChangeRequestStatus::Applied, 'resulting_sheet_revision' => $revision]);
         $this->audit->record($actor, $character->campaign_id, 'change_request.applied', $request, [
             'approved' => count($approved), 'rejected' => $operations->count() - count($approved), 'sheet_revision' => $revision,
-        ]);
+            'origin' => 'change_request', 'author_user_id' => $request->author_user_id,
+        ] + self::presetMetadata($version));
         // No sheet content in the event: consumers fetch the filtered projection.
         $this->audit->emit($character->campaign_id, 'character.sheet_revised', $character, ['campaign_character_id' => $character->getKey(), 'sheet_revision' => $revision]);
 
@@ -352,8 +357,13 @@ final readonly class ReviewWorkflow
             if (ChangeRequest::query()->where('campaign_character_id', $character->getKey())->whereIn('status', ChangeRequestStatus::ACTIVE)->exists()) {
                 throw ApiProblem::conflict('character.active_proposal');
             }
+            if ($this->changes->usesRulesV2($character->preset_version_id)) {
+                $this->assertCreationComplete($character);
+            }
             $character->update(['status' => CampaignCharacterStatus::Approved, 'approved_by' => $actor->getKey(), 'approved_at' => now()]);
-            $this->audit->record($actor, $character->campaign_id, 'campaign_character.approved', $character, ['sheet_revision' => $character->sheet_revision]);
+            $this->audit->record($actor, $character->campaign_id, 'campaign_character.approved', $character, [
+                'sheet_revision' => $character->sheet_revision,
+            ] + self::presetMetadata(PresetVersion::query()->findOrFail($character->preset_version_id)));
             $this->audit->emit($character->campaign_id, 'campaign_character.approved', $character, ['campaign_character_id' => $character->getKey()]);
 
             return $character->refresh();
@@ -529,6 +539,45 @@ final readonly class ReviewWorkflow
         }
 
         return $character;
+    }
+
+    /**
+     * While the campaign has an active live session, a preset with governance.lock_during_session
+     * keeps players from submitting sheet proposals (ADR 0012). Drafts stay editable.
+     */
+    private function assertNotLockedBySession(CampaignCharacter $character): void
+    {
+        if (!$this->changes->mechanics($character->preset_version_id)->locksDuringSession()) {
+            return;
+        }
+        if (GameSession::query()->where('campaign_id', $character->campaign_id)->where('status', 'active')->exists()) {
+            throw ApiProblem::conflict('character.locked_by_session', null, 'Sheet proposals reopen when the live session pauses or ends.');
+        }
+    }
+
+    /** A rules/2 character becomes active only when every creation step is complete. */
+    private function assertCreationComplete(CampaignCharacter $character): void
+    {
+        $progress = $this->changes->mechanics($character->preset_version_id)->creationProgress((array) $character->sheet, $this->changes->grants($character));
+        if ($progress['complete']) {
+            return;
+        }
+        $issues = $progress['issues'];
+        foreach ($progress['steps'] as $step) {
+            if (!$step['complete']) {
+                $issues[] = new ValidationIssue('creation.step_incomplete', Severity::Error, [], $step['missing'], ['step' => $step['id']]);
+            }
+        }
+        throw new ApiProblem(422, 'character.creation_incomplete', '', [
+            'validation' => (new ValidationResult($issues))->toArray(),
+            'steps' => $progress['steps'],
+        ]);
+    }
+
+    /** @return array{preset_version_id: string, preset_content_hash: string, rules_revision: ?string} */
+    private static function presetMetadata(PresetVersion $version): array
+    {
+        return ['preset_version_id' => $version->getKey(), 'preset_content_hash' => $version->content_hash, 'rules_revision' => $version->rulesRevision()];
     }
 
     private function lockActiveRequestForReview(User $actor, string $requestId, int $reviewVersion): ChangeRequest
