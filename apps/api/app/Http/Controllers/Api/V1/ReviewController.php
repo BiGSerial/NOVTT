@@ -218,6 +218,8 @@ final class ReviewController extends ApiController
             'change_set' => json_decode((string) $draft->getRawOriginal('change_set'), false, 64, JSON_THROW_ON_ERROR),
             'validation' => $preview->validation->toArray(),
             'balances' => (object) $preview->balances,
+            // The draft applied to the official sheet, projected for the author (never stored).
+            'preview' => $preview->character === null ? null : $this->presenter->sheetView($preview->character, $preview->candidate, $preview->asMaster),
         ];
     }
 

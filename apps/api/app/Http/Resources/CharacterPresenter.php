@@ -31,8 +31,30 @@ final readonly class CharacterPresenter
      */
     public function campaignCharacter(CampaignCharacter $character, bool $asMaster): array
     {
+        return [
+            'id' => $character->getKey(),
+            'campaign_id' => $character->campaign_id,
+            'name' => $character->name,
+            'status' => $character->status->value,
+            'sheet_revision' => $character->sheet_revision,
+            'player_user_id' => $character->player_user_id,
+            'in_custody' => $character->custodian_user_id !== null,
+            'preset_version_id' => $character->preset_version_id,
+            ...$this->sheetView($character, (array) $character->sheet, $asMaster),
+        ];
+    }
+
+    /**
+     * Projection of a sheet document of this character (the official one, or a draft candidate):
+     * derived values, filtered decision trace and, for rules/2, creation progress and choice
+     * availability.
+     *
+     * @param array<string, mixed> $raw
+     * @return array<string, mixed>
+     */
+    public function sheetView(CampaignCharacter $character, array $raw, bool $asMaster): array
+    {
         $versionId = $character->preset_version_id;
-        $raw = (array) $character->sheet;
         $mechanics = $this->changes->mechanics($versionId);
         $grants = $this->changes->grants($character);
         [$materialized, $trace] = $mechanics->materialize($raw, $grants);
@@ -52,14 +74,6 @@ final readonly class CharacterPresenter
         }
 
         $out = [
-            'id' => $character->getKey(),
-            'campaign_id' => $character->campaign_id,
-            'name' => $character->name,
-            'status' => $character->status->value,
-            'sheet_revision' => $character->sheet_revision,
-            'player_user_id' => $character->player_user_id,
-            'in_custody' => $character->custodian_user_id !== null,
-            'preset_version_id' => $character->preset_version_id,
             'sheet' => self::object($this->views->project($versionId, $materialized, $asMaster)),
             'decision_trace' => $visibleTrace,
         ];
@@ -75,6 +89,10 @@ final readonly class CharacterPresenter
                 }, $progress['steps']),
                 'issues' => $this->changes->filterFor(new ValidationResult($progress['issues']), $character, $viewer)->toArray()['issues'],
             ];
+            $out['choices'] = array_values(array_filter(
+                $mechanics->choiceAvailability($raw, $grants),
+                static fn (array $choice): bool => $readable($choice['path']),
+            ));
         }
 
         return $out;

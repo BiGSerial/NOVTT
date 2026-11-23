@@ -90,7 +90,7 @@ final readonly class ReviewWorkflow
             $result = $result->merge(new ValidationResult([new ValidationIssue('draft.stale', Severity::Warning, [], [], ['current_revision' => $character->sheet_revision])]));
         }
 
-        return new DraftPreview($this->changes->filterFor($result, $character, $role), $outcome->balances);
+        return new DraftPreview($this->changes->filterFor($result, $character, $role), $outcome->balances, $character, $outcome->sheet, $role === Actor::Master);
     }
 
     public function submit(User $actor, string $characterId, int $draftVersion): ChangeRequest
