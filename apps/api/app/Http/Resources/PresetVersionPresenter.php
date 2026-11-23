@@ -68,6 +68,14 @@ final class PresetVersionPresenter
             'sheet_schema' => self::raw($version, 'sheet_schema'),
             'sheet_ui' => self::raw($version, 'sheet_ui'),
             'rules' => self::raw($version, 'rules'),
+            // Short functional labels and original summaries for choice cards; provenance stays server-side.
+            'compendium' => array_map(static fn (array $item): array => [
+                'canonical_id' => $item['canonical_id'],
+                'kind' => $item['kind'],
+                'parent_id' => $item['parent_id'] ?? null,
+                'labels' => (object) $item['labels'],
+                'summary' => $item['summary'] ?? null,
+            ], array_values((array) ($version->compendium['items'] ?? []))),
         ];
     }
 
