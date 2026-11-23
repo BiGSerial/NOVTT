@@ -1,13 +1,18 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.0.0-sprint001
+  version: 1.1.0-mvp002
   license:
     name: MIT
     identifier: MIT
   description: |
     Versioned HTTP contract for Sprint 001 (SPEC-SPRINT-001): presets, campaigns, invitations,
-    characters, NPCs, drafts and master review of sheet changes.
+    characters, NPCs, drafts and master review of sheet changes. 1.1 adds the live table
+    (SPEC-MVP-002): accounts, paired devices, sessions and their event stream, master roll
+    requests and official rolls, live state, notes, whispers, clues, Roteiro and Atlas.
+    Realtime: committed session events are also pushed on private Reverb channels
+    (`campaign.{id}`, `campaign.{id}.master`, `user.{id}`; event `session.event`,
+    contracts/events/session-event.v1.schema.json), authorized at /api/broadcasting/auth.
 
     Conventions
     - Every endpoint requires an authenticated actor (ADR 0009) and is authorized server-side.
@@ -38,6 +43,14 @@ tags:
     description: NPC library and campaign NPCs
   - name: review
     description: Drafts, proposals, master review, grants
+  - name: accounts
+    description: Sign-up, sign-in and the current user
+  - name: devices
+    description: Paired master devices (ADR 0011)
+  - name: live
+    description: Live session, rolls and the master's table (SPEC-MVP-002)
+  - name: world
+    description: Session prep (Roteiro) and the campaign Atlas
 paths:
   /presets:
     get:
@@ -902,6 +915,735 @@ paths:
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationFailed' }
 
+  /auth/register:
+    post:
+      tags: [accounts]
+      summary: Create an account and sign in (first-party session)
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name, email, password]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 80 }
+                email: { type: string, format: email, maxLength: 190 }
+                password: { type: string, minLength: 10, maxLength: 200 }
+      responses:
+        '201': { description: Signed in, content: { application/json: { schema: { $ref: '#/components/schemas/Me' } } } }
+        '400': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /auth/login:
+    post:
+      tags: [accounts]
+      summary: Sign in with email and password
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [email, password]
+              properties:
+                email: { type: string, maxLength: 190 }
+                password: { type: string, maxLength: 200 }
+      responses:
+        '200': { description: Signed in, content: { application/json: { schema: { $ref: '#/components/schemas/Me' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /auth/logout:
+    post:
+      tags: [accounts]
+      summary: Sign out and invalidate the session
+      operationId: logout
+      security: []
+      responses:
+        '204': { description: Signed out }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /me:
+    get:
+      tags: [accounts]
+      summary: The signed-in user (and the paired device, on a paired tablet)
+      operationId: me
+      responses:
+        '200': { description: Current user, content: { application/json: { schema: { $ref: '#/components/schemas/Me' } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+  /pairing:
+    post:
+      tags: [devices]
+      summary: A new device asks for a one-time pairing code (ADR 0011)
+      description: Returns a 6-digit code to show on screen and a claim secret the device keeps. Codes live two minutes; only digests are stored.
+      operationId: createPairing
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [device_label]
+              properties:
+                device_label: { type: string, minLength: 1, maxLength: 60 }
+      responses:
+        '201':
+          description: Pairing started
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [pairing_id, code, claim_secret, expires_at]
+                properties:
+                  pairing_id: { type: string, format: uuid }
+                  code: { type: string, pattern: '^\d{6}$' }
+                  claim_secret: { type: string, minLength: 43, maxLength: 43 }
+                  expires_at: { type: string, format: date-time }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /pairing/{pairingId}/claim:
+    parameters: [{ name: pairingId, in: path, required: true, schema: { type: string } }]
+    post:
+      tags: [devices]
+      summary: The new device claims its session once a master confirmed the code
+      operationId: claimPairing
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [claim_secret]
+              properties:
+                claim_secret: { type: string, minLength: 43, maxLength: 43 }
+      responses:
+        '200':
+          description: Paired; this browser now has its own revocable session
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, me]
+                properties:
+                  status: { const: claimed }
+                  me: { $ref: '#/components/schemas/Me' }
+        '202': { description: Not confirmed yet (poll again), content: { application/json: { schema: { type: object, properties: { status: { const: pending } } } } } }
+        '410': { $ref: '#/components/responses/Problem' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /pairing/confirm:
+    post:
+      tags: [devices]
+      summary: A signed-in master confirms the code shown on the new device
+      operationId: confirmPairing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [code]
+              properties:
+                code: { type: string, pattern: '^\d{6}$' }
+      responses:
+        '200': { description: Confirmed, content: { application/json: { schema: { type: object, properties: { pairing_id: { type: string, format: uuid }, device_label: { type: string }, status: { const: confirmed } } } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /devices:
+    get:
+      tags: [devices]
+      summary: The master's active paired devices
+      operationId: listDevices
+      responses:
+        '200':
+          description: Devices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, label]
+                      properties:
+                        id: { type: string, format: uuid }
+                        label: { type: string }
+                        last_seen_at: { type: [string, 'null'], format: date-time }
+                        created_at: { type: [string, 'null'], format: date-time }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /devices/{deviceId}:
+    parameters: [{ name: deviceId, in: path, required: true, schema: { type: string, format: uuid } }]
+    delete:
+      tags: [devices]
+      summary: Revoke a paired device (its session ends on the next request)
+      operationId: revokeDevice
+      responses:
+        '204': { description: Revoked }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaigns/{campaignId}/roteiros:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [world]
+      summary: Session prep documents (master only)
+      operationId: listRoteiros
+      responses:
+        '200': { description: Roteiros, content: { application/json: { schema: { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Roteiro' } } } } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [world]
+      summary: Create a roteiro
+      operationId: createRoteiro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [title]
+              properties:
+                title: { type: string, minLength: 1, maxLength: 120 }
+                content: { $ref: '#/components/schemas/RoteiroContent' }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Roteiro' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /roteiros/{roteiroId}:
+    parameters: [{ name: roteiroId, in: path, required: true, schema: { type: string, format: uuid } }]
+    put:
+      tags: [world]
+      summary: Replace a roteiro (optimistic revision)
+      operationId: updateRoteiro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [revision, title]
+              properties:
+                revision: { type: integer, minimum: 1 }
+                title: { type: string, minLength: 1, maxLength: 120 }
+                content: { $ref: '#/components/schemas/RoteiroContent' }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/Roteiro' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /roteiros/{roteiroId}/archive:
+    parameters: [{ name: roteiroId, in: path, required: true, schema: { type: string, format: uuid } }]
+    post:
+      tags: [world]
+      summary: Archive a roteiro
+      operationId: archiveRoteiro
+      responses:
+        '204': { description: Archived }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaigns/{campaignId}/atlas:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [world]
+      summary: Atlas entries (players get only entries known to players, public summary only)
+      operationId: listAtlas
+      responses:
+        '200': { description: Entries, content: { application/json: { schema: { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/AtlasEntry' } } } } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [world]
+      summary: Create an Atlas entry (master only)
+      operationId: createAtlasEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AtlasEntryInput' }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/AtlasEntry' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /atlas/{entryId}:
+    parameters: [{ name: entryId, in: path, required: true, schema: { type: string, format: uuid } }]
+    patch:
+      tags: [world]
+      summary: Update an Atlas entry (optimistic revision)
+      operationId: updateAtlasEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/AtlasEntryInput'
+                - type: object
+                  required: [revision]
+                  properties: { revision: { type: integer, minimum: 1 } }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/AtlasEntry' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /atlas/{entryId}/timeline:
+    parameters: [{ name: entryId, in: path, required: true, schema: { type: string, format: uuid } }]
+    post:
+      tags: [world]
+      summary: Record how an entry evolved (defaults to the open session)
+      operationId: addAtlasTimeline
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [note]
+              properties:
+                note: { type: string, minLength: 1, maxLength: 500 }
+                session_id: { type: [string, 'null'], format: uuid }
+      responses:
+        '201': { description: Added, content: { application/json: { schema: { $ref: '#/components/schemas/AtlasTimelineItem' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaigns/{campaignId}/sessions/current:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [live]
+      summary: The campaign's open session, if any
+      operationId: currentSession
+      responses:
+        '200': { description: Session or null, content: { application/json: { schema: { type: object, properties: { session: { oneOf: [{ $ref: '#/components/schemas/GameSession' }, { type: 'null' }] } } } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaigns/{campaignId}/sessions:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    post:
+      tags: [live]
+      summary: Start a session (master); at most one open session per campaign
+      operationId: startSession
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [title]
+              properties:
+                title: { type: string, minLength: 1, maxLength: 120 }
+                roteiro_id: { type: [string, 'null'], format: uuid, description: 'Seeds the compass, clocks and clues' }
+      responses:
+        '201': { description: Started, content: { application/json: { schema: { $ref: '#/components/schemas/GameSession' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /sessions/{sessionId}/{action}:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+      - { name: action, in: path, required: true, schema: { enum: [pause, resume, end] } }
+    post:
+      tags: [live]
+      summary: Pause, resume or end the session (master). Ending closes open roll requests.
+      operationId: transitionSession
+      responses:
+        '200': { description: New state, content: { application/json: { schema: { $ref: '#/components/schemas/GameSession' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /sessions/{sessionId}/snapshot:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    get:
+      tags: [live]
+      summary: Everything the actor may see of the session (first load and reconciliation)
+      operationId: sessionSnapshot
+      responses:
+        '200': { description: Snapshot filtered for the actor, content: { application/json: { schema: { $ref: '#/components/schemas/TableSnapshot' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /sessions/{sessionId}/events:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    get:
+      tags: [live]
+      summary: Session events after a sequence number that the actor may see, in order
+      operationId: sessionEvents
+      parameters:
+        - { name: after, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 200 } }
+      responses:
+        '200':
+          description: Events (novtt.session-event/1)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, last_seq, has_more]
+                properties:
+                  data: { type: array, items: { $ref: '../events/session-event.v1.schema.json' } }
+                  last_seq: { type: integer }
+                  has_more: { type: boolean }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /sessions/{sessionId}/compass:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    put:
+      tags: [live]
+      summary: Replace the master's scene compass (master only)
+      operationId: saveCompass
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [revision, compass]
+              properties:
+                revision: { type: integer, minimum: 1 }
+                compass: { $ref: '#/components/schemas/Compass' }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/GameSession' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /sessions/{sessionId}/initiative:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    put:
+      tags: [live]
+      summary: Replace the initiative order (master; visible to the table by name only)
+      operationId: saveInitiative
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [revision, entries, turn, round]
+              properties:
+                revision: { type: integer, minimum: 1 }
+                entries:
+                  type: array
+                  maxItems: 30
+                  items: { type: object, required: [kind, id], properties: { kind: { enum: [character, npc] }, id: { type: string, format: uuid } } }
+                turn: { type: integer, minimum: 0 }
+                round: { type: integer, minimum: 1 }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/GameSession' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /sessions/{sessionId}/roll-requests:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    post:
+      tags: [live]
+      summary: Request a test from a character (master). The pool/bonus comes from the official sheet.
+      operationId: requestRoll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RollSpecInput'
+                - type: object
+                  required: [campaign_character_id]
+                  properties:
+                    campaign_character_id: { type: string, format: uuid }
+                    suggestion_id: { type: [string, 'null'], format: uuid }
+                    allows_choice: { type: boolean, description: Pool mode only; the roller may roll 1..pool dice }
+                    attempts: { type: integer, minimum: 1, maximum: 5, default: 1 }
+                    secret: { type: boolean, default: false, description: Result only to the master and the roller }
+                    expires_in_seconds: { type: [integer, 'null'], minimum: 30, maximum: 3600 }
+      responses:
+        '201': { description: Requested, content: { application/json: { schema: { $ref: '#/components/schemas/RollRequest' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /roll-requests/{requestId}/rolls:
+    parameters: [{ $ref: '#/components/parameters/RequestId' }]
+    post:
+      tags: [live]
+      summary: Execute an official roll (the request's roller). Faces are generated by the server.
+      operationId: executeRoll
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [expected_revision]
+              properties:
+                expected_revision: { type: integer, minimum: 0 }
+                dice_count: { type: [integer, 'null'], minimum: 1, maximum: 12, description: Only when the request allows a choice }
+      responses:
+        '201': { description: Resolved (or the original result on retry), content: { application/json: { schema: { $ref: '#/components/schemas/OfficialRoll' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /roll-requests/{requestId}/cancel:
+    parameters: [{ $ref: '#/components/parameters/RequestId' }]
+    post:
+      tags: [live]
+      summary: Cancel an open request (master)
+      operationId: cancelRollRequest
+      responses:
+        '200': { description: Cancelled, content: { application/json: { schema: { $ref: '#/components/schemas/RollRequest' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /roll-requests/{requestId}/grant-attempt:
+    parameters: [{ $ref: '#/components/parameters/RequestId' }]
+    post:
+      tags: [live]
+      summary: Grant one more attempt (audited GM reroll)
+      operationId: grantRollAttempt
+      responses:
+        '200': { description: Granted, content: { application/json: { schema: { $ref: '#/components/schemas/RollRequest' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /sessions/{sessionId}/npc-rolls:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    post:
+      tags: [live]
+      summary: The master rolls for an NPC (secret by default)
+      operationId: npcRoll
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RollSpecInput'
+                - type: object
+                  required: [campaign_npc_id]
+                  properties:
+                    campaign_npc_id: { type: string, format: uuid }
+                    secret: { type: boolean, default: true }
+      responses:
+        '201': { description: Resolved, content: { application/json: { schema: { $ref: '#/components/schemas/OfficialRoll' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /official-rolls/{rollId}/reveal:
+    parameters: [{ name: rollId, in: path, required: true, schema: { type: string, format: uuid } }]
+    post:
+      tags: [live]
+      summary: Reveal a secret roll to the table (NPC rolls without NPC numbers)
+      operationId: revealRoll
+      responses:
+        '200': { description: Revealed, content: { application/json: { schema: { $ref: '#/components/schemas/OfficialRoll' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaigns/{campaignId}/live-states/{kind}/{subjectId}:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+      - { name: kind, in: path, required: true, schema: { enum: [character, npc] } }
+      - { name: subjectId, in: path, required: true, schema: { type: string, format: uuid } }
+    put:
+      tags: [live]
+      summary: Replace resources and conditions of a character or NPC (master; revision 0 creates)
+      operationId: saveLiveState
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [revision, resources, conditions]
+              properties:
+                revision: { type: integer, minimum: 0 }
+                resources: { type: array, maxItems: 8, items: { $ref: '#/components/schemas/ResourceTrack' } }
+                conditions: { type: array, maxItems: 12, items: { type: string, minLength: 1, maxLength: 40 } }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { type: object, properties: { subject: { type: object }, live: { $ref: '#/components/schemas/LiveState' } } } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /campaigns/{campaignId}/notes:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [live]
+      summary: Private master notes
+      operationId: listNotes
+      responses:
+        '200': { description: Notes, content: { application/json: { schema: { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/MasterNote' } } } } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [live]
+      summary: Create a master note
+      operationId: createNote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [body]
+              properties:
+                body: { type: string, minLength: 1, maxLength: 4000 }
+                tags: { type: array, maxItems: 8, items: { type: string, maxLength: 24 } }
+                pinned: { type: boolean }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/MasterNote' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /notes/{noteId}:
+    parameters: [{ name: noteId, in: path, required: true, schema: { type: string, format: uuid } }]
+    patch:
+      tags: [live]
+      summary: Autosave a note (revision conflicts are reported, never overwritten)
+      operationId: updateNote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [revision]
+              properties:
+                revision: { type: integer, minimum: 1 }
+                body: { type: string, maxLength: 4000 }
+                tags: { type: array, maxItems: 8, items: { type: string, maxLength: 24 } }
+                pinned: { type: boolean }
+      responses:
+        '200': { description: Saved, content: { application/json: { schema: { $ref: '#/components/schemas/MasterNote' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    delete:
+      tags: [live]
+      summary: Delete a note
+      operationId: deleteNote
+      responses:
+        '204': { description: Deleted }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaigns/{campaignId}/whispers:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    post:
+      tags: [live]
+      summary: Whisper to exactly one person (master → a player, player → a master)
+      operationId: whisper
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [recipient_user_id, body]
+              properties:
+                recipient_user_id: { type: string, format: uuid }
+                body: { type: string, minLength: 1, maxLength: 2000 }
+      responses:
+        '201': { description: Sent, content: { application/json: { schema: { $ref: '#/components/schemas/Whisper' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /sessions/{sessionId}/clues:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    post:
+      tags: [live]
+      summary: Add a clue to the session (master)
+      operationId: createClue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [title, body]
+              properties:
+                title: { type: string, minLength: 1, maxLength: 120 }
+                body: { type: string, maxLength: 2000 }
+                scene: { type: [string, 'null'], maxLength: 120 }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/Clue' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /clues/{clueId}/reveal:
+    parameters: [{ name: clueId, in: path, required: true, schema: { type: string, format: uuid } }]
+    post:
+      tags: [live]
+      summary: Reveal a clue to the table, or whisper it to one player
+      operationId: revealClue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [to]
+              properties:
+                to: { enum: [table, user] }
+                user_id: { type: [string, 'null'], format: uuid }
+      responses:
+        '200': { description: Revealed, content: { application/json: { schema: { $ref: '#/components/schemas/Clue' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /sessions/{sessionId}/npc-reveals:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    post:
+      tags: [live]
+      summary: Show an NPC to the table (name and a public line; never numbers or secrets)
+      operationId: revealNpc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [campaign_npc_id, summary]
+              properties:
+                campaign_npc_id: { type: string, format: uuid }
+                summary: { type: string, maxLength: 300 }
+      responses:
+        '200': { description: Revealed, content: { application/json: { schema: { type: object, properties: { revealed_npcs: { type: array, items: { $ref: '#/components/schemas/RevealedNpc' } } } } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /sessions/{sessionId}/suggestions:
+    parameters: [{ $ref: '#/components/parameters/SessionId' }]
+    post:
+      tags: [live]
+      summary: A player suggests a combination to the master (never an official roll by itself)
+      operationId: suggestRoll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [campaign_character_id, paths]
+              properties:
+                campaign_character_id: { type: string, format: uuid }
+                paths: { type: array, minItems: 1, maxItems: 4, items: { type: string } }
+                note: { type: [string, 'null'], maxLength: 200 }
+      responses:
+        '201': { description: Sent to the master, content: { application/json: { schema: { $ref: '#/components/schemas/RollSuggestion' } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /suggestions/{suggestionId}/dismiss:
+    parameters: [{ name: suggestionId, in: path, required: true, schema: { type: string, format: uuid } }]
+    post:
+      tags: [live]
+      summary: Dismiss a suggestion (master)
+      operationId: dismissSuggestion
+      responses:
+        '204': { description: Dismissed }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
 components:
   securitySchemes:
     sanctumCookie:
@@ -947,7 +1689,27 @@ components:
       in: path
       required: true
       schema: { type: string, format: uuid }
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    RequestId:
+      name: requestId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
   responses:
+    Problem:
+      description: Request rejected (see `code`)
+      content:
+        application/problem+json:
+          schema: { $ref: './problem.v1.schema.json' }
+    Forbidden:
+      description: Member without the required role (e.g. a player calling a master action)
+      content:
+        application/problem+json:
+          schema: { $ref: './problem.v1.schema.json' }
     Unauthenticated:
       description: Not authenticated
       content:
@@ -1159,3 +1921,295 @@ components:
               base: {}
               current: {}
               mine: {}
+    Me:
+      type: object
+      required: [id, name, paired_device_id]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        paired_device_id: { type: [string, 'null'], format: uuid, description: Set on a paired tablet session }
+    GameSession:
+      type: object
+      required: [id, campaign_id, title, status, initiative, revealed_npcs, last_seq, revision, started_at]
+      properties:
+        id: { type: string, format: uuid }
+        campaign_id: { type: string, format: uuid }
+        title: { type: string }
+        status: { enum: [active, paused, ended] }
+        roteiro_id: { type: [string, 'null'], format: uuid }
+        initiative: { $ref: '#/components/schemas/Initiative' }
+        revealed_npcs: { type: array, items: { $ref: '#/components/schemas/RevealedNpc' } }
+        compass: { $ref: '#/components/schemas/Compass', description: Masters only }
+        last_seq: { type: integer }
+        revision: { type: integer }
+        started_at: { type: string, format: date-time }
+    Compass:
+      type: object
+      required: [scene, objective, next_clue, clocks, spotlight]
+      properties:
+        scene: { type: string, maxLength: 120 }
+        objective: { type: string, maxLength: 300 }
+        next_clue: { type: string, maxLength: 300 }
+        clocks:
+          type: array
+          maxItems: 8
+          items:
+            type: object
+            required: [id, label, segments, filled]
+            properties:
+              id: { type: string, maxLength: 40 }
+              label: { type: string, maxLength: 80 }
+              segments: { type: integer, minimum: 2, maximum: 12 }
+              filled: { type: integer, minimum: 0, maximum: 12 }
+        spotlight: { type: object, additionalProperties: { type: integer, minimum: 0 }, description: 'Moments in the spotlight per character id' }
+    Initiative:
+      type: object
+      properties:
+        entries: { type: array, items: { type: object, properties: { kind: { enum: [character, npc] }, id: { type: string, format: uuid }, name: { type: string } } } }
+        turn: { type: integer }
+        round: { type: integer }
+    RevealedNpc:
+      type: object
+      required: [id, name, summary]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        summary: { type: string }
+    RollSpecInput:
+      type: object
+      required: [paths, dice]
+      properties:
+        label: { type: [string, 'null'], maxLength: 120 }
+        paths: { type: array, maxItems: 4, items: { type: string }, description: 'Integer sheet fields to combine (attribute + skill); values are read from the official sheet' }
+        modifier: { type: integer, minimum: -20, maximum: 20 }
+        dice: { $ref: '#/components/schemas/DiceSpecInput' }
+    DiceSpecInput:
+      type: object
+      required: [faces, count_mode, reading]
+      description: Chosen by the master (SPEC-MVP-002 D3). In pool mode the dice count is the combination plus modifier (1–12); in fixed mode the combination plus modifier is a bonus added to the total.
+      properties:
+        faces: { enum: [4, 6, 8, 10, 12, 20, 100] }
+        count_mode: { enum: [pool, fixed] }
+        count: { type: [integer, 'null'], minimum: 1, maximum: 12 }
+        reading: { enum: [sum, highest, successes] }
+        threshold: { type: [integer, 'null'], minimum: 1, maximum: 100 }
+        successes_per_die: { type: integer, minimum: 1, maximum: 3 }
+        target: { type: [integer, 'null'], description: 'Minimum total (sum/highest) or successes needed' }
+    DiceSpec:
+      type: object
+      required: [faces, count_mode, reading, threshold, successes_per_die, target, bonus]
+      properties:
+        faces: { type: integer }
+        count_mode: { enum: [pool, fixed] }
+        reading: { enum: [sum, highest, successes] }
+        threshold: { type: integer }
+        successes_per_die: { type: integer }
+        target: { type: [integer, 'null'] }
+        bonus: { type: [integer, 'null'], description: null when an NPC roll is shown to players }
+    RollComponent:
+      type: object
+      required: [path, label]
+      properties:
+        path: { type: string }
+        label: { type: string }
+        value: { type: integer, description: Omitted for NPC rolls shown to players }
+    RollSubject:
+      type: object
+      required: [kind, id, name]
+      properties:
+        kind: { enum: [character, npc] }
+        id: { type: string, format: uuid }
+        name: { type: string }
+    RollRequest:
+      type: object
+      required: [id, session_id, subject, roller_user_id, label, components, modifier, dice, min_dice, max_dice, allows_choice, attempts_allowed, attempts_consumed, secret, status, revision]
+      properties:
+        id: { type: string, format: uuid }
+        session_id: { type: string, format: uuid }
+        subject: { $ref: '#/components/schemas/RollSubject' }
+        roller_user_id: { type: string, format: uuid }
+        label: { type: string }
+        components: { type: array, items: { $ref: '#/components/schemas/RollComponent' } }
+        modifier: { type: integer }
+        dice: { $ref: '#/components/schemas/DiceSpec' }
+        min_dice: { type: integer }
+        max_dice: { type: integer }
+        allows_choice: { type: boolean }
+        attempts_allowed: { type: integer }
+        attempts_consumed: { type: integer }
+        secret: { type: boolean }
+        status: { enum: [OPEN, EXHAUSTED, CANCELLED, EXPIRED, CLOSED] }
+        revision: { type: integer }
+        expires_at: { type: [string, 'null'], format: date-time }
+    OfficialRoll:
+      type: object
+      required: [id, request_id, session_id, subject, roller_user_id, label, components, dice, results, total, successes, succeeded, attempt, attempts_allowed, animation_seed, secret, revealed, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        request_id: { type: string, format: uuid }
+        session_id: { type: string, format: uuid }
+        subject: { $ref: '#/components/schemas/RollSubject' }
+        roller_user_id: { type: string, format: uuid }
+        label: { type: string }
+        components: { type: array, items: { $ref: '#/components/schemas/RollComponent' } }
+        modifier: { type: [integer, 'null'] }
+        dice: { $ref: '#/components/schemas/DiceSpec' }
+        results: { type: array, minItems: 1, maxItems: 12, items: { type: integer, minimum: 1 }, description: Server-generated faces; every client's dice settle on these }
+        total: { type: integer }
+        successes: { type: integer }
+        succeeded: { type: [boolean, 'null'] }
+        attempt: { type: integer }
+        attempts_allowed: { type: integer }
+        animation_seed: { type: integer, description: 'Shapes the throw only (novtt.dice-roll-animation/1); never the result' }
+        secret: { type: boolean }
+        revealed: { type: boolean }
+        created_at: { type: string, format: date-time }
+    ResourceTrack:
+      type: object
+      required: [id, label, current, max]
+      properties:
+        id: { type: string, pattern: '^[a-z0-9_-]{1,32}$' }
+        label: { type: string, minLength: 1, maxLength: 40 }
+        current: { type: integer, minimum: -99, maximum: 999 }
+        max: { type: integer, minimum: 1, maximum: 999 }
+    LiveState:
+      type: object
+      required: [resources, conditions, revision]
+      properties:
+        resources: { type: array, items: { $ref: '#/components/schemas/ResourceTrack' } }
+        conditions: { type: array, items: { type: string } }
+        revision: { type: integer }
+    MasterNote:
+      type: object
+      required: [id, body, tags, pinned, revision]
+      properties:
+        id: { type: string, format: uuid }
+        session_id: { type: [string, 'null'], format: uuid }
+        body: { type: string }
+        tags: { type: array, items: { type: string } }
+        pinned: { type: boolean }
+        revision: { type: integer }
+        updated_at: { type: [string, 'null'], format: date-time }
+    Whisper:
+      type: object
+      required: [id, sender_user_id, recipient_user_id, kind, body, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        sender_user_id: { type: string, format: uuid }
+        recipient_user_id: { type: string, format: uuid }
+        kind: { enum: [message, clue] }
+        body: { type: string }
+        created_at: { type: string, format: date-time }
+    Clue:
+      type: object
+      required: [id, title, body, revealed_to]
+      properties:
+        id: { type: string, format: uuid }
+        scene: { type: [string, 'null'] }
+        title: { type: string }
+        body: { type: string }
+        revealed_to: { enum: [table, user, null] }
+        revealed_user_id: { type: [string, 'null'], format: uuid, description: Masters only }
+        revealed_at: { type: [string, 'null'], format: date-time }
+    RollSuggestion:
+      type: object
+      required: [id, campaign_character_id, character_name, player_user_id, paths, status]
+      properties:
+        id: { type: string, format: uuid }
+        campaign_character_id: { type: string, format: uuid }
+        character_name: { type: string }
+        player_user_id: { type: string, format: uuid }
+        paths: { type: array, items: { type: string } }
+        note: { type: [string, 'null'] }
+        status: { enum: [pending, accepted, dismissed] }
+    TableSnapshot:
+      type: object
+      required: [contract, role, me, session, members, characters, npcs, requests, rolls, whispers, clues, suggestions, notes]
+      description: Everything one participant may see; players never receive compass, NPCs, notes or other players' secrets.
+      properties:
+        contract: { const: novtt.table-snapshot/1 }
+        role: { enum: [master, player] }
+        me: { type: object, properties: { user_id: { type: string, format: uuid }, name: { type: string } } }
+        session: { $ref: '#/components/schemas/GameSession' }
+        members: { type: array, items: { type: object, properties: { user_id: { type: string, format: uuid }, name: { type: string }, role: { enum: [master, player] } } } }
+        characters:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string, format: uuid }
+              name: { type: string }
+              player_user_id: { type: string, format: uuid }
+              controlled_by: { type: string, format: uuid }
+              status: { type: string }
+              preset_version_id: { type: string, format: uuid }
+              live: { oneOf: [{ $ref: '#/components/schemas/LiveState' }, { type: 'null' }] }
+        npcs: { type: array, items: { type: object }, description: Masters only (empty for players) }
+        requests: { type: array, items: { $ref: '#/components/schemas/RollRequest' } }
+        rolls: { type: array, items: { $ref: '#/components/schemas/OfficialRoll' } }
+        whispers: { type: array, items: { $ref: '#/components/schemas/Whisper' } }
+        clues: { type: array, items: { $ref: '#/components/schemas/Clue' } }
+        suggestions: { type: array, items: { $ref: '#/components/schemas/RollSuggestion' } }
+        notes: { type: array, items: { $ref: '#/components/schemas/MasterNote' } }
+    RoteiroContent:
+      type: object
+      properties:
+        strong_start: { type: string, maxLength: 1000 }
+        scenes:
+          type: array
+          maxItems: 12
+          items:
+            type: object
+            required: [title, goal, clues]
+            properties:
+              title: { type: string, maxLength: 120 }
+              goal: { type: string, maxLength: 300 }
+              clues: { type: array, maxItems: 8, items: { type: object, required: [title, body], properties: { title: { type: string, maxLength: 120 }, body: { type: string, maxLength: 1000 } } } }
+        npcs: { type: array, maxItems: 20, items: { type: object, required: [name, voice, wants, secret], properties: { name: { type: string }, voice: { type: string }, wants: { type: string }, secret: { type: string } } } }
+        clocks: { type: array, maxItems: 6, items: { type: object, required: [label, segments], properties: { label: { type: string }, segments: { type: integer, minimum: 2, maximum: 12 } } } }
+        wants: { type: array, maxItems: 12, items: { type: object, required: [character, text], properties: { character: { type: string }, text: { type: string } } } }
+    Roteiro:
+      type: object
+      required: [id, campaign_id, title, content, revision]
+      properties:
+        id: { type: string, format: uuid }
+        campaign_id: { type: string, format: uuid }
+        title: { type: string }
+        content: { $ref: '#/components/schemas/RoteiroContent' }
+        revision: { type: integer }
+        updated_at: { type: [string, 'null'], format: date-time }
+    AtlasEntryInput:
+      type: object
+      additionalProperties: false
+      properties:
+        revision: { type: integer, minimum: 1 }
+        kind: { enum: [place, person, faction, secret, thread] }
+        title: { type: string, minLength: 1, maxLength: 120 }
+        summary: { type: string, maxLength: 500 }
+        details: { type: string, maxLength: 8000 }
+        known_to_players: { type: boolean, description: Always false for secrets }
+        thread_status: { enum: [open, advancing, resolved, null] }
+        links: { type: array, maxItems: 20, items: { type: string, format: uuid } }
+    AtlasTimelineItem:
+      type: object
+      required: [id, note, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        session_id: { type: [string, 'null'], format: uuid }
+        note: { type: string }
+        created_at: { type: string, format: date-time }
+    AtlasEntry:
+      type: object
+      required: [id, kind, title, summary]
+      description: Players receive id, kind, title, summary and thread_status only.
+      properties:
+        id: { type: string, format: uuid }
+        kind: { enum: [place, person, faction, secret, thread] }
+        title: { type: string }
+        summary: { type: string }
+        thread_status: { enum: [open, advancing, resolved, null] }
+        details: { type: string }
+        known_to_players: { type: boolean }
+        links: { type: array, items: { type: string, format: uuid } }
+        revision: { type: integer }
+        timeline: { type: array, items: { $ref: '#/components/schemas/AtlasTimelineItem' } }

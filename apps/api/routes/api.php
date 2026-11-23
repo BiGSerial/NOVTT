@@ -2,13 +2,28 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Auth\AccountController;
+use App\Http\Controllers\Api\V1\Auth\PairingController;
 use App\Http\Controllers\Api\V1\CampaignCharacterController;
 use App\Http\Controllers\Api\V1\CampaignController;
 use App\Http\Controllers\Api\V1\LibraryController;
+use App\Http\Controllers\Api\V1\Live\RollController;
+use App\Http\Controllers\Api\V1\Live\SessionController;
+use App\Http\Controllers\Api\V1\Live\TableController;
+use App\Http\Controllers\Api\V1\Live\WorldController;
 use App\Http\Controllers\Api\V1\MembershipController;
 use App\Http\Controllers\Api\V1\PresetController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use Illuminate\Support\Facades\Route;
+
+// Accounts and device pairing (SPEC-MVP-002 LT-01, LT-08): reachable before signing in.
+Route::prefix('v1')->middleware(['throttle:novtt-api'])->group(function (): void {
+    Route::post('auth/register', [AccountController::class, 'register'])->middleware('throttle:novtt-auth');
+    Route::post('auth/login', [AccountController::class, 'login'])->middleware('throttle:novtt-auth');
+    Route::post('auth/logout', [AccountController::class, 'logout']);
+    Route::post('pairing', [PairingController::class, 'create'])->middleware('throttle:novtt-pairing');
+    Route::post('pairing/{pairingId}/claim', [PairingController::class, 'claim'])->middleware('throttle:novtt-pairing');
+});
 
 // Versioned domain API (contracts/http/openapi.v1.yaml). Every route requires an
 // authenticated actor; authorization is enforced by policies (ADR 0009).
@@ -59,6 +74,48 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:novtt-api'])->group(f
     Route::post('change-requests/{changeRequestId}/withdraw', [ReviewController::class, 'withdraw'])->whereUuid('changeRequestId');
     Route::put('change-requests/{changeRequestId}/decisions', [ReviewController::class, 'decide'])->whereUuid('changeRequestId');
     Route::post('change-requests/{changeRequestId}/finalize', [ReviewController::class, 'finalize'])->whereUuid('changeRequestId');
+
+    Route::get('me', [AccountController::class, 'show']);
+    Route::post('pairing/confirm', [PairingController::class, 'confirm'])->middleware('throttle:novtt-invitations');
+    Route::get('devices', [PairingController::class, 'devices']);
+    Route::delete('devices/{deviceId}', [PairingController::class, 'revoke']);
+
+    Route::get('campaigns/{campaignId}/roteiros', [WorldController::class, 'roteiros'])->whereUuid('campaignId');
+    Route::post('campaigns/{campaignId}/roteiros', [WorldController::class, 'createRoteiro'])->whereUuid('campaignId');
+    Route::put('roteiros/{roteiroId}', [WorldController::class, 'updateRoteiro']);
+    Route::post('roteiros/{roteiroId}/archive', [WorldController::class, 'archiveRoteiro']);
+    Route::get('campaigns/{campaignId}/atlas', [WorldController::class, 'atlas'])->whereUuid('campaignId');
+    Route::post('campaigns/{campaignId}/atlas', [WorldController::class, 'createEntry'])->whereUuid('campaignId');
+    Route::patch('atlas/{entryId}', [WorldController::class, 'updateEntry']);
+    Route::post('atlas/{entryId}/timeline', [WorldController::class, 'addTimeline']);
+
+    // Live table (SPEC-MVP-002).
+    Route::get('campaigns/{campaignId}/sessions/current', [SessionController::class, 'current'])->whereUuid('campaignId');
+    Route::post('campaigns/{campaignId}/sessions', [SessionController::class, 'start'])->whereUuid('campaignId');
+    Route::post('sessions/{sessionId}/{action}', [SessionController::class, 'transition'])->whereUuid('sessionId')->whereIn('action', ['pause', 'resume', 'end']);
+    Route::get('sessions/{sessionId}/snapshot', [SessionController::class, 'snapshot'])->whereUuid('sessionId');
+    Route::get('sessions/{sessionId}/events', [SessionController::class, 'events'])->whereUuid('sessionId');
+    Route::put('sessions/{sessionId}/compass', [SessionController::class, 'compass'])->whereUuid('sessionId');
+    Route::put('sessions/{sessionId}/initiative', [SessionController::class, 'initiative'])->whereUuid('sessionId');
+
+    Route::post('sessions/{sessionId}/roll-requests', [RollController::class, 'request'])->whereUuid('sessionId');
+    Route::post('roll-requests/{requestId}/rolls', [RollController::class, 'roll'])->middleware('throttle:novtt-rolls');
+    Route::post('roll-requests/{requestId}/cancel', [RollController::class, 'cancel']);
+    Route::post('roll-requests/{requestId}/grant-attempt', [RollController::class, 'grant']);
+    Route::post('sessions/{sessionId}/npc-rolls', [RollController::class, 'npcRoll'])->whereUuid('sessionId')->middleware('throttle:novtt-rolls');
+    Route::post('official-rolls/{rollId}/reveal', [RollController::class, 'reveal']);
+
+    Route::put('campaigns/{campaignId}/live-states/{kind}/{subjectId}', [TableController::class, 'saveLiveState'])->whereUuid('campaignId')->whereIn('kind', ['character', 'npc']);
+    Route::get('campaigns/{campaignId}/notes', [TableController::class, 'notes'])->whereUuid('campaignId');
+    Route::post('campaigns/{campaignId}/notes', [TableController::class, 'createNote'])->whereUuid('campaignId');
+    Route::patch('notes/{noteId}', [TableController::class, 'updateNote']);
+    Route::delete('notes/{noteId}', [TableController::class, 'deleteNote']);
+    Route::post('campaigns/{campaignId}/whispers', [TableController::class, 'whisper'])->whereUuid('campaignId')->middleware('throttle:novtt-whispers');
+    Route::post('sessions/{sessionId}/clues', [TableController::class, 'createClue'])->whereUuid('sessionId');
+    Route::post('clues/{clueId}/reveal', [TableController::class, 'revealClue']);
+    Route::post('sessions/{sessionId}/npc-reveals', [TableController::class, 'revealNpc'])->whereUuid('sessionId');
+    Route::post('sessions/{sessionId}/suggestions', [TableController::class, 'suggest'])->whereUuid('sessionId')->middleware('throttle:novtt-whispers');
+    Route::post('suggestions/{suggestionId}/dismiss', [TableController::class, 'dismissSuggestion']);
 
     Route::post('invitations/accept', [MembershipController::class, 'accept'])->middleware('throttle:novtt-invitations');
 });
