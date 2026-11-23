@@ -2,13 +2,13 @@
 // Presentation only: the server evaluates every rule and returns the results in the draft preview.
 import type { Scalar, ValidationIssue } from './types'
 
-export interface BuilderStep { id: string; label: string; paths?: string[]; required?: string[] }
-export interface BuilderOption { value: Scalar; label?: string; compendium_id?: string }
+export interface BuilderStep { id: string; label: string; paths?: string[]; required?: string[]; complete_when?: unknown }
+export interface BuilderOption { value: Scalar; label?: string; compendium_id?: string; requires?: unknown }
 export interface BuilderChoice { id: string; path: string; label?: string; options: BuilderOption[] }
 export interface BuilderRules {
   budgets?: { id: string; label: string }[]
   costs?: { id: string; phase: 'creation' | 'advancement'; budget: string; targets: string[] }[]
-  derived?: { id: string; path: string; label?: string }[]
+  derived?: { id: string; path: string; label?: string; formula?: unknown }[]
   effects?: { id: string; label?: string }[]
   creation?: { steps?: BuilderStep[]; choices?: BuilderChoice[] }
 }

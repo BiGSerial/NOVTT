@@ -93,22 +93,38 @@ describe('guided character builder', () => {
     expect(puts).toHaveLength(1)
   })
 
-  it('shows the step budgets, derived values and only the step fields; the review step submits', async () => {
-    const { root } = await mount()
+  it('shows the step points, steppers with linked values, a live sheet, and a review that submits', async () => {
+    const { root, puts } = await mount()
     ;[...root.querySelectorAll<HTMLButtonElement>('.stepper button')][2].click()
     await wait(10)
-    expect([...root.querySelectorAll('.budget-bar dt')].map(e => e.textContent)).toEqual([
-      'Pontos de atributos físicos', 'Pontos de atributos sociais', 'Pontos de atributos mentais', 'Pontos de habilidade',
+    expect([...root.querySelectorAll('.step-points li')].map(e => e.textContent!.replace(/\s+/g, ' ').trim())).toEqual([
+      '0 Pontos de atributos físicos', '0 Pontos de atributos sociais', '0 Pontos de atributos mentais', '6 Pontos de habilidade',
     ])
-    expect(root.querySelector('[id="f-attributes-physical-forca"]')).not.toBeNull()
+    const rows = [...root.querySelectorAll('.stat-row')]
+    expect(rows.map(r => r.querySelector('.stat-name span')!.textContent)).toContain('Força')
+    const forca = rows.find(r => r.textContent!.includes('Força'))!
+    expect(forca.querySelector('output')!.textContent!.trim()).toBe('1') // the preset default, not a dash
+    expect(forca.querySelector<HTMLButtonElement>('[aria-label="Aumentar Força"]')!.disabled).toBe(true) // no physical points yet
+    const luta = rows.find(r => r.textContent!.includes('Luta'))!
+    luta.querySelector<HTMLButtonElement>('[aria-label="Aumentar Luta"]')!.click()
+    await wait(800)
+    expect(puts.at(-1)!.change_set.operations).toEqual([expect.objectContaining({ path: '/skills/luta', value: 1 })])
     expect(root.querySelector('[id="f-identity-name"]')).toBeNull()
     expect(root.querySelector('.builder-side')!.textContent).toContain('Vitalidade')
 
     ;[...root.querySelectorAll<HTMLButtonElement>('.stepper button')][3].click()
     await wait(10)
-    expect([...root.querySelectorAll('.actions button')].map(b => b.textContent)).toEqual(['Voltar', 'Salvar rascunho', 'Enviar para o mestre'])
+    expect(root.querySelector('.builder-side')).toBeNull()
+    expect(root.querySelector('.sheet-summary.large')).not.toBeNull()
+    expect([...root.querySelectorAll('.builder-actions button')].map(b => b.textContent)).toEqual(['Voltar', 'Enviar para o mestre'])
     expect(root.querySelector('.review-box')!.textContent).toContain('completar')
     expect(await axeViolations(root)).toEqual([])
+  })
+
+  it('explains why an option is locked with the preset labels', async () => {
+    const { root } = await mount()
+    const locked = [...root.querySelectorAll('.choice-card.locked .choice-lock')].map(e => e.textContent)
+    expect(locked).toEqual(['🔒 Requer Linhagem: Aurora', '🔒 Requer Linhagem: Brasa'])
   })
 
   it('matches rules targets the same way the engine does', () => {
