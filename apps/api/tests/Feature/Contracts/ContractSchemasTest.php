@@ -38,10 +38,37 @@ final class ContractSchemasTest extends TestCase
 
     public function test_demo_preset_fixture_satisfies_the_preset_contracts(): void
     {
-        foreach (['manifest.json' => 'novtt.preset-manifest/1', 'sheet.ui.json' => 'novtt.sheet-ui/1', 'rules.json' => 'novtt.rules/1'] as $file => $contract) {
+        foreach (['manifest.json' => 'novtt.preset-manifest/2', 'sheet.ui.json' => 'novtt.sheet-ui/1', 'rules.json' => 'novtt.rules/1'] as $file => $contract) {
             $result = $this->validator()->validateContract(self::fixture($file), $contract);
             $this->assertTrue($result->isValid(), $file . ': ' . json_encode($result->toArray()));
         }
+    }
+
+    /** @return iterable<string, array{0: string}> */
+    public static function demoPresets(): iterable
+    {
+        yield 'demo-linhagens' => ['demo-linhagens'];
+        yield 'demo-heroico' => ['demo-heroico'];
+    }
+
+    #[DataProvider('demoPresets')]
+    public function test_authorial_demo_presets_satisfy_the_v2_contracts(string $variant): void
+    {
+        $dir = __DIR__ . '/../../../../../presets/novtt-demo/' . $variant . '/1.0.0/';
+        foreach (['manifest.json' => 'novtt.preset-manifest/2', 'sheet.ui.json' => 'novtt.sheet-ui/1', 'rules.json' => 'novtt.rules/2', 'compendium.json' => 'novtt.compendium/1'] as $file => $contract) {
+            $document = json_decode((string) file_get_contents($dir . $file), true, 64, JSON_THROW_ON_ERROR);
+            $result = $this->validator()->validateContract($document, $contract);
+            $this->assertTrue($result->isValid(), $file . ': ' . json_encode($result->toArray()));
+        }
+    }
+
+    public function test_public_manifest_v2_requires_approved_rights(): void
+    {
+        $manifest = self::fixture('manifest.json');
+        $manifest['license']['rights_status'] = 'draft';
+        $this->assertFalse($this->validator()->validateContract($manifest, 'novtt.preset-manifest/2')->isValid());
+        $manifest['publication']['public'] = false;
+        $this->assertTrue($this->validator()->validateContract($manifest, 'novtt.preset-manifest/2')->isValid());
     }
 
     public function test_sheet_values_are_validated_against_the_version_schema(): void

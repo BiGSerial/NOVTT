@@ -13,6 +13,9 @@ final readonly class ContractRegistry
         'novtt.preset-manifest/1' => 'presets/preset-manifest.v1.schema.json',
         'novtt.sheet-ui/1' => 'presets/sheet-ui.v1.schema.json',
         'novtt.rules/1' => 'presets/rules.v1.schema.json',
+        'novtt.preset-manifest/2' => 'presets/preset-manifest.v2.schema.json',
+        'novtt.rules/2' => 'presets/rules.v2.schema.json',
+        'novtt.compendium/1' => 'presets/compendium.v1.schema.json',
         'novtt.sheet-change-set/1' => 'sheets/sheet-change-set.v1.schema.json',
         'novtt.validation-result/1' => 'sheets/validation-result.v1.schema.json',
     ];

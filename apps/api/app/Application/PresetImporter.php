@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use JsonException;
 use Novtt\Engine\Presets\PresetCompatibility;
+use Novtt\Engine\Presets\PublicationGate;
 use Novtt\Engine\Sheets\CanonicalJson;
 use Novtt\Engine\Validation\Severity;
 use Novtt\Engine\Validation\StructuralValidator;
@@ -21,22 +22,36 @@ use Novtt\Engine\Validation\ValidationIssue;
 use Novtt\Engine\Validation\ValidationResult;
 
 /**
- * Imports a preset package (SPEC-PRESET-AUTHORING-001). Three stages: JSON syntax, structural
- * contracts, engine compatibility. Transactional, bounded, never executes content, never
- * overwrites an existing (family, variant, version).
+ * Imports a preset package (SPEC-PRESET-AUTHORING-001, ADR 0012). Three stages: JSON syntax,
+ * structural contracts (chosen by each part's declared `contract`), engine compatibility.
+ * Canonical publication additionally passes the rights gate. Transactional, bounded, never
+ * executes content, never overwrites an existing (family, variant, version).
  */
 final readonly class PresetImporter
 {
+    public const REQUIRED_PARTS = ['manifest', 'sheet_schema', 'sheet_ui', 'rules'];
+    public const OPTIONAL_PARTS = ['compendium'];
+
+    /** Accepted contracts per part; the first one is used to report a missing or unknown value. */
+    private const CONTRACTS = [
+        'manifest' => ['novtt.preset-manifest/2', 'novtt.preset-manifest/1'],
+        'sheet_ui' => ['novtt.sheet-ui/1'],
+        'rules' => ['novtt.rules/2', 'novtt.rules/1'],
+        'compendium' => ['novtt.compendium/1'],
+    ];
+
     public function __construct(
         private StructuralValidator $structure,
         private PresetCompatibility $compatibility,
         private AuditTrail $audit,
+        private PublicationGate $gate = new PublicationGate(),
     ) {
     }
 
     /**
-     * Reads a preset folder (manifest.json, sheet.schema.json, sheet.ui.json, rules.json) into the
-     * raw package body accepted by parse(). Returns null and the missing file name on failure.
+     * Reads a preset folder (manifest.json, sheet.schema.json, sheet.ui.json, rules.json and, when
+     * present, compendium.json) into the raw package body accepted by parse(). Returns null and the
+     * missing file name on failure.
      *
      * @return array{0: ?string, 1: ?string}
      */
@@ -49,6 +64,9 @@ final readonly class PresetImporter
                 return [null, $file];
             }
             $parts[] = json_encode($key) . ':' . file_get_contents("{$dir}/{$file}");
+        }
+        if (is_file("{$dir}/compendium.json")) {
+            $parts[] = '"compendium":' . file_get_contents("{$dir}/compendium.json");
         }
 
         return ['{' . implode(',', $parts) . '}', null];
@@ -85,19 +103,29 @@ final readonly class PresetImporter
     public function validate(array $package): ValidationResult
     {
         $issues = [];
-        foreach (['manifest', 'sheet_schema', 'sheet_ui', 'rules'] as $part) {
+        foreach (self::REQUIRED_PARTS as $part) {
             if (!is_array($package[$part] ?? null)) {
                 $issues[] = new ValidationIssue('package.missing_part', Severity::Error, [], ['/' . $part]);
             }
         }
-        foreach (array_diff(array_keys($package), ['manifest', 'sheet_schema', 'sheet_ui', 'rules']) as $unknown) {
+        foreach (self::OPTIONAL_PARTS as $part) {
+            if (array_key_exists($part, $package) && !is_array($package[$part])) {
+                $issues[] = new ValidationIssue('package.invalid_part', Severity::Error, [], ['/' . $part]);
+            }
+        }
+        foreach (array_diff(array_keys($package), [...self::REQUIRED_PARTS, ...self::OPTIONAL_PARTS]) as $unknown) {
             $issues[] = new ValidationIssue('package.unknown_part', Severity::Error, [], ['/' . $unknown]);
         }
         if ($issues !== []) {
             return new ValidationResult($issues);
         }
         $result = ValidationResult::ok();
-        foreach (['manifest' => 'novtt.preset-manifest/1', 'sheet_ui' => 'novtt.sheet-ui/1', 'rules' => 'novtt.rules/1'] as $part => $contract) {
+        foreach (self::CONTRACTS as $part => $accepted) {
+            if (!isset($package[$part])) {
+                continue;
+            }
+            $declared = $package[$part]['contract'] ?? null;
+            $contract = in_array($declared, $accepted, true) ? $declared : $accepted[0];
             $partResult = $this->structure->validateContract($package[$part], $contract);
             $result = $result->merge(new ValidationResult(array_map(
                 static fn (ValidationIssue $i): ValidationIssue => new ValidationIssue($i->ruleId, $i->severity, [], array_map(static fn (string $p): string => '/' . $part . $p, $i->paths), $i->params),
@@ -108,7 +136,15 @@ final readonly class PresetImporter
             return $result;
         }
 
-        return $this->compatibility->check($package['manifest'], $package['sheet_schema'], $package['sheet_ui'], $package['rules']);
+        return $this->compatibility->check($package['manifest'], $package['sheet_schema'], $package['sheet_ui'], $package['rules'], $package['compendium'] ?? null);
+    }
+
+    /** Rights status recorded for a version: from manifest/2, or `draft` (no rights metadata). @param array<string, mixed> $manifest */
+    public static function rightsStatus(array $manifest): string
+    {
+        $status = ($manifest['contract'] ?? null) === 'novtt.preset-manifest/2' ? ($manifest['license']['rights_status'] ?? null) : null;
+
+        return in_array($status, PublicationGate::RIGHTS_STATES, true) ? $status : 'draft';
     }
 
     /**
@@ -126,6 +162,13 @@ final readonly class PresetImporter
             throw ApiProblem::validation($result, 'preset.invalid');
         }
         $manifest = $package['manifest'];
+        if ($canonical) {
+            // Technical validity is not a licence: the public catalogue needs recorded rights.
+            $rights = $this->gate->check($manifest, $package['compendium'] ?? null);
+            if (!$rights->isValid()) {
+                throw ApiProblem::validation($rights, 'preset.rights_blocked');
+            }
+        }
         $hash = hash('sha256', CanonicalJson::encode($package));
         $ownerId = $canonical ? null : $actor->getKey();
 
@@ -155,6 +198,9 @@ final readonly class PresetImporter
                 'sheet_schema' => $objects->sheet_schema,
                 'sheet_ui' => $objects->sheet_ui,
                 'rules' => $objects->rules,
+                'compendium' => $objects->compendium ?? null,
+                'rights_status' => self::rightsStatus($manifest),
+                'rights_updated_at' => now(),
                 'validation_report' => $result->toArray(),
                 'engine_version' => PresetCompatibility::ENGINE_VERSION,
                 'imported_by' => $actor->getKey(),
@@ -167,6 +213,7 @@ final readonly class PresetImporter
             }
             $this->audit->record($actor, null, $canonical ? 'preset.published' : 'preset.imported', $version, [
                 'family_id' => $manifest['family_id'], 'variant_id' => $manifest['variant_id'], 'version' => $manifest['version'], 'content_hash' => $hash,
+                'rules_revision' => $manifest['rules_revision'] ?? null, 'rights_status' => self::rightsStatus($manifest),
             ]);
 
             // Reload: class casts cache the stdClass trees that were written.

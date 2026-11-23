@@ -46,6 +46,11 @@
     },
     "capabilities": {
       "type": "object",
+      "properties": {
+        "character_creation": { "type": "boolean" },
+        "character_progression": { "type": "boolean" },
+        "dice_resolution": { "type": "boolean" }
+      },
       "additionalProperties": { "type": "boolean" },
       "required": ["character_creation", "character_progression", "dice_resolution"],
       "maxProperties": 32

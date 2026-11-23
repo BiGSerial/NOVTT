@@ -1,11 +1,41 @@
 {
-  "contract": "novtt.preset-manifest/1",
+  "contract": "novtt.preset-manifest/2",
   "family_id": "novtt-mesa",
   "variant_id": "mesa-demo",
   "version": "1.0.0",
   "display_name": "Mesa NOVTT (demonstração)",
-  "license": "MIT (conteúdo original do NOVTT)",
-  "provenance": "Sistema genérico criado pela equipe NOVTT para demonstrar a mesa ao vivo; não reproduz nenhum sistema publicado.",
+  "locale": "pt-BR",
+  "rules_revision": "original-2026",
+  "source_version": null,
+  "errata_reference": null,
+  "license": {
+    "identifier": "NOVTT-original",
+    "source_url": "https://github.com/BiGSerial/NOVTT",
+    "rights_status": "approved",
+    "requires_attribution": false,
+    "attribution": "Conteúdo original da equipe NOVTT.",
+    "consulted_at": "2026-11-23",
+    "policy_version": null
+  },
+  "provenance": {
+    "source_authenticity": "original",
+    "authors": [
+      "Equipe NOVTT"
+    ],
+    "notes": "Sistema genérico criado pela equipe NOVTT para demonstrar a mesa ao vivo; não reproduz nenhum sistema publicado."
+  },
+  "capabilities": {
+    "character_creation": true,
+    "character_progression": true,
+    "dice_resolution": false
+  },
+  "coverage": "character_creation",
+  "limitations": [
+    "Fixture técnica (rules/1): sem valores derivados, efeitos ou rolagens declaradas."
+  ],
+  "publication": {
+    "public": true
+  },
   "engine": {
     "min_version": "0.1.0"
   },

@@ -116,7 +116,11 @@ final class PresetPackageTest extends TestCase
 
     public function test_manifests_without_rights_metadata_cannot_be_published(): void
     {
-        $legacy = DemoPreset::json(__DIR__ . '/../../../../presets/fixtures/demo-basic/1.0.0/manifest.json');
+        $legacy = [
+            'contract' => 'novtt.preset-manifest/1', 'family_id' => 'legacy', 'variant_id' => 'legacy', 'version' => '1.0.0',
+            'display_name' => 'Legacy', 'license' => 'MIT', 'provenance' => 'Free text only', 'engine' => ['min_version' => '0.1.0'],
+            'files' => ['sheet_schema' => 'sheet.schema.json', 'sheet_ui' => 'sheet.ui.json', 'rules' => 'rules.json'],
+        ];
         $this->assertSame(['rights.manifest_without_rights'], self::ids((new PublicationGate())->check($legacy)));
         $this->assertFalse(PublicationGate::publiclyListable('published', 'quarantined'));
         $this->assertFalse(PublicationGate::publiclyListable('engine_compatible', 'approved'));
