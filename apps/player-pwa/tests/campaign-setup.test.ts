@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, h, nextTick } from 'vue'
-import { allDecided, labelsOf, reasonError, type ChangeRequestView, type PresetSummary } from '../src/live/campaign'
+import { allDecided, labelsOf, optionLabelsOf, reasonError, type ChangeRequestView, type PresetSummary } from '../src/live/campaign'
 import { sheetSections } from '../src/live/sheet'
 import type { SheetUi } from '../src/sheets/types'
 import PresetBadge from '../src/views/campaign/PresetBadge.vue'
@@ -61,6 +61,8 @@ describe('campaign set-up helpers', () => {
     const physical = sections.find(s => s.id === 'attributes-physical')!
     expect(physical.fields.map(f => [f.path, f.value])).toEqual([['/attributes/physical/forca', 3], ['/attributes/physical/destreza', 1], ['/attributes/physical/vigor', 1]])
     expect(sections.find(s => s.id === 'notes')).toBeUndefined()
+    const origin = sheetSections(ui as never, { origin: { lineage: 'aurora' } }, schema, { '/origin/lineage': { aurora: 'Aurora' } }).find(s => s.id === 'origin')!
+    expect(origin.fields[0].value).toBe('Aurora')
     // Without a schema nothing is inferred (older callers).
     expect(sheetSections(ui as never, {}).find(s => s.id === 'attributes-physical')).toBeUndefined()
   })
@@ -81,6 +83,14 @@ describe('PresetBadge', () => {
 
 describe('ProposalReview', () => {
   const props = (view: ChangeRequestView) => ({ request: view, sheet: { attributes: { physical: { forca: 1 } } }, labels: labelsOf(ui), budgetLabels: { physical: 'Pontos de atributos físicos' } })
+
+  it('uses choice labels from the rules or the compendium instead of raw values', () => {
+    const labels = optionLabelsOf({ locale: 'pt-BR', rules: demo('rules.json'), compendium: demo<{ items: { canonical_id: string; labels: Record<string, string> }[] }>('compendium.json').items })
+    expect(labels['/origin/lineage'].aurora).toBe('Aurora')
+    expect(labels['/origin/gift'].voo_curto).toBe('Voo curto')
+    const el = mount(ProposalReview, { ...props(request()), optionLabels: labels })
+    expect([...el.querySelectorAll('.after')].map(a => a.textContent)).toContain('Aurora')
+  })
 
   it('shows labelled before → after values and the engine issue in pt-BR', async () => {
     const el = mount(ProposalReview, props(request()))

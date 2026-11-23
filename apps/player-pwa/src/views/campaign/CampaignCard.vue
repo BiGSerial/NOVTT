@@ -12,6 +12,7 @@ const props = defineProps<{ campaign: Campaign }>()
 const preset = ref<PresetVersionFull | null>(null)
 const characters = ref<CampaignCharacterView[]>([])
 const creating = ref(false)
+const loaded = ref(false)
 const newName = ref('')
 const busy = ref(false)
 const error = ref('')
@@ -25,6 +26,7 @@ onMounted(async () => {
     const [p, c] = await Promise.all([presets.version(props.campaign.preset_version_id), setup.characters(props.campaign.id)])
     preset.value = p
     characters.value = c.data
+    loaded.value = true
   } catch { error.value = 'Não foi possível carregar os detalhes desta campanha.' }
 })
 
@@ -62,9 +64,10 @@ async function copy(): Promise<void> {
       <h2>{{ campaign.name }}</h2>
       <p v-if="campaign.description" class="muted small">{{ campaign.description }}</p>
       <PresetBadge v-if="preset" :preset="preset" compact />
+      <p v-else-if="!error" class="muted small" role="status">Carregando o preset…</p>
     </div>
 
-    <div v-if="!isMaster" class="my-characters">
+    <div v-if="!isMaster && loaded" class="my-characters">
       <ul v-if="characters.length" class="character-chips" aria-label="Seus personagens">
         <li v-for="c in characters" :key="c.id">
           <a class="character-chip" :href="`#/personagens/${c.id}`">

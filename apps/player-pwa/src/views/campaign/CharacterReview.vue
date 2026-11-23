@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { ApiError } from '../../api/client'
 import { t } from '../../i18n/messages'
-import { ACTIVE_REQUEST, review, STATUS_LABEL, type CampaignCharacterView, type ChangeRequestView, type PresetVersionFull } from '../../live/campaign'
+import { ACTIVE_REQUEST, optionLabelsOf, review, STATUS_LABEL, type CampaignCharacterView, type ChangeRequestView, type PresetVersionFull } from '../../live/campaign'
 import ProposalReview from './ProposalReview.vue'
 
 /** One character for the master: creation progress, balances, the active proposal, grants, activation. */
@@ -19,6 +19,7 @@ const grantReason = ref('')
 let grantKey: string | null = null
 
 const budgets = computed(() => props.preset.rules.budgets ?? [])
+const optionLabels = computed(() => optionLabelsOf(props.preset))
 const budgetLabels = computed(() => Object.fromEntries(budgets.value.map(b => [b.id, b.label])))
 const stepLabels = computed(() => Object.fromEntries((props.preset.rules.creation?.steps ?? []).map(s => [s.id, s.label])))
 const canActivate = computed(() => props.character.status !== 'approved' && props.character.sheet_revision > 0 && !request.value)
@@ -94,6 +95,7 @@ function finalized(): void {
       :sheet="character.sheet"
       :labels="labels"
       :budget-labels="budgetLabels"
+      :option-labels="optionLabels"
       @updated="v => (request = v)"
       @finalized="finalized"
     />

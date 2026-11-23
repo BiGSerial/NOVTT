@@ -29,7 +29,15 @@ export interface Budget { id: string; kind: string; label: string }
 export interface PresetVersionFull extends PresetSummary {
   sheet_ui: SheetUi
   sheet_schema: Record<string, unknown>
-  rules: { contract: string; budgets?: Budget[]; creation?: { steps?: { id: string; label: string }[] } }
+  rules: {
+    contract: string
+    budgets?: Budget[]
+    creation?: {
+      steps?: { id: string; label: string }[]
+      choices?: { id: string; path: string; label?: string; options: { value: string | number | boolean; label?: string; compendium_id?: string }[] }[]
+    }
+  }
+  compendium?: { canonical_id: string; labels: Record<string, string> }[]
 }
 
 export interface CreationStep { id: string; available: boolean; complete: boolean; missing: string[]; condition_met: boolean; issues: number }
@@ -152,6 +160,16 @@ export function labelsOf(ui: SheetUi): Map<string, string> {
     }
   }
   return labels
+}
+
+/** Display label per choice value (`path` => value => label), from the rules or the compendium. */
+export function optionLabelsOf(preset: Pick<PresetVersionFull, 'rules' | 'compendium' | 'locale'>): Record<string, Record<string, string>> {
+  const entries = new Map((preset.compendium ?? []).map(e => [e.canonical_id, e.labels[preset.locale ?? 'pt-BR'] ?? Object.values(e.labels)[0]]))
+  const out: Record<string, Record<string, string>> = {}
+  for (const choice of preset.rules.creation?.choices ?? []) {
+    out[choice.path] = Object.fromEntries(choice.options.map(o => [String(o.value), o.label ?? (o.compendium_id ? entries.get(o.compendium_id) : undefined) ?? String(o.value)]))
+  }
+  return out
 }
 
 /** Short pt-BR label of a taxonomy for one preset ("Linhagem, Dom"). */

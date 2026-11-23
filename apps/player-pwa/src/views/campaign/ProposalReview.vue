@@ -10,7 +10,7 @@ import { allDecided, REASON_MAX, REASON_MIN, reasonError, review, type ChangeReq
  * with the current value and the proposed one; a section can be approved at once (provisional),
  * each rejection needs its own reason, and finalization applies the approved set or nothing.
  */
-const props = defineProps<{ request: ChangeRequestView; sheet: Record<string, unknown>; labels: Map<string, string>; budgetLabels: Record<string, string> }>()
+const props = defineProps<{ request: ChangeRequestView; sheet: Record<string, unknown>; labels: Map<string, string>; budgetLabels: Record<string, string>; optionLabels?: Record<string, Record<string, string>> }>()
 const emit = defineEmits<{ updated: [view: ChangeRequestView]; finalized: [view: ChangeRequestView] }>()
 
 const reasons = reactive<Record<string, string>>({})
@@ -47,6 +47,7 @@ function label(op: OperationView): string {
 function before(op: OperationView): string {
   if (op.type === 'add_item') return 'novo item'
   const current = readPointer(props.sheet, op.path)
+  if (!op.item_id && current !== undefined && current !== null) return props.optionLabels?.[op.path]?.[String(current)] ?? show(current)
   if (op.item_id && Array.isArray(current)) {
     const item = (current as Record<string, unknown>[]).find(i => i.id === op.item_id)
     return op.field ? show(item?.[op.field]) : show(item?.name ?? op.item_id)
@@ -58,6 +59,7 @@ function after(op: OperationView): string {
   if (op.type === 'remove_item') return 'removido'
   if (op.type === 'unset_field') return '—'
   if (op.type === 'reorder_items') return 'nova ordem'
+  if (!op.item_id && op.value !== null && op.value !== undefined) return props.optionLabels?.[op.path]?.[String(op.value)] ?? show(op.value)
   return show(op.value)
 }
 

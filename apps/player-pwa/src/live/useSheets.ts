@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
 import { sheets } from './api'
-import { presets } from './campaign'
+import { optionLabelsOf, presets } from './campaign'
 import { sheetSections, type SheetField, type SheetSection } from './sheet'
 
 /**
@@ -13,11 +13,11 @@ export function useSheets(campaignId: string) {
   let npcSheets: Promise<Map<string, Record<string, unknown>>> | null = null
 
   async function build(id: string, presetVersionId: string, raw: Record<string, unknown>): Promise<void> {
-    const [ui, schema] = await Promise.all([
+    const [ui, version] = await Promise.all([
       sheets.layout(presetVersionId),
-      presets.version(presetVersionId).then(v => v.sheet_schema).catch(() => undefined),
+      presets.version(presetVersionId).catch(() => undefined),
     ])
-    const sections = sheetSections(ui, raw, schema)
+    const sections = sheetSections(ui, raw, version?.sheet_schema, version ? optionLabelsOf(version) : undefined)
     byId.set(id, { sections, numeric: sections.filter(s => s.numeric).flatMap(s => s.fields), raw })
   }
 

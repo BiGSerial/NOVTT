@@ -32,7 +32,7 @@ function schemaAt(schema: Record<string, unknown> | undefined, pointer: string):
  * sections. Fields the server left out are absent, except numbers a player may read that were
  * never written: those show the preset's default (then minimum), the value the engine uses.
  */
-export function sheetSections(ui: SheetUi, sheet: Record<string, unknown>, schema?: Record<string, unknown>): SheetSection[] {
+export function sheetSections(ui: SheetUi, sheet: Record<string, unknown>, schema?: Record<string, unknown>, optionLabels?: Record<string, Record<string, string>>): SheetSection[] {
   const fallback = (path: string, widget: string, access: string | undefined): unknown => {
     if (!schema || (widget !== 'dot_rating' && widget !== 'integer') || !READABLE.includes(access ?? '')) return undefined
     const node = schemaAt(schema, path)
@@ -45,7 +45,10 @@ export function sheetSections(ui: SheetUi, sheet: Record<string, unknown>, schem
       .filter((e): e is SheetField & { kind: 'field' } => e.kind === 'field')
       .map(e => {
         const widget = (e as { widget: string }).widget
-        const value = readPointer(sheet, e.path) ?? fallback(e.path, widget, (e as { access?: string }).access ?? section.access ?? defaultAccess)
+        const raw = readPointer(sheet, e.path)
+        // Choice values show the preset's label (e.g. a lineage name), never the stored id.
+        const labelled = raw !== undefined && raw !== null ? optionLabels?.[e.path]?.[String(raw)] : undefined
+        const value = labelled ?? raw ?? fallback(e.path, widget, (e as { access?: string }).access ?? section.access ?? defaultAccess)
         return { path: e.path, label: e.label, widget, value }
       })
       .filter(f => f.value !== undefined && f.value !== '')
