@@ -41,7 +41,7 @@ final readonly class DemoSeeder
 
         return DB::transaction(function () use ($raw): array {
             $master = $this->user(DemoMode::MASTER_EMAIL, 'Mestre (demo)');
-            $player = $this->user(DemoMode::PLAYER_EMAIL, 'Jogador (demo)');
+            $player = $this->user(DemoMode::PLAYER_EMAIL, 'Ana (demo)');
             [$package, $objects] = $this->importer->parse($raw);
             [$version] = $this->importer->import($master, $package, $objects, canonical: true);
 
