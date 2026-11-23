@@ -1,6 +1,6 @@
-import { api, ensureCsrfCookie } from '../api/client'
+import { api, ApiError, ensureCsrfCookie } from '../api/client'
 import type {
-  AtlasEntry, Campaign, Clue, Compass, DiceChoice, GameSession, LiveState, MasterNote, Me, OfficialRoll,
+  AtlasEntry, Campaign, CarryOver, Clue, Item, Plot, Stage, Compass, DiceChoice, GameSession, LiveState, MasterNote, Me, OfficialRoll,
   ResourceTrack, RollRequest, Roteiro, RoteiroContent, SessionEvent, SheetUi, Suggestion, TableSnapshot, Whisper,
 } from './types'
 
@@ -21,7 +21,7 @@ export const auth = {
 
 export const demo = {
   state: () => api<{ seeded: boolean; user: { id: string; name: string; role: string } | null; table_campaign_id: string | null }>('GET', '', undefined, { base: '/api/dev/demo' }),
-  login: async (role: 'master' | 'player' | 'player2' | 'player3') => {
+  login: async (role: 'master' | 'player' | 'player2' | 'player3' | 'player4' | 'player5') => {
     await ensureCsrfCookie()
     return api<{ user: { id: string; name: string } }>('POST', '/session', { role }, { base: '/api/dev/demo' })
   },
@@ -38,6 +38,8 @@ export const session = {
   events: (id: string, after: number) => api<{ data: SessionEvent[]; last_seq: number; has_more: boolean }>('GET', `/sessions/${id}/events?after=${after}&limit=500`),
   transition: (id: string, action: 'pause' | 'resume' | 'end') => mutate<GameSession>('POST', `/sessions/${id}/${action}`),
   compass: (id: string, revision: number, compass: Compass) => mutate<GameSession>('PUT', `/sessions/${id}/compass`, { revision, compass }),
+  plot: (id: string, revision: number, plot: Plot) => mutate<GameSession>('PUT', `/sessions/${id}/plot`, { revision, plot }),
+  stage: (id: string, revision: number, stage: Omit<Stage, 'shown_at'> | null) => mutate<GameSession>('PUT', `/sessions/${id}/stage`, { revision, stage }),
   initiative: (id: string, revision: number, entries: { kind: 'character' | 'npc'; id: string }[], turn: number, round: number) =>
     mutate<GameSession>('PUT', `/sessions/${id}/initiative`, { revision, entries, turn, round }),
 }
@@ -69,13 +71,13 @@ export const rolls = {
 }
 
 export const table = {
-  live: (campaignId: string, kind: 'character' | 'npc', id: string, revision: number, resources: ResourceTrack[], conditions: string[]) =>
-    mutate<{ live: LiveState }>('PUT', `/campaigns/${campaignId}/live-states/${kind}/${id}`, { revision, resources, conditions }),
+  live: (campaignId: string, kind: 'character' | 'npc', id: string, revision: number, resources: ResourceTrack[], conditions: string[], items?: Item[]) =>
+    mutate<{ live: LiveState }>('PUT', `/campaigns/${campaignId}/live-states/${kind}/${id}`, { revision, resources, conditions, ...(items ? { items } : {}) }),
   createNote: (campaignId: string, body: string, tags: string[], pinned = false) => mutate<MasterNote>('POST', `/campaigns/${campaignId}/notes`, { body, tags, pinned }),
   updateNote: (id: string, revision: number, patch: { body?: string; tags?: string[]; pinned?: boolean }) => mutate<MasterNote>('PATCH', `/notes/${id}`, { revision, ...patch }),
   deleteNote: (id: string) => mutate<void>('DELETE', `/notes/${id}`),
   whisper: (campaignId: string, recipient: string, body: string) => mutate<Whisper>('POST', `/campaigns/${campaignId}/whispers`, { recipient_user_id: recipient, body }),
-  createClue: (sessionId: string, title: string, body: string, scene: string | null) => mutate<Clue>('POST', `/sessions/${sessionId}/clues`, { title, body, scene }),
+  createClue: (sessionId: string, title: string, body: string, scene: string | null, imageId: string | null = null) => mutate<Clue>('POST', `/sessions/${sessionId}/clues`, { title, body, scene, ...(imageId ? { image_id: imageId } : {}) }),
   revealClue: (clueId: string, to: 'table' | 'user', userId?: string) => mutate<Clue>('POST', `/clues/${clueId}/reveal`, { to, user_id: userId ?? null }),
   revealNpc: (sessionId: string, npcId: string, summary: string) => mutate<{ revealed_npcs: unknown[] }>('POST', `/sessions/${sessionId}/npc-reveals`, { campaign_npc_id: npcId, summary }),
 }
@@ -97,7 +99,31 @@ export const sheets = {
   })(),
 }
 
+/** Same-origin image URL: the session cookie authorizes it (players only get what they may see). */
+export const imageUrl = (id: string | null | undefined): string | null => (id ? `/api/v1/images/${id}` : null)
+
+export const images = {
+  /** Multipart upload; the server re-encodes to WebP (strips metadata) and limits size. */
+  upload: async (campaignId: string, file: File, kind: 'portrait' | 'scene' | 'handout'): Promise<{ id: string; kind: string; width: number; height: number }> => {
+    await ensureCsrfCookie()
+    const form = new FormData()
+    form.append('file', file)
+    form.append('kind', kind)
+    const m = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]+)/)
+    let res: Response
+    try {
+      res = await fetch(`/api/v1/campaigns/${campaignId}/images`, { method: 'POST', credentials: 'include', headers: { Accept: 'application/json', ...(m ? { 'X-XSRF-TOKEN': decodeURIComponent(m[1]) } : {}) }, body: form })
+    } catch { throw new ApiError(0, 'network.error') }
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) throw new ApiError(res.status, String(data.code ?? `http.${res.status}`))
+    return data
+  },
+  setPortrait: (campaignId: string, kind: 'character' | 'npc', subjectId: string, imageId: string | null) =>
+    mutate<unknown>('PUT', `/campaigns/${campaignId}/portraits/${kind}/${subjectId}`, { image_id: imageId }),
+}
+
 export const world = {
+  carryOver: (campaignId: string) => api<CarryOver>('GET', `/campaigns/${campaignId}/prep/carry-over`),
   roteiros: (campaignId: string) => api<{ data: Roteiro[] }>('GET', `/campaigns/${campaignId}/roteiros`),
   createRoteiro: (campaignId: string, title: string, content: Partial<RoteiroContent>) => mutate<Roteiro>('POST', `/campaigns/${campaignId}/roteiros`, { title, content }),
   saveRoteiro: (id: string, revision: number, title: string, content: Partial<RoteiroContent>) => mutate<Roteiro>('PUT', `/roteiros/${id}`, { revision, title, content }),

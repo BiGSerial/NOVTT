@@ -36,7 +36,7 @@ export function useLiveTable(campaignId: string, opts: { connect?: () => Promise
   }
 
   function nextRoll(): void {
-    if (dice.value || card.value) return
+    if (dice.value || card.value || pendingCard) return
     const roll = queue.shift()
     if (!roll) return
     const record = officialRecord(roll, loadSkin())
@@ -50,23 +50,28 @@ export function useLiveTable(campaignId: string, opts: { connect?: () => Promise
   }
   let pendingCard: OfficialRoll | null = null
 
-  /** Called by the dice overlay when the dice settled: the result comes to the front. */
+  /**
+   * Called by the dice overlay when the dice settled: the result comes to the front while the
+   * dice stay on the table under it. Both leave together when the card is dismissed (tap, Esc)
+   * or after CARD_MS; a queued roll then takes the stage.
+   */
   function settled(): void {
-    dice.value = null
     if (pendingCard) showCard(pendingCard)
     pendingCard = null
   }
 
+  const CARD_MS = 14000
   function showCard(roll: OfficialRoll): void {
     card.value = roll
     clearTimeout(cardTimer)
-    cardTimer = setTimeout(dismissCard, 4500)
+    cardTimer = setTimeout(dismissCard, queue.length ? CARD_MS / 2 : CARD_MS)
   }
 
   function dismissCard(): void {
     clearTimeout(cardTimer)
     card.value = null
-    setTimeout(nextRoll, 150)
+    dice.value = null
+    setTimeout(nextRoll, 500)
   }
 
   function enqueue(roll: OfficialRoll): void {
@@ -100,6 +105,7 @@ export function useLiveTable(campaignId: string, opts: { connect?: () => Promise
         onRoll: roll => enqueue(roll),
         onWhisper: (w: Whisper) => { if (w.sender_user_id !== snap.me.user_id) toast(w.kind === 'clue' ? 'Uma pista chegou só para você' : 'Novo sussurro', 'whisper') },
         onClue: (c: Clue) => toast(`Pista revelada: ${c.title}`, 'clue'),
+        onStage: st => { if (st && snap.role !== 'master') toast(`Nova cena: ${st.title}`, 'clue') },
       })
       state.value = t
       const pending = buffer
