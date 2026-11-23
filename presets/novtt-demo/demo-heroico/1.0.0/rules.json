@@ -1,0 +1,734 @@
+{
+  "contract": "novtt.rules/2",
+  "budgets": [
+    {
+      "id": "ability_points",
+      "kind": "initial",
+      "label": "Pontos de capacidade",
+      "initial_amount": 12
+    },
+    {
+      "id": "talent_points",
+      "kind": "other",
+      "label": "Talentos liberados",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/progress/level"
+        },
+        "steps": [
+          [
+            1,
+            0
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            9,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "id": "xp",
+      "kind": "experience",
+      "label": "Experiência (não é gasta)",
+      "initial_amount": 0
+    },
+    {
+      "id": "milestones",
+      "kind": "other",
+      "label": "Marcos",
+      "initial_amount": 0
+    }
+  ],
+  "costs": [
+    {
+      "id": "ability_creation",
+      "phase": "creation",
+      "budget": "ability_points",
+      "targets": [
+        "/abilities/*"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 13
+                }
+              ],
+              "cmp": "ge"
+            },
+            {
+              "const": 2
+            },
+            {
+              "const": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "talent_creation",
+      "phase": "creation",
+      "budget": "talent_points",
+      "targets": [
+        "/talents/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "talent_advancement",
+      "phase": "advancement",
+      "budget": "talent_points",
+      "targets": [
+        "/talents/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    }
+  ],
+  "phase_limits": [
+    {
+      "id": "creation_ability_cap",
+      "phase": "creation",
+      "targets": [
+        "/abilities/*"
+      ],
+      "max": 15
+    }
+  ],
+  "dependencies": [],
+  "derived": [
+    {
+      "id": "mod_forca",
+      "path": "/modifiers/forca",
+      "label": "Modificador de Força",
+      "formula": {
+        "op": "floor",
+        "args": [
+          {
+            "op": "divide",
+            "args": [
+              {
+                "op": "subtract",
+                "args": [
+                  {
+                    "ref": "/abilities/forca"
+                  },
+                  {
+                    "const": 10
+                  }
+                ]
+              },
+              {
+                "const": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "mod_agilidade",
+      "path": "/modifiers/agilidade",
+      "label": "Modificador de Agilidade",
+      "formula": {
+        "op": "floor",
+        "args": [
+          {
+            "op": "divide",
+            "args": [
+              {
+                "op": "subtract",
+                "args": [
+                  {
+                    "ref": "/abilities/agilidade"
+                  },
+                  {
+                    "const": 10
+                  }
+                ]
+              },
+              {
+                "const": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "mod_mente",
+      "path": "/modifiers/mente",
+      "label": "Modificador de Mente",
+      "formula": {
+        "op": "floor",
+        "args": [
+          {
+            "op": "divide",
+            "args": [
+              {
+                "op": "subtract",
+                "args": [
+                  {
+                    "ref": "/abilities/mente"
+                  },
+                  {
+                    "const": 10
+                  }
+                ]
+              },
+              {
+                "const": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "mod_presenca",
+      "path": "/modifiers/presenca",
+      "label": "Modificador de Presença",
+      "formula": {
+        "op": "floor",
+        "args": [
+          {
+            "op": "divide",
+            "args": [
+              {
+                "op": "subtract",
+                "args": [
+                  {
+                    "ref": "/abilities/presenca"
+                  },
+                  {
+                    "const": 10
+                  }
+                ]
+              },
+              {
+                "const": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "proficiency",
+      "path": "/progress/proficiency",
+      "label": "Bônus de treino",
+      "formula": {
+        "op": "lookup",
+        "key": {
+          "ref": "/progress/level"
+        },
+        "steps": [
+          [
+            1,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            9,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "max_hp",
+      "path": "/progress/max_hp",
+      "label": "Vida máxima",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/progress/level"
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "const": 6
+              },
+              {
+                "derived": "mod_forca"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "effects": [
+    {
+      "id": "bulwark_hp",
+      "target": "max_hp",
+      "mode": "add",
+      "label": "Especialização: baluarte",
+      "when": {
+        "op": "compare",
+        "args": [
+          {
+            "ref": "/calling/specialization"
+          },
+          {
+            "const": "baluarte"
+          }
+        ],
+        "cmp": "eq"
+      },
+      "value": {
+        "ref": "/progress/level"
+      }
+    }
+  ],
+  "constraints": [],
+  "creation": {
+    "steps": [
+      {
+        "id": "identity",
+        "label": "Identidade",
+        "paths": [
+          "/identity/*"
+        ],
+        "required": [
+          "/identity/name"
+        ]
+      },
+      {
+        "id": "calling",
+        "label": "Vocação",
+        "paths": [
+          "/calling/*"
+        ],
+        "required": [
+          "/calling/vocation"
+        ]
+      },
+      {
+        "id": "abilities",
+        "label": "Capacidades",
+        "paths": [
+          "/abilities/*"
+        ],
+        "complete_when": {
+          "op": "compare",
+          "args": [
+            {
+              "budget": "ability_points",
+              "of": "balance"
+            },
+            {
+              "const": 0
+            }
+          ],
+          "cmp": "eq"
+        }
+      },
+      {
+        "id": "review",
+        "label": "Revisão",
+        "paths": [
+          "/resources/*"
+        ],
+        "complete_when": {
+          "const": true
+        }
+      }
+    ],
+    "choices": [
+      {
+        "id": "vocation",
+        "path": "/calling/vocation",
+        "label": "Vocação",
+        "options": [
+          {
+            "value": "lamina",
+            "label": "Lâmina",
+            "compendium_id": "vocation.lamina"
+          },
+          {
+            "value": "arcano",
+            "label": "Arcano",
+            "compendium_id": "vocation.arcano"
+          },
+          {
+            "value": "andarilho",
+            "label": "Andarilho",
+            "compendium_id": "vocation.andarilho"
+          }
+        ]
+      },
+      {
+        "id": "specialization",
+        "path": "/calling/specialization",
+        "label": "Especialização",
+        "options": [
+          {
+            "value": "duelista",
+            "label": "Duelista",
+            "compendium_id": "specialization.duelista",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "args": [
+                    {
+                      "ref": "/calling/vocation"
+                    },
+                    {
+                      "const": "lamina"
+                    }
+                  ],
+                  "cmp": "eq"
+                },
+                {
+                  "op": "compare",
+                  "args": [
+                    {
+                      "ref": "/progress/level"
+                    },
+                    {
+                      "const": 3
+                    }
+                  ],
+                  "cmp": "ge"
+                }
+              ]
+            }
+          },
+          {
+            "value": "baluarte",
+            "label": "Baluarte",
+            "compendium_id": "specialization.baluarte",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "args": [
+                    {
+                      "ref": "/calling/vocation"
+                    },
+                    {
+                      "const": "lamina"
+                    }
+                  ],
+                  "cmp": "eq"
+                },
+                {
+                  "op": "compare",
+                  "args": [
+                    {
+                      "ref": "/progress/level"
+                    },
+                    {
+                      "const": 3
+                    }
+                  ],
+                  "cmp": "ge"
+                }
+              ]
+            }
+          },
+          {
+            "value": "runista",
+            "label": "Runista",
+            "compendium_id": "specialization.runista",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "args": [
+                    {
+                      "ref": "/calling/vocation"
+                    },
+                    {
+                      "const": "arcano"
+                    }
+                  ],
+                  "cmp": "eq"
+                },
+                {
+                  "op": "compare",
+                  "args": [
+                    {
+                      "ref": "/progress/level"
+                    },
+                    {
+                      "const": 3
+                    }
+                  ],
+                  "cmp": "ge"
+                }
+              ]
+            }
+          },
+          {
+            "value": "batedor",
+            "label": "Batedor",
+            "compendium_id": "specialization.batedor",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "args": [
+                    {
+                      "ref": "/calling/vocation"
+                    },
+                    {
+                      "const": "andarilho"
+                    }
+                  ],
+                  "cmp": "eq"
+                },
+                {
+                  "op": "compare",
+                  "args": [
+                    {
+                      "ref": "/progress/level"
+                    },
+                    {
+                      "const": 3
+                    }
+                  ],
+                  "cmp": "ge"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "progression": {
+    "tracks": [
+      {
+        "id": "level",
+        "label": "Nível",
+        "path": "/progress/level",
+        "max_step": 1,
+        "measure": {
+          "op": "max",
+          "args": [
+            {
+              "budget": "xp",
+              "of": "granted"
+            },
+            {
+              "op": "lookup",
+              "key": {
+                "budget": "milestones",
+                "of": "granted"
+              },
+              "steps": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  300
+                ],
+                [
+                  2,
+                  900
+                ],
+                [
+                  3,
+                  2700
+                ],
+                [
+                  4,
+                  6500
+                ],
+                [
+                  5,
+                  14000
+                ],
+                [
+                  6,
+                  23000
+                ],
+                [
+                  7,
+                  34000
+                ],
+                [
+                  8,
+                  48000
+                ],
+                [
+                  9,
+                  64000
+                ]
+              ]
+            }
+          ]
+        },
+        "thresholds": [
+          0,
+          300,
+          900,
+          2700,
+          6500,
+          14000,
+          23000,
+          34000,
+          48000,
+          64000
+        ]
+      }
+    ]
+  },
+  "resources": [
+    {
+      "id": "hp",
+      "label": "Vida",
+      "path": "/resources/hp",
+      "max": {
+        "derived": "max_hp"
+      },
+      "min": 0,
+      "recovery": "rest"
+    }
+  ],
+  "rolls": [
+    {
+      "id": "check",
+      "label": "Teste de capacidade",
+      "strategy": "sum",
+      "dice": "1d20",
+      "inputs": {
+        "ability": {
+          "targets": [
+            "/abilities/*"
+          ]
+        }
+      },
+      "modifier": {
+        "op": "floor",
+        "args": [
+          {
+            "op": "divide",
+            "args": [
+              {
+                "op": "subtract",
+                "args": [
+                  {
+                    "var": "ability"
+                  },
+                  {
+                    "const": 10
+                  }
+                ]
+              },
+              {
+                "const": 2
+              }
+            ]
+          }
+        ]
+      },
+      "target": {
+        "default": 10,
+        "min": 1,
+        "max": 40
+      },
+      "critical_at_least": 20,
+      "fumble_at_most": 1,
+      "edge": {
+        "extra_dice": 1
+      }
+    },
+    {
+      "id": "trained_check",
+      "label": "Teste treinado",
+      "strategy": "sum",
+      "dice": "1d20",
+      "inputs": {
+        "ability": {
+          "targets": [
+            "/abilities/*"
+          ]
+        }
+      },
+      "modifier": {
+        "op": "add",
+        "args": [
+          {
+            "op": "floor",
+            "args": [
+              {
+                "op": "divide",
+                "args": [
+                  {
+                    "op": "subtract",
+                    "args": [
+                      {
+                        "var": "ability"
+                      },
+                      {
+                        "const": 10
+                      }
+                    ]
+                  },
+                  {
+                    "const": 2
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "derived": "proficiency"
+          }
+        ]
+      },
+      "target": {
+        "default": 10,
+        "min": 1,
+        "max": 40
+      },
+      "critical_at_least": 20,
+      "fumble_at_most": 1,
+      "edge": {
+        "extra_dice": 1
+      }
+    }
+  ],
+  "governance": {
+    "lock_during_session": true
+  }
+}

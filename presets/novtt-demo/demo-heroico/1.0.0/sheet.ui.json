@@ -1,0 +1,162 @@
+{
+  "contract": "novtt.sheet-ui/1",
+  "default_access": "read_only",
+  "sections": [
+    {
+      "id": "identity",
+      "label": "Identidade",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/identity/name",
+          "label": "Nome",
+          "widget": "text",
+          "access": "editable"
+        }
+      ]
+    },
+    {
+      "id": "calling",
+      "label": "Vocação",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/calling/vocation",
+          "label": "Vocação",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/calling/specialization",
+          "label": "Especialização",
+          "widget": "select"
+        }
+      ]
+    },
+    {
+      "id": "abilities",
+      "label": "Capacidades",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/abilities/forca",
+          "label": "Força",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/agilidade",
+          "label": "Agilidade",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/mente",
+          "label": "Mente",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/presenca",
+          "label": "Presença",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "modifiers",
+      "label": "Modificadores",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/modifiers/forca",
+          "label": "Força",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/modifiers/agilidade",
+          "label": "Agilidade",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/modifiers/mente",
+          "label": "Mente",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/modifiers/presenca",
+          "label": "Presença",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "progress",
+      "label": "Progresso",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/progress/level",
+          "label": "Nível",
+          "widget": "integer",
+          "access": "approval_required"
+        },
+        {
+          "kind": "field",
+          "path": "/progress/proficiency",
+          "label": "Bônus de treino",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/progress/max_hp",
+          "label": "Vida máxima",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "talents",
+      "label": "Talentos",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/talents/golpe_firme",
+          "label": "Golpe firme",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/talents/passo_leve",
+          "label": "Passo leve",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/talents/foco_arcano",
+          "label": "Foco arcano",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "resources",
+      "label": "Recursos",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/resources/hp",
+          "label": "Vida atual",
+          "widget": "integer"
+        }
+      ]
+    }
+  ]
+}

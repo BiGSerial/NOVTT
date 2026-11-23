@@ -1,0 +1,278 @@
+{
+  "contract": "novtt.sheet-ui/1",
+  "default_access": "read_only",
+  "sections": [
+    {
+      "id": "identity",
+      "label": "Identidade",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/identity/name",
+          "label": "Nome",
+          "widget": "text",
+          "access": "editable"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/concept",
+          "label": "Conceito",
+          "widget": "text",
+          "access": "editable"
+        }
+      ]
+    },
+    {
+      "id": "origin",
+      "label": "Origem",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/origin/lineage",
+          "label": "Linhagem",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/origin/gift",
+          "label": "Dom",
+          "widget": "select"
+        }
+      ]
+    },
+    {
+      "id": "priorities",
+      "label": "Prioridades",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/priorities/physical",
+          "label": "Atributos físicos",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/priorities/social",
+          "label": "Atributos sociais",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/priorities/mental",
+          "label": "Atributos mentais",
+          "widget": "select"
+        }
+      ]
+    },
+    {
+      "id": "attributes-physical",
+      "label": "Atributos físicos",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/attributes/physical/forca",
+          "label": "Força",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/physical/destreza",
+          "label": "Destreza",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/physical/vigor",
+          "label": "Vigor",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "attributes-social",
+      "label": "Atributos sociais",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/attributes/social/carisma",
+          "label": "Carisma",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/social/manipulacao",
+          "label": "Manipulação",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/social/aparencia",
+          "label": "Aparência",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "attributes-mental",
+      "label": "Atributos mentais",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/attributes/mental/percepcao",
+          "label": "Percepção",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/mental/inteligencia",
+          "label": "Inteligência",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/mental/raciocinio",
+          "label": "Raciocínio",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "label": "Habilidades",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/skills/luta",
+          "label": "Luta",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/furtividade",
+          "label": "Furtividade",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/erudicao",
+          "label": "Erudição",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/persuasao",
+          "label": "Persuasão",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/skills/oficio",
+          "label": "Ofício",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "derived",
+      "label": "Calculados",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/derived/vitality",
+          "label": "Vitalidade",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/initiative",
+          "label": "Iniciativa",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/load_capacity",
+          "label": "Carga máxima",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "resources",
+      "label": "Recursos",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/resources/vitality_current",
+          "label": "Vitalidade atual",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/resources/resolve",
+          "label": "Determinação",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "inventory",
+      "label": "Pertences",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/inventory",
+          "label": "Pertences",
+          "access": "approval_required",
+          "max_items": 30,
+          "item_fields": [
+            {
+              "field": "name",
+              "label": "Nome",
+              "widget": "text"
+            },
+            {
+              "field": "weight",
+              "label": "Peso",
+              "widget": "integer"
+            },
+            {
+              "field": "quantity",
+              "label": "Quantidade",
+              "widget": "integer"
+            },
+            {
+              "field": "equipped",
+              "label": "Em uso",
+              "widget": "boolean"
+            },
+            {
+              "field": "initiative_bonus",
+              "label": "Bônus de iniciativa",
+              "widget": "integer"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "notes",
+      "label": "Segredos",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/notes/secret",
+          "label": "Segredo",
+          "widget": "textarea",
+          "access": "hidden"
+        }
+      ]
+    }
+  ]
+}

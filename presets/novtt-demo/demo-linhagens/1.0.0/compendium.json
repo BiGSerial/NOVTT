@@ -1,0 +1,155 @@
+{
+  "contract": "novtt.compendium/1",
+  "taxonomy": [
+    {
+      "kind": "lineage",
+      "labels": {
+        "pt-BR": "Linhagem"
+      }
+    },
+    {
+      "kind": "gift",
+      "labels": {
+        "pt-BR": "Dom"
+      }
+    }
+  ],
+  "attributions": {
+    "novtt": "Conteúdo original da equipe NOVTT para demonstração. Não reproduz nenhum sistema publicado."
+  },
+  "items": [
+    {
+      "canonical_id": "lineage.aurora",
+      "kind": "lineage",
+      "labels": {
+        "pt-BR": "Aurora"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "summary": "Gente do primeiro raio de sol; leve e veloz.",
+      "source": {
+        "source_id": "novtt-demo-linhagens",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified",
+        "attribution_ref": "novtt"
+      },
+      "mechanical_refs": [
+        "choice:lineage:aurora"
+      ],
+      "content_hash": "2e7c90e27e3f9858051a34d4961d5c49d670b2327c0e401546dcfaeb05cb1f77"
+    },
+    {
+      "canonical_id": "lineage.brasa",
+      "kind": "lineage",
+      "labels": {
+        "pt-BR": "Brasa"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "summary": "Gente das forjas; resistente ao calor e ao golpe.",
+      "source": {
+        "source_id": "novtt-demo-linhagens",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified",
+        "attribution_ref": "novtt"
+      },
+      "mechanical_refs": [
+        "choice:lineage:brasa"
+      ],
+      "content_hash": "b2fc4eedcd60b8ee6d31e4a30864352da6f9631c6a85db7ba1891c73889c8cdd"
+    },
+    {
+      "canonical_id": "lineage.nevoa",
+      "kind": "lineage",
+      "labels": {
+        "pt-BR": "Névoa"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "summary": "Gente das margens; discreta e atenta.",
+      "source": {
+        "source_id": "novtt-demo-linhagens",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified",
+        "attribution_ref": "novtt"
+      },
+      "mechanical_refs": [
+        "choice:lineage:nevoa"
+      ],
+      "content_hash": "bb53993a24630822c333e3714d3f5f52efb0f5760c8343a597e57121c5247262"
+    },
+    {
+      "canonical_id": "gift.voo_curto",
+      "kind": "gift",
+      "labels": {
+        "pt-BR": "Voo curto"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "summary": "Pequenos saltos planados.",
+      "source": {
+        "source_id": "novtt-demo-linhagens",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified",
+        "attribution_ref": "novtt"
+      },
+      "mechanical_refs": [
+        "choice:gift:voo_curto"
+      ],
+      "content_hash": "362effa4d430c991c90d183024fc7780c48fd05ccb86eaecbd9b6f1196b43615"
+    },
+    {
+      "canonical_id": "gift.pele_de_pedra",
+      "kind": "gift",
+      "labels": {
+        "pt-BR": "Pele de pedra"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "summary": "A pele endurece por instantes.",
+      "source": {
+        "source_id": "novtt-demo-linhagens",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified",
+        "attribution_ref": "novtt"
+      },
+      "mechanical_refs": [
+        "choice:gift:pele_de_pedra"
+      ],
+      "content_hash": "aa1c46093a0f74fb283109201516f7a34cd02802906040d794193bac4e6f4301"
+    },
+    {
+      "canonical_id": "gift.sussurro",
+      "kind": "gift",
+      "labels": {
+        "pt-BR": "Sussurro"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "summary": "Ouve o que é dito em voz baixa; reage antes.",
+      "source": {
+        "source_id": "novtt-demo-linhagens",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified",
+        "attribution_ref": "novtt"
+      },
+      "mechanical_refs": [
+        "choice:gift:sussurro",
+        "effect:mist_initiative"
+      ],
+      "content_hash": "dda946ec59cdbf7b5f2fc18f42370da3681ba1edaa9a67f8b82c6d42249697d8"
+    }
+  ]
+}

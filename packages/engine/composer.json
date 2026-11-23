@@ -10,6 +10,11 @@
       "Novtt\\Engine\\": "src/Engine/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Novtt\\Engine\\Tests\\": "tests/"
+    }
+  },
   "scripts": {
     "test": "php vendor/bin/phpunit --configuration phpunit.xml"
   },
