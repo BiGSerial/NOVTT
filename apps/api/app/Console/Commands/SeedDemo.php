@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Demo\DemoMode;
 use App\Demo\DemoSeeder;
+use App\Demo\PresetDemoSeeder;
 use App\Demo\TableDemoSeeder;
 use Illuminate\Console\Command;
 
@@ -16,7 +17,7 @@ final class SeedDemo extends Command
 
     protected $description = 'Create the local demonstration campaign, users and character (NOVTT_DEMO_MODE only)';
 
-    public function handle(DemoSeeder $seeder, TableDemoSeeder $table): int
+    public function handle(DemoSeeder $seeder, TableDemoSeeder $table, PresetDemoSeeder $presets): int
     {
         if (!DemoMode::enabled()) {
             $this->error('Demo mode is disabled: set NOVTT_DEMO_MODE=true in a local environment.');
@@ -28,6 +29,9 @@ final class SeedDemo extends Command
         $this->line('Campaign: ' . $world['campaign']->getKey());
         $this->line('Character: ' . $world['character']->getKey());
         $this->line('Live table campaign: ' . $table->seed(dirname(base_path(), 2))['campaign']->getKey());
+        foreach ($presets->seed(dirname(base_path(), 2)) as $campaign) {
+            $this->line("Preset campaign: {$campaign->name} {$campaign->getKey()}");
+        }
 
         return self::SUCCESS;
     }
