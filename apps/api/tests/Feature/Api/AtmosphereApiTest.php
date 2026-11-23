@@ -60,6 +60,15 @@ final class AtmosphereApiTest extends TestCase
 
         $second = $this->actingAs($this->master)->putJson("/api/v1/sessions/{$id}/atmosphere", ['hour' => 6, 'weather' => 'clear', 'intensity' => 0, 'time_scale' => 0, 'transition_seconds' => 0])->assertOk();
         $second->assertJsonPath('revision', 2)->assertJsonPath('weather', 'clear');
+        $first->assertJsonPath('fog', 0); // omitted fog means none
+    }
+
+    public function test_fog_is_a_layer_that_coexists_with_any_weather(): void
+    {
+        $id = $this->openSession();
+        $this->actingAs($this->master)->putJson("/api/v1/sessions/{$id}/atmosphere", ['weather' => 'storm', 'fog' => 0.456] + self::VALID)
+            ->assertOk()->assertJsonPath('weather', 'storm')->assertJsonPath('fog', 0.46);
+        $this->actingAs($this->ana)->getJson("/api/v1/sessions/{$id}/snapshot")->assertJsonPath('session.atmosphere.fog', 0.46);
     }
 
     public function test_session_revision_is_untouched_by_atmosphere_changes(): void
@@ -88,6 +97,7 @@ final class AtmosphereApiTest extends TestCase
         yield 'time scale above 120' => [['time_scale' => 121] + self::VALID];
         yield 'transition above 30' => [['transition_seconds' => 31] + self::VALID];
         yield 'missing field' => [array_diff_key(self::VALID, ['weather' => true])];
+        yield 'fog above 1' => [self::VALID + ['fog' => 1.2]];
         yield 'extra key' => [self::VALID + ['sound' => 'thunder']];
     }
 

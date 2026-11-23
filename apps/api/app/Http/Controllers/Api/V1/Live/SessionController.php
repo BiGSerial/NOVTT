@@ -350,6 +350,8 @@ final class SessionController extends ApiController
             'hour' => ['required', 'numeric', 'min:0', 'lt:24', 'multiple_of:0.25'],
             'weather' => ['required', 'string', 'in:clear,clouds,rain,storm,fog,snow'],
             'intensity' => ['required', 'numeric', 'min:0', 'max:1'],
+            // Fog is a layer of its own: it can sit over rain, snow or a storm (0 = none).
+            'fog' => ['sometimes', 'numeric', 'min:0', 'max:1'],
             'time_scale' => ['required', 'integer', 'min:0', 'max:120'],
             'transition_seconds' => ['required', 'integer', 'min:0', 'max:30'],
         ]);
@@ -360,6 +362,7 @@ final class SessionController extends ApiController
                 'hour' => (float) $data['hour'],
                 'weather' => (string) $data['weather'],
                 'intensity' => round((float) $data['intensity'], 2),
+                'fog' => round((float) ($data['fog'] ?? 0), 2),
                 'time_scale' => (int) $data['time_scale'],
                 'transition_seconds' => (int) $data['transition_seconds'],
                 'set_at' => now()->format(DATE_RFC3339_EXTENDED),
