@@ -9,7 +9,7 @@ export interface Me { id: string; name: string; paired_device_id: string | null 
 
 export interface CampaignSession { title: string; status: 'active' | 'paused' | 'ended'; started_at: string; ended_at?: string | null }
 export interface Campaign {
-  id: string; name: string; role?: Role; preset_version_id: string; status: string; description?: string | null
+  id: string; name: string; role?: Role; preset_version_id: string; status: string; description?: string | null; revision?: number
   /** List endpoint only. */
   masters?: { user_id: string; name: string }[]; players_count?: number; last_session?: CampaignSession | null
 }

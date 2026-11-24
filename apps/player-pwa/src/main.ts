@@ -15,7 +15,10 @@ import './styles/table.css'
 import './styles/narrative.css'
 import './styles/campaign.css'
 import './styles/atmosphere.css'
+import './styles/shell.css'
+import { installPlatform } from './live/platform'
 
+installPlatform()
 createApp(App).mount('#app')
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {

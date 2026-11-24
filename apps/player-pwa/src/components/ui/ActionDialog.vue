@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { pushBack } from '../../live/platform'
 
 /**
  * A modal for master/player actions that need more than one control. Focus goes to the first
@@ -22,13 +23,16 @@ function trap(ev: KeyboardEvent): void {
   if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus() }
   else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus() }
 }
+// The system/browser Back closes the dialog (Android convention) instead of leaving the screen.
+let releaseBack: () => void = () => undefined
 onMounted(async () => {
+  releaseBack = pushBack(() => emit('close'))
   opener = document.activeElement as HTMLElement | null
   await nextTick()
   const first = box.value?.querySelector<HTMLElement>('[autofocus], input, select, textarea') ?? focusables()[0]
   first?.focus()
 })
-onBeforeUnmount(() => opener?.focus?.())
+onBeforeUnmount(() => { releaseBack(); opener?.focus?.() })
 void props
 </script>
 

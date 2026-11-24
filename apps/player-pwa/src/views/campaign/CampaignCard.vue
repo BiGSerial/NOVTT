@@ -6,10 +6,12 @@ import { presets, setup, STATUS_LABEL, type CampaignCharacterView, type PresetVe
 import type { Campaign } from '../../live/types'
 import { go } from '../../live/user'
 import Portrait from '../../components/live/Portrait.vue'
+import ActionDialog from '../../components/ui/ActionDialog.vue'
 import PresetBadge from './PresetBadge.vue'
 
 /** One campaign: its preset, the viewer's characters (player) or the master's tools. */
 const props = defineProps<{ campaign: Campaign }>()
+const emit = defineEmits<{ changed: [] }>()
 const preset = ref<PresetVersionFull | null>(null)
 const characters = ref<CampaignCharacterView[]>([])
 const creating = ref(false)
@@ -35,6 +37,19 @@ function when(iso: string): string {
 // Characters built on another version of the campaign's sheet need adapting.
 const versions = ref<Record<string, string>>({})
 const outdated = (c: CampaignCharacterView) => c.preset_version_id !== props.campaign.preset_version_id
+// Master: newer versions of this campaign's preset.
+const upgrades = ref<{ id: string; version: string }[]>([])
+const upgrading = ref(false)
+const upgradeTo = ref('')
+async function upgrade(): Promise<void> {
+  busy.value = true
+  error.value = ''
+  try {
+    await setup.upgradePreset(props.campaign.id, upgradeTo.value, props.campaign.revision ?? 1)
+    upgrading.value = false
+    emit('changed')
+  } catch (e) { error.value = t(e instanceof ApiError ? e.code : 'network.error') } finally { busy.value = false }
+}
 
 onMounted(async () => {
   try {
@@ -42,6 +57,7 @@ onMounted(async () => {
     preset.value = p
     characters.value = c.data
     loaded.value = true
+    if (isMaster) setup.presetUpgrades(props.campaign.id).then(u => { upgrades.value = u.data }).catch(() => undefined)
     for (const ch of c.data.filter(outdated)) {
       presets.version(ch.preset_version_id).then(v => { versions.value = { ...versions.value, [ch.id]: v.version } }).catch(() => undefined)
     }
@@ -109,7 +125,7 @@ async function copy(): Promise<void> {
             <Portrait :name="c.name" :image-id="c.portrait_image_id ?? null" :size="40" :ring="false" />
             <span class="chip-text">
               <span class="chip-name">{{ c.name }}</span>
-              <small v-if="outdated(c)" class="chip-warn">⚠ Ficha v{{ versions[c.id] ?? '…' }}; a campanha usa v{{ preset?.version ?? '…' }}. Precisa ser adaptada.</small>
+              <small v-if="outdated(c)" class="chip-warn">⚠ Ficha v{{ versions[c.id] ?? '…' }}; a campanha usa v{{ preset?.version ?? '…' }}. <a href="#/personagens" @click.stop>Adaptar</a></small>
             </span>
             <span class="status-pill" :class="c.status">{{ STATUS_LABEL[c.status] }}</span>
           </a>
@@ -133,6 +149,7 @@ async function copy(): Promise<void> {
         <a class="button" :href="`#/atlas/${campaign.id}`">Atlas</a>
         <a class="button" :href="`#/tablet/${campaign.id}`">Fichário (tablet)</a>
         <button type="button" class="ghost" :disabled="busy" @click="invite">Convidar jogadores</button>
+        <button v-if="upgrades.length" type="button" class="ghost upgrade-btn" @click="upgradeTo = upgrades[upgrades.length - 1]!.id; upgrading = true">Atualizar sistema (v{{ upgrades[upgrades.length - 1]!.version }})</button>
       </template>
       <a v-else class="button" :href="`#/atlas/${campaign.id}`">O que sabemos</a>
     </footer>
@@ -142,5 +159,12 @@ async function copy(): Promise<void> {
       <button type="button" class="ghost" @click="copy">{{ copied ? 'Copiado' : 'Copiar código' }}</button>
     </div>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
+    <ActionDialog v-if="upgrading" title="Atualizar o sistema da campanha" @close="upgrading = false" @submit="upgrade">
+      <label>Nova versão da ficha
+        <select v-model="upgradeTo"><option v-for="u in upgrades" :key="u.id" :value="u.id">v{{ u.version }}</option></select>
+      </label>
+      <p class="muted small">A campanha passa a usar a nova versão. Cada personagem continua na versão dele até ser adaptado pelo jogador ou por você; a adaptação mostra o que muda e volta para sua aprovação.</p>
+      <template #actions><span class="grow" /><button type="button" class="ghost" @click="upgrading = false">Cancelar</button><button type="submit" class="primary" :disabled="busy">Atualizar</button></template>
+    </ActionDialog>
   </li>
 </template>

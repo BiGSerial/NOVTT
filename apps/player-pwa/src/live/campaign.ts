@@ -108,7 +108,24 @@ export const setup = {
   invite: (campaignId: string) => mutate<Invitation>('POST', `/campaigns/${campaignId}/invitations`, { expires_in_hours: 72, max_uses: 10 }),
   accept: (token: string) => mutate<{ id: string; role: string }>('POST', '/invitations/accept', { token }),
   characters: (campaignId: string) => api<{ data: CampaignCharacterView[] }>('GET', `/campaigns/${campaignId}/characters`),
-  createCharacter: (campaignId: string, name: string, key: string) => mutate<CampaignCharacterView>('POST', `/campaigns/${campaignId}/characters`, { name }, key),
+  createCharacter: (campaignId: string, name: string, key: string, fromCharacterId?: string) =>
+    mutate<CampaignCharacterView>('POST', `/campaigns/${campaignId}/characters`, { name, ...(fromCharacterId ? { from_campaign_character_id: fromCharacterId } : {}) }, key),
+  presetUpgrades: (campaignId: string) => api<{ current: { id: string; version: string }; data: { id: string; version: string }[] }>('GET', `/campaigns/${campaignId}/preset-upgrades`),
+  upgradePreset: (campaignId: string, versionId: string, expectedRevision: number) =>
+    mutate<{ id: string; preset_version_id: string; revision: number }>('POST', `/campaigns/${campaignId}/preset-upgrade`, { preset_version_id: versionId, expected_revision: expectedRevision }),
+  adaptation: (characterId: string) => api<AdaptationReport>('GET', `/campaign-characters/${characterId}/adaptation`),
+  adapt: (characterId: string, expectedRevision: number) =>
+    mutate<{ report: AdaptationReport; character: CampaignCharacterView }>('POST', `/campaign-characters/${characterId}/adaptation`, { expected_sheet_revision: expectedRevision }),
+}
+
+export interface AdaptationReport {
+  needed: boolean; from_version: string; to_version: string; kept: number
+  dropped: { path: string; reason: 'field_removed' | 'option_removed' | 'out_of_range' | 'type' | 'length' | 'pattern' | 'incomplete' | 'too_many_items' }[]
+  draft_operations_dropped: number; needs_approval: boolean; proposals_withdrawn?: number
+}
+export const DROP_REASON: Record<AdaptationReport['dropped'][number]['reason'], string> = {
+  field_removed: 'o campo não existe mais', option_removed: 'a opção não existe mais', out_of_range: 'fora dos novos limites',
+  type: 'tipo mudou', length: 'tamanho fora do novo limite', pattern: 'formato mudou', incomplete: 'item incompleto', too_many_items: 'itens demais',
 }
 
 export const review = {

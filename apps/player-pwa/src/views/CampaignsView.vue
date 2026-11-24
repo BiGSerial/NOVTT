@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import BrandMark from '../components/BrandMark.vue'
+import AppShell from '../components/shell/AppShell.vue'
 import { ApiError } from '../api/client'
 import { t } from '../i18n/messages'
-import { auth, campaigns } from '../live/api'
+import { campaigns } from '../live/api'
 import { setup } from '../live/campaign'
 import { go, me } from '../live/user'
 import type { Campaign } from '../live/types'
@@ -46,19 +46,11 @@ function created(): void {
   void load()
 }
 
-async function logout(): Promise<void> {
-  try { await auth.logout() } finally { me.value = null; go('#/') }
-}
 </script>
 
 <template>
-  <main class="page wide campaigns-page">
-    <header class="topbar">
-      <a href="#/" class="brand-link"><BrandMark /></a>
-      <span class="spacer" />
-      <span class="muted">{{ me?.name }}</span>
-      <button type="button" class="ghost" @click="logout">Sair</button>
-    </header>
+  <AppShell title="Campanhas">
+  <div class="page wide campaigns-page">
     <div class="campaigns-head">
       <h1>Suas campanhas</h1>
       <button v-if="!creating" type="button" class="primary" @click="creating = true">Nova campanha</button>
@@ -75,7 +67,8 @@ async function logout(): Promise<void> {
     <p v-else-if="error" class="error" role="alert">{{ error }}</p>
     <p v-else-if="!list.length" class="muted">Você ainda não participa de nenhuma campanha. Crie uma ou entre com o convite do mestre.</p>
     <ul class="campaign-list">
-      <CampaignCard v-for="c in list" :key="c.id" :campaign="c" />
+      <CampaignCard v-for="c in list" :key="`${c.id}:${c.revision}`" :campaign="c" @changed="load" />
     </ul>
-  </main>
+  </div>
+  </AppShell>
 </template>

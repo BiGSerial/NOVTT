@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref } from 'vue'
+import { loadPreferences } from './live/me'
 import { loadMe, meLoaded } from './live/user'
 
 // Hash routing (no server routes needed; the same build serves phone, tablet and desktop).
@@ -12,12 +13,15 @@ const TabletView = defineAsyncComponent(() => import('./views/TabletView.vue'))
 const RoteiroView = defineAsyncComponent(() => import('./views/RoteiroView.vue'))
 const AtlasView = defineAsyncComponent(() => import('./views/AtlasView.vue'))
 const CampaignCharactersView = defineAsyncComponent(() => import('./views/campaign/CampaignCharactersView.vue'))
+const MyCharactersView = defineAsyncComponent(() => import('./views/MyCharactersView.vue'))
+const FriendsView = defineAsyncComponent(() => import('./views/FriendsView.vue'))
+const SettingsView = defineAsyncComponent(() => import('./views/SettingsView.vue'))
 
 const route = ref(location.hash)
 const onHash = (): void => { route.value = location.hash }
 window.addEventListener('hashchange', onHash)
 onBeforeUnmount(() => window.removeEventListener('hashchange', onHash))
-onMounted(() => { void loadMe().catch(() => undefined) })
+onMounted(() => { void loadMe().then(m => { if (m) void loadPreferences() }).catch(() => undefined) })
 
 const UUID = '([0-9a-f-]{36})'
 const match = (pattern: string) => new RegExp(`^#/${pattern}$`, 'i').exec(route.value)?.[1] ?? null
@@ -32,6 +36,9 @@ const view = computed(() => {
   if (/^#\/tablet\/?$/.test(route.value)) return { c: TabletView, props: {} }
   if (/^#\/dados\/?$/.test(route.value)) return { c: FreeDiceView, props: {} }
   if (/^#\/campanhas\/?$/.test(route.value)) return { c: CampaignsView, props: {} }
+  if (/^#\/personagens\/?$/.test(route.value)) return { c: MyCharactersView, props: {} }
+  if (/^#\/amigos\/?$/.test(route.value)) return { c: FriendsView, props: {} }
+  if (/^#\/ajustes\/?$/.test(route.value)) return { c: SettingsView, props: {} }
   return { c: LandingView, props: {} }
 })
 </script>

@@ -1,0 +1,105 @@
+/* App frame per platform (AppShell.vue, live/platform.ts). <html data-platform="web|pwa|android"
+   data-form="phone|tablet|desktop">. Table views are full-screen and not framed here. */
+.shell { min-height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; }
+.shell-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 18px; padding: 10px 24px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); }
+.shell-title { margin: 0; font-size: 20px; }
+.shell-nav { display: flex; gap: 4px; }
+.shell-nav a { padding: 8px 14px; border-radius: 999px; color: var(--muted); font: 700 15px var(--font-ui); text-decoration: none; }
+.shell-nav a[aria-current='page'] { color: var(--text); background: var(--surface-2, var(--surface)); box-shadow: inset 0 0 0 1px var(--line-strong); }
+@media (hover: hover) { .shell-nav a:hover { color: var(--accent); } }
+.shell-account { position: relative; }
+.avatar-btn { width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: 50%; border: 1px solid var(--ornament); background: var(--surface); color: var(--accent); font: 800 14px var(--font-ui); cursor: pointer; }
+.account-menu { position: absolute; right: 0; top: calc(100% + 8px); min-width: 200px; display: grid; padding: 8px; border-radius: 14px; border: 1px solid var(--ornament); background: var(--panel); box-shadow: var(--shadow); z-index: 40; }
+.account-menu a, .account-menu button { display: block; width: 100%; text-align: left; padding: 10px 12px; border: 0; border-radius: 10px; background: none; color: var(--text); font: 600 15px var(--font-ui); text-decoration: none; cursor: pointer; }
+.account-menu a:hover, .account-menu button:hover { background: var(--surface); }
+.account-name { margin: 4px 12px 8px; color: var(--muted); font-size: 13px; }
+.shell-main { width: min(100%, 1180px); margin: 0 auto; padding: 24px 24px 48px; min-width: 0; }
+.shell-main > .page { width: 100%; max-width: none; padding: 0; margin: 0; }
+
+/* Web on a phone: the sections become a scrolling row under the brand. */
+:root[data-platform='web'][data-form='phone'] .shell-bar { flex-wrap: wrap; gap: 8px 12px; padding: 8px 16px; }
+:root[data-platform='web'][data-form='phone'] .shell-nav { order: 3; width: 100%; overflow-x: auto; scrollbar-width: none; }
+:root[data-platform='web'][data-form='phone'] .shell-main { padding: 16px 16px 40px; }
+
+/* Installed (PWA / Android): app chrome, safe areas, no rubber-band, bottom navigation. */
+:root[data-platform='pwa'], :root[data-platform='android'] { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+:root[data-platform='pwa'] .shell-bar, :root[data-platform='android'] .shell-bar { padding-top: max(10px, env(safe-area-inset-top)); padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+.has-bottom-nav .shell-main { padding: 16px 16px calc(96px + env(safe-area-inset-bottom)); }
+.bottom-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 96%, transparent); backdrop-filter: blur(10px); }
+.bottom-nav a { display: grid; justify-items: center; gap: 2px; padding: 6px 2px; color: var(--muted); text-decoration: none; font: 700 11px var(--font-ui); }
+.bn-icon { font-size: 20px; line-height: 1; }
+.bottom-nav a[aria-current='page'] { color: var(--accent); }
+
+/* Android: Material conventions — 80 dp navigation bar with an active pill, 48 dp targets,
+   pressed states instead of hover, larger app bar title. */
+:root[data-platform='android'] .bottom-nav { padding-top: 10px; min-height: 80px; }
+:root[data-platform='android'] .bottom-nav a { gap: 4px; font-size: 12px; }
+:root[data-platform='android'] .bottom-nav .bn-icon { padding: 4px 18px; border-radius: 999px; }
+:root[data-platform='android'] .bottom-nav a[aria-current='page'] { color: var(--text); }
+:root[data-platform='android'] .bottom-nav a[aria-current='page'] .bn-icon { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+:root[data-platform='android'] button, :root[data-platform='android'] .button, :root[data-platform='android'] a.button { min-height: 48px; }
+:root[data-platform='android'] button:active, :root[data-platform='android'] .button:active { filter: brightness(1.15); }
+:root[data-platform='android'] .shell-title { font-size: 22px; font-weight: 600; }
+/* iOS-style PWA: lighter tab bar, smaller labels. */
+:root[data-platform='pwa'] .bottom-nav a { font-size: 10px; }
+
+/* Dialogs become bottom sheets on installed phones (thumb reach), centred on web/desktop. */
+:root[data-platform='android'][data-form='phone'] .action-veil, :root[data-platform='pwa'][data-form='phone'] .action-veil { align-items: flex-end; }
+:root[data-platform='android'][data-form='phone'] .action-dialog, :root[data-platform='pwa'][data-form='phone'] .action-dialog { width: 100%; margin: 0; border-radius: 22px 22px 0 0; max-height: 92dvh; padding-bottom: env(safe-area-inset-bottom); }
+
+/* Personal pages (characters, friends, settings). */
+.section-head { display: grid; gap: 4px; margin-bottom: 18px; }
+.section-head h1 { margin: 0; font-size: clamp(26px, 4vw, 34px); }
+.section-head p { margin: 0; }
+.status-banner { padding: 10px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--win) 50%, transparent); background: color-mix(in srgb, var(--win) 12%, transparent); }
+.empty-note { padding: 18px; border-radius: 14px; border: 1px dashed var(--line-strong); color: var(--muted); text-align: center; }
+.group-title { margin: 22px 0 10px; font: 700 12px var(--font-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.mine-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
+.mine-card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 14px; align-items: start; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); }
+.mine-card.outdated { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+.mine-text { display: grid; gap: 3px; min-width: 0; }
+.mine-name { font: 700 20px var(--font-display); color: var(--text); text-decoration: none; }
+.mine-sub { color: var(--muted); font-size: 14px; }
+.mine-tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.mine-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.mine-actions .small-btn, .mine-actions .button { width: auto; }
+.drop-list ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14px; }
+.drop-list code { font-size: 12px; }
+.friend-list { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+.friend { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); }
+.friend:not(.online) { opacity: .82; }
+.friend-avatar { position: relative; display: inline-grid; }
+.presence-dot { position: absolute; right: 0; bottom: 2px; width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--panel); background: var(--muted); }
+.friend.online .presence-dot { background: var(--win); }
+.friend-text { display: grid; min-width: 0; }
+.friend-text small { color: var(--muted); }
+.friend.online .friend-text small { color: var(--win); }
+.friend-campaigns { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; max-width: 50%; }
+.friend-campaigns .tag { text-decoration: none; }
+@media (max-width: 560px) { .friend { grid-template-columns: auto minmax(0, 1fr); } .friend-campaigns { grid-column: 1 / -1; justify-content: flex-start; max-width: none; } }
+.settings { display: grid; gap: 16px; }
+.settings-card { display: grid; gap: 12px; padding: 18px 20px; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); }
+.settings-card h2 { margin: 0; font-size: 22px; }
+.settings-card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.settings-card-head .primary { width: auto; }
+.dice-sets { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+.dice-set { display: grid; gap: 4px; padding: 8px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); }
+.dice-set.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--glow); }
+.dice-set-pick { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 0; padding: 4px; border: 0; background: none; color: var(--text); text-align: left; cursor: pointer; }
+.dice-set-pick span { display: grid; }
+.dice-set-pick small { color: var(--muted); }
+.dice-set-actions { display: flex; gap: 12px; padding: 0 6px 4px; }
+.dice-swatch { display: block; flex: none; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .4)); }
+.dice-editor { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: start; }
+.dice-editor-preview { display: grid; justify-items: center; gap: 6px; }
+.dice-editor-fields { display: grid; gap: 12px; }
+.color-row { display: flex; flex-wrap: wrap; gap: 14px; }
+.color-row input[type='color'] { width: 64px; height: 40px; padding: 2px; border-radius: 10px; }
+.texture-tiles { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); }
+.texture-tile { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: 600 12px var(--font-ui); cursor: pointer; width: auto; min-height: 0; }
+.texture-tile.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--glow); }
+.scale-row { display: flex; align-items: center; gap: 10px; }
+.scale-row input { flex: 1; }
+@media (max-width: 560px) { .dice-editor { grid-template-columns: 1fr; justify-items: center; } }
+.dice-editor .seg-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
+.dice-editor .seg-tabs button { width: auto; flex: 1 1 auto; }
