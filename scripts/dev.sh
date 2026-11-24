@@ -68,6 +68,12 @@ case "${1:-help}" in
     docker run --rm --network container:novtt-player-1 -v "$PWD/scripts/e2e":/e2e:ro -v "$PWD/e2e-output":/out \
       mcr.microsoft.com/playwright:v1.65.1-noble sh -c "cd /tmp && npm i -s playwright@1.65.1 >/dev/null 2>&1 && cp /e2e/clocks.mjs . && node clocks.mjs; status=\$?; chown -R $(id -u):$(id -g) /out; exit \$status"
     ;;
+  e2e-sheet)
+    # The player's paper sheet and portrait upload (needs: sh scripts/dev.sh demo).
+    mkdir -p e2e-output
+    docker run --rm --network container:novtt-player-1 -v "$PWD/scripts/e2e":/e2e:ro -v "$PWD/e2e-output":/out \
+      mcr.microsoft.com/playwright:v1.65.1-noble sh -c "cd /tmp && npm i -s playwright@1.65.1 >/dev/null 2>&1 && cp /e2e/player-sheet.mjs . && node player-sheet.mjs; status=\$?; chown -R $(id -u):$(id -g) /out; exit \$status"
+    ;;
   e2e-presets)
     # Guided creation on the demo preset, master review and activation (needs: sh scripts/dev.sh demo-reset).
     mkdir -p e2e-output
