@@ -53,6 +53,7 @@ final readonly class PresetRolls
             return match ($roll['strategy']) {
                 SumStrategy::NAME => $this->sum($roll, $scope, $params),
                 PoolStrategy::NAME => $this->pool($roll, $scope, $params),
+                'keep' => $this->keep($roll, $scope, $params),
                 default => throw new RollRejected('UNSUPPORTED_CAPABILITY', ['strategy' => (string) $roll['strategy']]),
             };
         } catch (FormulaException $e) {
@@ -123,6 +124,33 @@ final readonly class PresetRolls
         }
 
         return $spec;
+    }
+
+    /**
+     * `keep`: N dice of F faces, keeping the K highest or lowest (a SumRoll with one keep group).
+     * Count and mode come from formulas over the sheet, so a preset can say "a die per point,
+     * keep the best; at 0, two dice and keep the worst" without game code in the engine.
+     *
+     * @param array<string, mixed> $roll @param array<string, mixed> $params
+     */
+    private function keep(array $roll, SheetScope $scope, array $params): SumRoll
+    {
+        $count = $this->integer($roll['count'], $scope);
+        if ($count < 1) {
+            throw new RollRejected('roll.no_dice', ['count' => $count]);
+        }
+        $mode = isset($roll['keep_mode']) ? (new FormulaEvaluator($scope))->evaluate($roll['keep_mode']) : 'highest';
+        if (!in_array($mode, ['highest', 'lowest'], true)) {
+            throw new RollRejected('roll.keep_mode_invalid');
+        }
+        $keep = min($count, (int) ($roll['keep'] ?? 1));
+        $modifier = isset($roll['modifier']) ? $this->integer($roll['modifier'], $scope) : 0;
+        $target = $this->bounded($roll['target'] ?? null, $params['target'] ?? null, 'target');
+        if (($params['edge'] ?? 'normal') !== 'normal') {
+            throw new RollRejected('roll.edge_not_allowed');
+        }
+
+        return new SumRoll([new DiceGroup($count, (int) $roll['faces'], 1, $mode, $keep)], $modifier, $target, $roll['critical_at_least'] ?? null, $roll['fumble_at_most'] ?? null);
     }
 
     /** @param array<string, mixed> $roll @param array<string, mixed> $params */

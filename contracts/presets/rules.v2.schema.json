@@ -490,6 +490,32 @@
                     "compendium_id": {
                       "type": "string",
                       "maxLength": 128
+                    },
+                    "fixes": {
+                      "type": "array",
+                      "maxItems": 16,
+                      "description": "While this option is selected, each path holds the given value and cannot be changed (e.g. a lineage that sets a trait to 0). The engine writes it when the option is chosen and rejects other values.",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "path",
+                          "value"
+                        ],
+                        "properties": {
+                          "path": {
+                            "$ref": "#/$defs/pointer"
+                          },
+                          "value": {
+                            "$ref": "#/$defs/formula"
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 120
+                          }
+                        }
+                      }
                     }
                   }
                 }
@@ -650,7 +676,8 @@
           "strategy": {
             "enum": [
               "sum",
-              "pool"
+              "pool",
+              "keep"
             ]
           },
           "inputs": {
@@ -832,6 +859,75 @@
                 "maximum": 1000
               },
               "botch_at_most": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "strategy",
+              "count",
+              "faces"
+            ],
+            "description": "Roll `count` dice of `faces` and keep the `keep` highest or lowest (mode from a formula: \"highest\" | \"lowest\"); total = kept dice + modifier. E.g. a d20 per point of an attribute keeping the best, or the worst of two at 0.",
+            "properties": {
+              "id": true,
+              "label": true,
+              "inputs": true,
+              "strategy": {
+                "const": "keep"
+              },
+              "count": {
+                "$ref": "#/$defs/formula"
+              },
+              "faces": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 1000
+              },
+              "keep": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20,
+                "default": 1
+              },
+              "keep_mode": {
+                "$ref": "#/$defs/formula"
+              },
+              "modifier": {
+                "$ref": "#/$defs/formula"
+              },
+              "target": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "min",
+                  "max"
+                ],
+                "properties": {
+                  "default": {
+                    "type": "integer"
+                  },
+                  "min": {
+                    "type": "integer"
+                  },
+                  "max": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "critical_at_least": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "fumble_at_most": {
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 1000

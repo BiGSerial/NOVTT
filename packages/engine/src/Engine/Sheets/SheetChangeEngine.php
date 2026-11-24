@@ -78,6 +78,27 @@ final readonly class SheetChangeEngine
             }
             $touched[$op->path->toString()][] = $op->key;
         }
+        // A selected option may hold fields (`fixes`): writing another value there is refused;
+        // choosing the option writes them (and refunds points spent on them via the ledger).
+        foreach ($this->mechanics->fixedFields($candidate, $grants) as $path => $fix) {
+            $pointer = JsonPointer::parse($path);
+            [, $current] = SheetProjector::read($candidate, $pointer->segments);
+            if ($current === $fix['value']) {
+                continue;
+            }
+            if (isset($touched[$path])) {
+                $issues[] = new ValidationIssue('choice.fixed_value', Severity::Error, $touched[$path], [$path], ['choice' => $fix['choice'], 'option' => (string) $fix['option'], 'value' => $fix['value']]);
+                continue;
+            }
+            SheetProjector::write($candidate, $pointer->segments, $fix['value']);
+            $choicePath = null;
+            foreach ($this->rules['creation']['choices'] ?? [] as $choice) {
+                if ($choice['id'] === $fix['choice']) {
+                    $choicePath = JsonPointer::parse((string) $choice['path'])->toString();
+                }
+            }
+            $touched[$path] = $touched[$choicePath] ?? [];
+        }
         if ($issues !== []) {
             return new ChangeOutcome(new ValidationResult($issues), $sheet, $this->balances($sheet, $grants));
         }

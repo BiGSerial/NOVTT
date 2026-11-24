@@ -228,6 +228,17 @@ final class RulesCompatibility
                 if (isset($option['requires'])) {
                     $this->formula($option['requires'], new FormulaContext(), "{$at}/options/{$o}/requires");
                 }
+                foreach ($option['fixes'] ?? [] as $f => $fix) {
+                    $fixAt = "{$at}/options/{$o}/fixes/{$f}";
+                    $fixed = $this->pointer((string) $fix['path'], $fixAt . '/path');
+                    if ($fixed !== null && !$this->schema->isScalar($fixed)) {
+                        $this->error('rules.fix_path_not_scalar', $fixAt . '/path', ['path' => $fix['path']]);
+                    }
+                    if ($fixed !== null && $fixed->toString() === $pointer->toString()) {
+                        $this->error('rules.fix_on_own_choice', $fixAt . '/path', ['path' => $fix['path']]);
+                    }
+                    $this->formula($fix['value'], new FormulaContext(), $fixAt . '/value');
+                }
             }
         }
     }
@@ -267,6 +278,20 @@ final class RulesCompatibility
                     $this->formula($roll['modifier'], $context, $at . '/modifier');
                 }
                 $this->bounds($roll['target'] ?? null, $at . '/target', -100_000, 100_000);
+            } elseif ($roll['strategy'] === 'keep') {
+                $this->formula($roll['count'], $context, $at . '/count');
+                if (isset($roll['keep_mode'])) {
+                    $this->formula($roll['keep_mode'], $context, $at . '/keep_mode');
+                }
+                if (isset($roll['modifier'])) {
+                    $this->formula($roll['modifier'], $context, $at . '/modifier');
+                }
+                $this->bounds($roll['target'] ?? null, $at . '/target', -100_000, 100_000);
+                foreach (['critical_at_least', 'fumble_at_most'] as $face) {
+                    if (isset($roll[$face]) && (int) $roll[$face] > (int) $roll['faces']) {
+                        $this->error('rules.face_out_of_bounds', "{$at}/{$face}", ['faces' => (int) $roll['faces']]);
+                    }
+                }
             } else {
                 $this->formula($roll['count'], $context, $at . '/count');
                 $faces = (int) $roll['faces'];

@@ -256,6 +256,12 @@ final class Mechanics
             }
         }
 
+        foreach ($this->fixedFields($candidate, $grants) as $path => $fix) {
+            if ($scope->pointer($path) !== $fix['value']) {
+                $issues[] = $this->issue('choice.fixed_value', [$path], ['choice' => $fix['choice'], 'option' => (string) $fix['option'], 'value' => $fix['value']]);
+            }
+        }
+
         foreach ($this->rules['constraints'] ?? [] as $constraint) {
             $when = $constraint['phase'] ?? 'always';
             if ($when !== 'always' && $when !== $phase->value) {
@@ -400,10 +406,57 @@ final class Mechanics
                 $options[] = ['value' => $option['value'], 'available' => !isset($option['requires']) || $this->truth($option['requires'], $scope, $ignored, []) === true];
             }
             $value = $scope->pointer((string) $choice['path']);
-            $out[] = ['id' => (string) $choice['id'], 'path' => (string) $choice['path'], 'value' => $value === '' ? null : $value, 'options' => $options];
+            $out[] = ['id' => (string) $choice['id'], 'path' => (string) $choice['path'], 'value' => $value === '' ? null : $value, 'options' => $options, 'fixes' => []];
+        }
+        // What the selected options hold, so a client can lock those controls and say why.
+        foreach ($this->fixedFields($sheet, $grants) as $path => $fix) {
+            foreach ($out as $i => $row) {
+                if ($row['id'] === $fix['choice']) {
+                    $out[$i]['fixes'][] = ['path' => $path, 'value' => $fix['value'], 'label' => $fix['label']];
+                }
+            }
         }
 
         return $out;
+    }
+
+    /**
+     * Fields held by the selected options of the sheet's choices (`options[].fixes`): pointer =>
+     * the value it must hold and which choice/option holds it. Values are formulas over the sheet.
+     * A fix whose formula fails is skipped here; RulesCompatibility rejects malformed ones.
+     *
+     * @param array<string, mixed> $sheet
+     * @param array<string, int> $grants
+     * @return array<string, array{value: int|float|bool|string|null, choice: string, option: mixed, label: string|null}>
+     */
+    public function fixedFields(array $sheet, array $grants): array
+    {
+        $fixed = [];
+        $scope = null;
+        foreach ($this->rules['creation']['choices'] ?? [] as $choice) {
+            [, $value] = SheetProjector::read($sheet, JsonPointer::parse((string) $choice['path'])->segments);
+            if ($value === null || $value === '') {
+                continue;
+            }
+            foreach ($choice['options'] as $option) {
+                if ($option['value'] !== $value || !isset($option['fixes'])) {
+                    continue;
+                }
+                $scope ??= $this->scope($sheet, $grants);
+                foreach ($option['fixes'] as $fix) {
+                    try {
+                        $result = (new FormulaEvaluator($scope))->evaluate($fix['value']);
+                    } catch (FormulaException) {
+                        continue;
+                    }
+                    $fixed[JsonPointer::parse((string) $fix['path'])->toString()] = [
+                        'value' => $result, 'choice' => (string) $choice['id'], 'option' => $option['value'], 'label' => $fix['label'] ?? null,
+                    ];
+                }
+            }
+        }
+
+        return $fixed;
     }
 
     /** @param list<string> $paths @param array<string, mixed> $step */
