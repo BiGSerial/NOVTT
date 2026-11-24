@@ -1,0 +1,160 @@
+{
+  "contract": "novtt.sheet-ui/1",
+  "default_access": "read_only",
+  "sections": [
+    {
+      "id": "identity",
+      "label": "Identidade",
+      "tab": "Ficha",
+      "access": "editable",
+      "elements": [{"kind": "field", "path": "/identity/name", "label": "Nome do personagem", "widget": "text"}, {"kind": "field", "path": "/identity/player", "label": "Jogador", "widget": "text"}, {"kind": "field", "path": "/identity/alignment", "label": "Tendência", "widget": "select"}, {"kind": "field", "path": "/identity/age", "label": "Idade", "widget": "text"}]
+    },
+    {
+      "id": "character",
+      "label": "Classe e nível",
+      "tab": "Ficha",
+      "access": "approval_required",
+      "elements": [{"kind": "field", "path": "/character/class", "label": "Classe", "widget": "select"}, {"kind": "field", "path": "/character/subclass", "label": "Subclasse", "widget": "select"}, {"kind": "field", "path": "/character/divine_order", "label": "Ordem Divina", "widget": "select"}, {"kind": "field", "path": "/character/primal_order", "label": "Ordem Primal", "widget": "select"}, {"kind": "field", "path": "/progress/level", "label": "Nível", "widget": "integer"}, {"kind": "field", "path": "/progress/xp", "label": "Pontos de experiência", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/progress/proficiency_bonus", "label": "Bônus de proficiência", "widget": "integer", "access": "read_only"}]
+    },
+    {
+      "id": "origin",
+      "label": "Origem (antecedente e espécie)",
+      "tab": "Ficha",
+      "access": "approval_required",
+      "elements": [{"kind": "field", "path": "/origin/species", "label": "Espécie", "widget": "select"}, {"kind": "field", "path": "/origin/lineage", "label": "Linhagem, legado ou ancestralidade", "widget": "select"}, {"kind": "field", "path": "/origin/lineage_ability", "label": "Atributo de conjuração da linhagem", "widget": "select"}, {"kind": "field", "path": "/origin/keen_senses", "label": "Sentidos Aguçados (perícia)", "widget": "select"}, {"kind": "field", "path": "/origin/size", "label": "Tamanho", "widget": "select"}, {"kind": "field", "path": "/origin/species_feat", "label": "Talento de origem (Versátil, Humano)", "widget": "select"}, {"kind": "field", "path": "/origin/background", "label": "Antecedente", "widget": "select"}, {"kind": "field", "path": "/origin/background_feat", "label": "Talento de origem do antecedente", "widget": "text", "access": "read_only"}]
+    },
+    {
+      "id": "ability_generation",
+      "label": "Geração de atributos",
+      "tab": "Ficha",
+      "access": "approval_required",
+      "elements": [{"kind": "field", "path": "/character/ability_method", "label": "Método", "widget": "select"}, {"kind": "field", "path": "/abilities/base/str", "label": "Força — compra de pontos (8–15)", "widget": "integer"}, {"kind": "field", "path": "/abilities/base/dex", "label": "Destreza — compra de pontos (8–15)", "widget": "integer"}, {"kind": "field", "path": "/abilities/base/con", "label": "Constituição — compra de pontos (8–15)", "widget": "integer"}, {"kind": "field", "path": "/abilities/base/int", "label": "Inteligência — compra de pontos (8–15)", "widget": "integer"}, {"kind": "field", "path": "/abilities/base/wis", "label": "Sabedoria — compra de pontos (8–15)", "widget": "integer"}, {"kind": "field", "path": "/abilities/base/cha", "label": "Carisma — compra de pontos (8–15)", "widget": "integer"}, {"kind": "field", "path": "/abilities/assigned/str", "label": "Força — valor definido pelo mestre", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/assigned/dex", "label": "Destreza — valor definido pelo mestre", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/assigned/con", "label": "Constituição — valor definido pelo mestre", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/assigned/int", "label": "Inteligência — valor definido pelo mestre", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/assigned/wis", "label": "Sabedoria — valor definido pelo mestre", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/assigned/cha", "label": "Carisma — valor definido pelo mestre", "widget": "integer", "access": "read_only"}]
+    },
+    {
+      "id": "ability_increases",
+      "label": "Aumentos de atributo",
+      "tab": "Ficha",
+      "access": "approval_required",
+      "elements": [{"kind": "field", "path": "/abilities/origin/str", "label": "Força — aumento do antecedente", "widget": "integer"}, {"kind": "field", "path": "/abilities/origin/dex", "label": "Destreza — aumento do antecedente", "widget": "integer"}, {"kind": "field", "path": "/abilities/origin/con", "label": "Constituição — aumento do antecedente", "widget": "integer"}, {"kind": "field", "path": "/abilities/origin/int", "label": "Inteligência — aumento do antecedente", "widget": "integer"}, {"kind": "field", "path": "/abilities/origin/wis", "label": "Sabedoria — aumento do antecedente", "widget": "integer"}, {"kind": "field", "path": "/abilities/origin/cha", "label": "Carisma — aumento do antecedente", "widget": "integer"}, {"kind": "field", "path": "/abilities/improvement/str", "label": "Força — aumentos por nível", "widget": "integer"}, {"kind": "field", "path": "/abilities/improvement/dex", "label": "Destreza — aumentos por nível", "widget": "integer"}, {"kind": "field", "path": "/abilities/improvement/con", "label": "Constituição — aumentos por nível", "widget": "integer"}, {"kind": "field", "path": "/abilities/improvement/int", "label": "Inteligência — aumentos por nível", "widget": "integer"}, {"kind": "field", "path": "/abilities/improvement/wis", "label": "Sabedoria — aumentos por nível", "widget": "integer"}, {"kind": "field", "path": "/abilities/improvement/cha", "label": "Carisma — aumentos por nível", "widget": "integer"}, {"kind": "field", "path": "/abilities/adjust/str", "label": "Força — ajuste do mestre (itens, dons)", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/adjust/dex", "label": "Destreza — ajuste do mestre (itens, dons)", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/adjust/con", "label": "Constituição — ajuste do mestre (itens, dons)", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/adjust/int", "label": "Inteligência — ajuste do mestre (itens, dons)", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/adjust/wis", "label": "Sabedoria — ajuste do mestre (itens, dons)", "widget": "integer", "access": "read_only"}, {"kind": "field", "path": "/abilities/adjust/cha", "label": "Carisma — ajuste do mestre (itens, dons)", "widget": "integer", "access": "read_only"}]
+    },
+    {
+      "id": "abilities",
+      "label": "Atributos",
+      "tab": "Ficha",
+      "access": "read_only",
+      "elements": [{"kind": "field", "path": "/abilities/score/str", "label": "Força (FOR)", "widget": "integer"}, {"kind": "field", "path": "/abilities/score/dex", "label": "Destreza (DES)", "widget": "integer"}, {"kind": "field", "path": "/abilities/score/con", "label": "Constituição (CON)", "widget": "integer"}, {"kind": "field", "path": "/abilities/score/int", "label": "Inteligência (INT)", "widget": "integer"}, {"kind": "field", "path": "/abilities/score/wis", "label": "Sabedoria (SAB)", "widget": "integer"}, {"kind": "field", "path": "/abilities/score/cha", "label": "Carisma (CAR)", "widget": "integer"}, {"kind": "field", "path": "/abilities/mod/str", "label": "Modificador de Força", "widget": "integer"}, {"kind": "field", "path": "/abilities/mod/dex", "label": "Modificador de Destreza", "widget": "integer"}, {"kind": "field", "path": "/abilities/mod/con", "label": "Modificador de Constituição", "widget": "integer"}, {"kind": "field", "path": "/abilities/mod/int", "label": "Modificador de Inteligência", "widget": "integer"}, {"kind": "field", "path": "/abilities/mod/wis", "label": "Modificador de Sabedoria", "widget": "integer"}, {"kind": "field", "path": "/abilities/mod/cha", "label": "Modificador de Carisma", "widget": "integer"}, {"kind": "field", "path": "/checks/str", "label": "Teste de Força", "widget": "integer"}, {"kind": "field", "path": "/checks/dex", "label": "Teste de Destreza", "widget": "integer"}, {"kind": "field", "path": "/checks/con", "label": "Teste de Constituição", "widget": "integer"}, {"kind": "field", "path": "/checks/int", "label": "Teste de Inteligência", "widget": "integer"}, {"kind": "field", "path": "/checks/wis", "label": "Teste de Sabedoria", "widget": "integer"}, {"kind": "field", "path": "/checks/cha", "label": "Teste de Carisma", "widget": "integer"}]
+    },
+    {
+      "id": "saves",
+      "label": "Salvaguardas",
+      "tab": "Ficha",
+      "access": "read_only",
+      "elements": [{"kind": "field", "path": "/saving_throws/str", "label": "Proficiente em Força", "widget": "boolean"}, {"kind": "field", "path": "/saving_throws/dex", "label": "Proficiente em Destreza", "widget": "boolean"}, {"kind": "field", "path": "/saving_throws/con", "label": "Proficiente em Constituição", "widget": "boolean"}, {"kind": "field", "path": "/saving_throws/int", "label": "Proficiente em Inteligência", "widget": "boolean"}, {"kind": "field", "path": "/saving_throws/wis", "label": "Proficiente em Sabedoria", "widget": "boolean"}, {"kind": "field", "path": "/saving_throws/cha", "label": "Proficiente em Carisma", "widget": "boolean"}, {"kind": "field", "path": "/saves/str", "label": "Salvaguarda de Força", "widget": "integer"}, {"kind": "field", "path": "/saves/dex", "label": "Salvaguarda de Destreza", "widget": "integer"}, {"kind": "field", "path": "/saves/con", "label": "Salvaguarda de Constituição", "widget": "integer"}, {"kind": "field", "path": "/saves/int", "label": "Salvaguarda de Inteligência", "widget": "integer"}, {"kind": "field", "path": "/saves/wis", "label": "Salvaguarda de Sabedoria", "widget": "integer"}, {"kind": "field", "path": "/saves/cha", "label": "Salvaguarda de Carisma", "widget": "integer"}]
+    },
+    {
+      "id": "skills",
+      "label": "Proficiência em perícias",
+      "tab": "Perícias",
+      "access": "approval_required",
+      "elements": [{"kind": "field", "path": "/skills/acrobatics", "label": "Acrobacia (DEX)", "widget": "integer"}, {"kind": "field", "path": "/skills/animal_handling", "label": "Adestrar Animais (WIS)", "widget": "integer"}, {"kind": "field", "path": "/skills/arcana", "label": "Arcanismo (INT)", "widget": "integer"}, {"kind": "field", "path": "/skills/athletics", "label": "Atletismo (STR)", "widget": "integer"}, {"kind": "field", "path": "/skills/deception", "label": "Enganação (CHA)", "widget": "integer"}, {"kind": "field", "path": "/skills/history", "label": "História (INT)", "widget": "integer"}, {"kind": "field", "path": "/skills/insight", "label": "Intuição (WIS)", "widget": "integer"}, {"kind": "field", "path": "/skills/intimidation", "label": "Intimidação (CHA)", "widget": "integer"}, {"kind": "field", "path": "/skills/investigation", "label": "Investigação (INT)", "widget": "integer"}, {"kind": "field", "path": "/skills/medicine", "label": "Medicina (WIS)", "widget": "integer"}, {"kind": "field", "path": "/skills/nature", "label": "Natureza (INT)", "widget": "integer"}, {"kind": "field", "path": "/skills/perception", "label": "Percepção (WIS)", "widget": "integer"}, {"kind": "field", "path": "/skills/performance", "label": "Atuação (CHA)", "widget": "integer"}, {"kind": "field", "path": "/skills/persuasion", "label": "Persuasão (CHA)", "widget": "integer"}, {"kind": "field", "path": "/skills/religion", "label": "Religião (INT)", "widget": "integer"}, {"kind": "field", "path": "/skills/sleight_of_hand", "label": "Prestidigitação (DEX)", "widget": "integer"}, {"kind": "field", "path": "/skills/stealth", "label": "Furtividade (DEX)", "widget": "integer"}, {"kind": "field", "path": "/skills/survival", "label": "Sobrevivência (WIS)", "widget": "integer"}]
+    },
+    {
+      "id": "expertise",
+      "label": "Especialização",
+      "tab": "Perícias",
+      "access": "approval_required",
+      "elements": [{"kind": "field", "path": "/expertise/acrobatics", "label": "Especialização em Acrobacia", "widget": "integer"}, {"kind": "field", "path": "/expertise/animal_handling", "label": "Especialização em Adestrar Animais", "widget": "integer"}, {"kind": "field", "path": "/expertise/arcana", "label": "Especialização em Arcanismo", "widget": "integer"}, {"kind": "field", "path": "/expertise/athletics", "label": "Especialização em Atletismo", "widget": "integer"}, {"kind": "field", "path": "/expertise/deception", "label": "Especialização em Enganação", "widget": "integer"}, {"kind": "field", "path": "/expertise/history", "label": "Especialização em História", "widget": "integer"}, {"kind": "field", "path": "/expertise/insight", "label": "Especialização em Intuição", "widget": "integer"}, {"kind": "field", "path": "/expertise/intimidation", "label": "Especialização em Intimidação", "widget": "integer"}, {"kind": "field", "path": "/expertise/investigation", "label": "Especialização em Investigação", "widget": "integer"}, {"kind": "field", "path": "/expertise/medicine", "label": "Especialização em Medicina", "widget": "integer"}, {"kind": "field", "path": "/expertise/nature", "label": "Especialização em Natureza", "widget": "integer"}, {"kind": "field", "path": "/expertise/perception", "label": "Especialização em Percepção", "widget": "integer"}, {"kind": "field", "path": "/expertise/performance", "label": "Especialização em Atuação", "widget": "integer"}, {"kind": "field", "path": "/expertise/persuasion", "label": "Especialização em Persuasão", "widget": "integer"}, {"kind": "field", "path": "/expertise/religion", "label": "Especialização em Religião", "widget": "integer"}, {"kind": "field", "path": "/expertise/sleight_of_hand", "label": "Especialização em Prestidigitação", "widget": "integer"}, {"kind": "field", "path": "/expertise/stealth", "label": "Especialização em Furtividade", "widget": "integer"}, {"kind": "field", "path": "/expertise/survival", "label": "Especialização em Sobrevivência", "widget": "integer"}]
+    },
+    {
+      "id": "skill_bonus",
+      "label": "Bônus de perícia",
+      "tab": "Perícias",
+      "access": "read_only",
+      "elements": [{"kind": "field", "path": "/skill_bonus/acrobatics", "label": "Acrobacia (DEX)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/animal_handling", "label": "Adestrar Animais (WIS)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/arcana", "label": "Arcanismo (INT)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/athletics", "label": "Atletismo (STR)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/deception", "label": "Enganação (CHA)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/history", "label": "História (INT)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/insight", "label": "Intuição (WIS)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/intimidation", "label": "Intimidação (CHA)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/investigation", "label": "Investigação (INT)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/medicine", "label": "Medicina (WIS)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/nature", "label": "Natureza (INT)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/perception", "label": "Percepção (WIS)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/performance", "label": "Atuação (CHA)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/persuasion", "label": "Persuasão (CHA)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/religion", "label": "Religião (INT)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/sleight_of_hand", "label": "Prestidigitação (DEX)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/stealth", "label": "Furtividade (DEX)", "widget": "integer"}, {"kind": "field", "path": "/skill_bonus/survival", "label": "Sobrevivência (WIS)", "widget": "integer"}, {"kind": "field", "path": "/senses/passive_perception", "label": "Percepção passiva", "widget": "integer"}, {"kind": "field", "path": "/senses/darkvision", "label": "Visão no escuro (pés)", "widget": "integer"}]
+    },
+    {
+      "id": "combat",
+      "label": "Combate",
+      "tab": "Combate",
+      "access": "read_only",
+      "elements": [{"kind": "field", "path": "/combat/armor_class", "label": "Classe de Armadura", "widget": "integer"}, {"kind": "field", "path": "/combat/initiative", "label": "Iniciativa", "widget": "integer"}, {"kind": "field", "path": "/combat/speed", "label": "Deslocamento (pés)", "widget": "integer"}, {"kind": "field", "path": "/combat/hp_max", "label": "Pontos de Vida máximos", "widget": "integer"}, {"kind": "field", "path": "/combat/hit_die", "label": "Dado de Vida (d)", "widget": "integer"}, {"kind": "field", "path": "/combat/attack/melee", "label": "Ataque corpo a corpo", "widget": "integer"}, {"kind": "field", "path": "/combat/attack/ranged", "label": "Ataque à distância", "widget": "integer"}, {"kind": "field", "path": "/combat/attack/finesse", "label": "Ataque com acuidade", "widget": "integer"}, {"kind": "field", "path": "/combat/attack/spell", "label": "Ataque mágico", "widget": "integer"}, {"kind": "field", "path": "/combat/hp_adjust", "label": "Ajuste de PV do mestre (rolagens, efeitos)", "widget": "integer"}]
+    },
+    {
+      "id": "armor",
+      "label": "Armadura",
+      "tab": "Combate",
+      "access": "approval_required",
+      "elements": [{"kind": "field", "path": "/combat/armor", "label": "Armadura vestida", "widget": "select"}, {"kind": "field", "path": "/combat/shield", "label": "Escudo empunhado", "widget": "boolean"}, {"kind": "field", "path": "/combat/ac_bonus", "label": "Outros bônus de CA (estilo, itens)", "widget": "integer"}]
+    },
+    {
+      "id": "vitals",
+      "label": "Vida e condição",
+      "tab": "Combate",
+      "access": "editable",
+      "elements": [{"kind": "field", "path": "/resources/hp", "label": "PV atuais", "widget": "integer"}, {"kind": "field", "path": "/resources/temp_hp", "label": "PV temporários", "widget": "integer"}, {"kind": "field", "path": "/resources/hit_dice_spent", "label": "Dados de Vida gastos", "widget": "integer"}, {"kind": "field", "path": "/combat/death_successes", "label": "Salvaguardas contra a morte: sucessos", "widget": "integer"}, {"kind": "field", "path": "/combat/death_failures", "label": "Salvaguardas contra a morte: falhas", "widget": "integer"}, {"kind": "field", "path": "/combat/inspiration", "label": "Inspiração Heroica", "widget": "boolean"}, {"kind": "field", "path": "/conditions/blinded", "label": "Cego", "widget": "boolean"}, {"kind": "field", "path": "/conditions/charmed", "label": "Enfeitiçado", "widget": "boolean"}, {"kind": "field", "path": "/conditions/deafened", "label": "Surdo", "widget": "boolean"}, {"kind": "field", "path": "/conditions/frightened", "label": "Amedrontado", "widget": "boolean"}, {"kind": "field", "path": "/conditions/grappled", "label": "Agarrado", "widget": "boolean"}, {"kind": "field", "path": "/conditions/incapacitated", "label": "Incapacitado", "widget": "boolean"}, {"kind": "field", "path": "/conditions/invisible", "label": "Invisível", "widget": "boolean"}, {"kind": "field", "path": "/conditions/paralyzed", "label": "Paralisado", "widget": "boolean"}, {"kind": "field", "path": "/conditions/petrified", "label": "Petrificado", "widget": "boolean"}, {"kind": "field", "path": "/conditions/poisoned", "label": "Envenenado", "widget": "boolean"}, {"kind": "field", "path": "/conditions/prone", "label": "Caído", "widget": "boolean"}, {"kind": "field", "path": "/conditions/restrained", "label": "Impedido", "widget": "boolean"}, {"kind": "field", "path": "/conditions/stunned", "label": "Atordoado", "widget": "boolean"}, {"kind": "field", "path": "/conditions/unconscious", "label": "Inconsciente", "widget": "boolean"}, {"kind": "field", "path": "/conditions/exhaustion", "label": "Exaustão (nível)", "widget": "integer"}]
+    },
+    {
+      "id": "attacks",
+      "label": "Ataques",
+      "tab": "Combate",
+      "access": "approval_required",
+      "elements": [{"kind": "collection", "path": "/attacks", "label": "Armas e ataques", "max_items": 30, "item_fields": [{"field": "name", "label": "Nome", "widget": "text"}, {"field": "bonus", "label": "Bônus", "widget": "text"}, {"field": "damage", "label": "Dano", "widget": "text"}, {"field": "damage_type", "label": "Tipo", "widget": "text"}, {"field": "range", "label": "Alcance", "widget": "text"}, {"field": "notes", "label": "Notas", "widget": "text"}]}]
+    },
+    {
+      "id": "spellcasting",
+      "label": "Conjuração",
+      "tab": "Magias",
+      "access": "read_only",
+      "elements": [{"kind": "field", "path": "/spellcasting/ability", "label": "Atributo de conjuração", "widget": "text"}, {"kind": "field", "path": "/spellcasting/modifier", "label": "Modificador de conjuração", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/save_dc", "label": "CD de magia", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/attack_bonus", "label": "Bônus de ataque mágico", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/cantrips_known", "label": "Truques conhecidos", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/prepared", "label": "Magias preparadas", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/slots/l1", "label": "Espaços de 1º círculo", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/slots/l2", "label": "Espaços de 2º círculo", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/slots/l3", "label": "Espaços de 3º círculo", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/slots/l4", "label": "Espaços de 4º círculo", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/slots/l5", "label": "Espaços de 5º círculo", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/slots/l6", "label": "Espaços de 6º círculo", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/slots/l7", "label": "Espaços de 7º círculo", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/slots/l8", "label": "Espaços de 8º círculo", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/slots/l9", "label": "Espaços de 9º círculo", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/pact_slots", "label": "Espaços de Pacto", "widget": "integer"}, {"kind": "field", "path": "/spellcasting/pact_slot_level", "label": "Círculo do Pacto", "widget": "integer"}]
+    },
+    {
+      "id": "slots_used",
+      "label": "Espaços gastos",
+      "tab": "Magias",
+      "access": "editable",
+      "elements": [{"kind": "field", "path": "/resources/slots_used/l1", "label": "1º círculo gastos", "widget": "integer"}, {"kind": "field", "path": "/resources/slots_used/l2", "label": "2º círculo gastos", "widget": "integer"}, {"kind": "field", "path": "/resources/slots_used/l3", "label": "3º círculo gastos", "widget": "integer"}, {"kind": "field", "path": "/resources/slots_used/l4", "label": "4º círculo gastos", "widget": "integer"}, {"kind": "field", "path": "/resources/slots_used/l5", "label": "5º círculo gastos", "widget": "integer"}, {"kind": "field", "path": "/resources/slots_used/l6", "label": "6º círculo gastos", "widget": "integer"}, {"kind": "field", "path": "/resources/slots_used/l7", "label": "7º círculo gastos", "widget": "integer"}, {"kind": "field", "path": "/resources/slots_used/l8", "label": "8º círculo gastos", "widget": "integer"}, {"kind": "field", "path": "/resources/slots_used/l9", "label": "9º círculo gastos", "widget": "integer"}, {"kind": "field", "path": "/resources/pact_used", "label": "Pacto gastos", "widget": "integer"}]
+    },
+    {
+      "id": "spells",
+      "label": "Magias",
+      "tab": "Magias",
+      "access": "approval_required",
+      "elements": [{"kind": "collection", "path": "/spells", "label": "Magias conhecidas e preparadas", "max_items": 120, "item_fields": [{"field": "name", "label": "Magia", "widget": "text"}, {"field": "level", "label": "Círculo (0 = truque)", "widget": "integer"}, {"field": "school", "label": "Escola", "widget": "select"}, {"field": "prepared", "label": "Preparada", "widget": "boolean"}, {"field": "concentration", "label": "Concentração", "widget": "boolean"}, {"field": "ritual", "label": "Ritual", "widget": "boolean"}, {"field": "notes", "label": "Notas do jogador", "widget": "textarea"}]}]
+    },
+    {
+      "id": "inventory",
+      "label": "Inventário",
+      "tab": "Itens",
+      "access": "approval_required",
+      "elements": [{"kind": "collection", "path": "/inventory", "label": "Itens", "max_items": 100, "item_fields": [{"field": "name", "label": "Item", "widget": "text"}, {"field": "quantity", "label": "Quantidade", "widget": "integer"}, {"field": "weight", "label": "Peso unitário (lb)", "widget": "number"}, {"field": "equipped", "label": "Equipado", "widget": "boolean"}, {"field": "notes", "label": "Notas", "widget": "text"}]}, {"kind": "field", "path": "/load/carried", "label": "Peso carregado (lb)", "widget": "number", "access": "read_only"}, {"kind": "field", "path": "/load/capacity", "label": "Capacidade de carga (lb)", "widget": "integer", "access": "read_only"}]
+    },
+    {
+      "id": "currency",
+      "label": "Moedas",
+      "tab": "Itens",
+      "access": "editable",
+      "elements": [{"kind": "field", "path": "/currency/cp", "label": "PC (cobre)", "widget": "integer"}, {"kind": "field", "path": "/currency/sp", "label": "PP (prata)", "widget": "integer"}, {"kind": "field", "path": "/currency/ep", "label": "PE (electro)", "widget": "integer"}, {"kind": "field", "path": "/currency/gp", "label": "PO (ouro)", "widget": "integer"}, {"kind": "field", "path": "/currency/pp", "label": "PL (platina)", "widget": "integer"}]
+    },
+    {
+      "id": "proficiencies",
+      "label": "Proficiências e idiomas",
+      "tab": "Detalhes",
+      "access": "read_only",
+      "elements": [{"kind": "field", "path": "/proficiencies/armor_light", "label": "Armaduras leves", "widget": "boolean"}, {"kind": "field", "path": "/proficiencies/armor_medium", "label": "Armaduras médias", "widget": "boolean"}, {"kind": "field", "path": "/proficiencies/armor_heavy", "label": "Armaduras pesadas", "widget": "boolean"}, {"kind": "field", "path": "/proficiencies/shields", "label": "Escudos", "widget": "boolean"}, {"kind": "field", "path": "/proficiencies/weapons_simple", "label": "Armas simples", "widget": "boolean"}, {"kind": "field", "path": "/proficiencies/weapons_martial", "label": "Armas marciais", "widget": "boolean"}, {"kind": "field", "path": "/proficiencies/class_notes", "label": "Da classe", "widget": "text"}, {"kind": "field", "path": "/proficiencies/other", "label": "Outras proficiências", "widget": "textarea", "access": "approval_required"}, {"kind": "field", "path": "/proficiencies/tools", "label": "Ferramentas", "widget": "textarea", "access": "approval_required"}, {"kind": "field", "path": "/proficiencies/languages", "label": "Idiomas", "widget": "textarea", "access": "approval_required"}]
+    },
+    {
+      "id": "features",
+      "label": "Características e talentos",
+      "tab": "Detalhes",
+      "access": "approval_required",
+      "elements": [{"kind": "collection", "path": "/features", "label": "Características", "max_items": 80, "item_fields": [{"field": "name", "label": "Nome", "widget": "text"}, {"field": "source", "label": "Origem", "widget": "select"}, {"field": "level", "label": "Nível", "widget": "integer"}, {"field": "uses_max", "label": "Usos", "widget": "integer"}, {"field": "uses_spent", "label": "Usos gastos", "widget": "integer"}, {"field": "notes", "label": "Anotação do jogador", "widget": "textarea"}]}, {"kind": "collection", "path": "/feats", "label": "Talentos", "max_items": 30, "item_fields": [{"field": "name", "label": "Talento", "widget": "text"}, {"field": "category", "label": "Categoria", "widget": "text"}, {"field": "notes", "label": "Anotação do jogador", "widget": "textarea"}]}]
+    },
+    {
+      "id": "description",
+      "label": "Descrição",
+      "tab": "Detalhes",
+      "access": "editable",
+      "elements": [{"kind": "field", "path": "/description/personality", "label": "Traços de personalidade", "widget": "textarea"}, {"kind": "field", "path": "/description/ideals", "label": "Ideais", "widget": "textarea"}, {"kind": "field", "path": "/description/bonds", "label": "Vínculos", "widget": "textarea"}, {"kind": "field", "path": "/description/flaws", "label": "Defeitos", "widget": "textarea"}, {"kind": "field", "path": "/description/appearance", "label": "Aparência", "widget": "textarea"}, {"kind": "field", "path": "/description/backstory", "label": "História", "widget": "textarea"}, {"kind": "field", "path": "/description/notes", "label": "Anotações", "widget": "textarea"}]
+    }
+  ]
+}
