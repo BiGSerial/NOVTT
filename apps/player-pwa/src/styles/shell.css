@@ -103,3 +103,29 @@
 @media (max-width: 560px) { .dice-editor { grid-template-columns: 1fr; justify-items: center; } }
 .dice-editor .seg-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
 .dice-editor .seg-tabs button { width: auto; flex: 1 1 auto; }
+
+/* Session lobby (TableView before a session starts). */
+.waiting { width: min(100%, 1080px); }
+.lobby { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr) 320px; align-items: start; margin-top: 12px; }
+@media (max-width: 860px) { .lobby { grid-template-columns: 1fr; } }
+.lobby-main { display: grid; gap: 14px; padding: 24px 26px; }
+.lobby-main h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); }
+.lobby-main .eyebrow { margin: 0; }
+.lobby-title input { font-size: 18px; }
+.roteiro-tiles { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+.roteiro-tile { display: grid; gap: 4px; justify-items: start; text-align: left; width: auto; min-height: 72px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; }
+.roteiro-tile b { font: 700 17px var(--font-display); }
+.roteiro-tile small { color: var(--muted); }
+.roteiro-tile.blank { border-style: dashed; }
+.roteiro-tile.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--glow); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.lobby-start { justify-self: start; min-height: 52px; padding: 10px 28px; font-size: 18px; width: auto; }
+.lobby-side { display: grid; gap: 12px; }
+.lobby-card { display: grid; gap: 8px; padding: 16px 18px; }
+.lobby-card h2 { margin: 0; font: 700 12px var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.lobby-card p { margin: 0; }
+.lobby-people, .lobby-open { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lobby-people li { display: flex; align-items: center; gap: 10px; opacity: .7; }
+.lobby-people li.online { opacity: 1; }
+.lobby-people li.online .presence-dot { background: var(--win); }
+.lobby-people small, .lobby-open small { color: var(--muted); }
+.lobby-people .presence-dot { border-color: var(--panel); }
