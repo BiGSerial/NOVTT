@@ -29,13 +29,13 @@ No rulebook prose, art or descriptions: compendium entries carry names and mecha
 | Humanity uses Conscience and Self-Control | Humanity option fixes both virtue types | high | pending |
 | Dice pool: d10, difficulty 2–10 (default 6), each 1 cancels a success, botch = no successes and at least one 1 | roll `test` (strategy `pool`) | high | pending |
 | Specialty: a 10 counts as two successes | separate roll `specialty_test` (`bonus_at_least: 10`); 1s may cancel the bonus success too | medium | pending |
-| Health: 7 levels and wound penalties | 0, 0, −1, −1, −2, −2, −5, incapacitated; derived only, not applied to pools | high | pending |
+| Health: 7 levels and wound penalties | 0, 0, −1, −1, −2, −2, −5, incapacitated; applied to action pools | high | pending |
 | Initiative | 1d10 + Dexterity + Wits | high | pending |
 | Attribute/ability/virtue names (en) | compendium `labels.en` | high | pending |
 | Portuguese labels | functional translations, not checked against the Brazilian edition | low | pending |
 | Merits and Flaws | player-recorded collection; no freebie cost/bonus wired | — | missing |
 | Untrained Abilities (Skills +1 difficulty, Knowledges not rollable) | not wired | — | missing |
-| Wound penalty applied to dice pools | not wired (needs a bounded pool modifier on rolls) | — | missing |
+| Wound penalty applied to dice pools | `count_modifier` on test / specialty / attribute pools (server-side) | high | pending |
 | Clan weaknesses other than Appearance 0 | not wired (narrative/situational) | — | missing |
 | Thaumaturgy/Necromancy secondary paths and rituals (costs) | player-recorded collections, no costs | — | missing |
 | Background purchase with XP | no advancement cost rule (raising a Background in advancement is refused) | — | missing |
@@ -43,8 +43,8 @@ No rulebook prose, art or descriptions: compendium entries carry names and mecha
 | Archetypes (Nature/Demeanor) list and Willpower regain | free text | — | missing |
 | Diablerie / generation change in play | not wired | — | missing |
 | Soak, damage and combat maneuvers | not wired (roll `attribute` covers Stamina) | — | missing |
-| Engine: a cost rule that does not apply to some increments | modelled by pricing them at 1000 (above any balance) so the next rule pays; an unaffordable dot reports that price | — | missing capability (`applies_when`) |
-| Engine: losing a trait in play (degeneration, permanent Willpower) without a refund | lowering a rating refunds the XP that paid it | — | missing capability |
+| Priority points only up to the creation cap; creation Discipline dots only in clan | cost rule `applies_when` (engine 0.3.0) | high | implemented |
+| Losing Humanity/Path or permanent Willpower in play | `refund_on_decrease: false` on the XP rule (the loss stays on the ledger) | high | implemented |
 | Clans V20 Dark Ages core | Assamite, Brujah, Cappadocian, Followers of Set, Gangrel, Lasombra, Malkavian, Nosferatu, Ravnos, Salubri, Toreador, Tremere, Tzimisce, Ventrue | medium-high (Salubri in the core list: medium) | pending |
 | Cappadocian Mortis; Salubri Obeah | clan Disciplines as listed | medium | pending |
 | Disciplines | Animalism, Auspex, Celerity, Chimerstry, Dementation, Dominate, Fortitude, Mortis, Obeah, Obfuscate, Obtenebration, Potence, Presence, Protean, Quietus, Serpentis, Thaumaturgy, Vicissitude | medium-high | pending |

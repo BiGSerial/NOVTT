@@ -24,6 +24,8 @@ final class FaithfulPresetPackagesTest extends TestCase
     public static function blockedPackages(): iterable
     {
         yield 'Ordem Paranormal' => ['ordem-paranormal-rpg/livro-basico/0.1.1'];
+        yield 'Vampire V20' => ['world-of-darkness/vampire-v20/0.1.0'];
+        yield 'Vampire Dark Ages V20' => ['world-of-darkness/vampire-dark-ages-v20/0.1.0'];
     }
 
     #[DataProvider('blockedPackages')]

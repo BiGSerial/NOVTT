@@ -17,10 +17,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PENDING = " · a conferir"
-# A cost rule cannot yet say "I do not apply to this increment" (see SOURCE-REGISTER, missing
-# capability `applies_when`). An increment this rule must not pay is priced above any balance the
-# rule's budget can hold, so the engine falls through to the next rule of the phase (freebies).
-NOT_PAYABLE = 1000
 
 PRIORITY_OPTIONS = ["primary", "secondary", "tertiary"]
 PRIORITY_LABELS = {"primary": "Primária", "secondary": "Secundária", "tertiary": "Terciária"}
@@ -268,14 +264,16 @@ def build(book):
     for g in ABILITY_GROUPS:
         cap = budgets_cfg["ability_creation_max"]
         costs.append({"id": f"{g}_creation", "phase": "creation", "budget": g, "targets": [f"/abilities/{g}/*"],
-                      "model": {"type": "formula", "formula": if_(cmp("le", var("new"), const(cap)), const(1), const(NOT_PAYABLE))}})
+                      # Priority points pay only up to the creation cap; above it the freebie rule pays.
+                      "applies_when": cmp("le", var("new"), const(cap)), "model": {"type": "fixed_per_dot", "amount": 1}})
         costs.append({"id": f"{g}_freebies", "phase": "creation", "budget": "freebies", "targets": [f"/abilities/{g}/*"], "model": {"type": "fixed_per_dot", "amount": freebie["ability"]}})
         costs.append({"id": f"{g}_xp", "phase": "advancement", "budget": "xp", "targets": [f"/abilities/{g}/*"],
                       "model": {"type": "current_rating_multiplier", "multiplier": xp["ability"], "when_zero": xp["new_ability"]}})
     for d, _, _ in disciplines:
         allowed = table(CLAN, disc_in_clan(d, 1, 1))
         costs.append({"id": f"disc_{d}_creation", "phase": "creation", "budget": "disciplines", "targets": [f"/disciplines/{d}"],
-                      "model": {"type": "formula", "formula": if_(cmp("eq", allowed, const(1)), const(1), const(NOT_PAYABLE))}})
+                      # Creation Discipline dots only for the clan's Disciplines; others cost freebies.
+                      "applies_when": cmp("eq", allowed, const(1)), "model": {"type": "fixed_per_dot", "amount": 1}})
     costs.append({"id": "disciplines_freebies", "phase": "creation", "budget": "freebies", "targets": ["/disciplines/*"], "model": {"type": "fixed_per_dot", "amount": freebie["discipline"]}})
     for d, _, _ in disciplines:
         multiplier = table(CLAN, disc_in_clan(d, xp["clan_discipline"], xp.get("clanless_discipline")), xp["other_discipline"])
@@ -291,10 +289,11 @@ def build(book):
         # free; levels above them cost freebies.
         {"id": "morality_creation", "phase": "creation", "budget": "freebies", "targets": ["/morality/rating"],
          "model": {"type": "formula", "formula": if_(cmp("le", var("new"), morality_base), const(0), const(freebie["morality"]))}},
-        {"id": "morality_xp", "phase": "advancement", "budget": "xp", "targets": ["/morality/rating"], "model": {"type": "current_rating_multiplier", "multiplier": xp["morality"]}},
+        # Degeneration is a loss: lowering Humanity/Path in play does not give the XP back.
+        {"id": "morality_xp", "phase": "advancement", "budget": "xp", "targets": ["/morality/rating"], "model": {"type": "current_rating_multiplier", "multiplier": xp["morality"]}, "refund_on_decrease": False},
         {"id": "willpower_creation", "phase": "creation", "budget": "freebies", "targets": ["/willpower/permanent"],
          "model": {"type": "formula", "formula": if_(cmp("le", var("new"), ref("/virtues/courage")), const(0), const(freebie["willpower"]))}},
-        {"id": "willpower_xp", "phase": "advancement", "budget": "xp", "targets": ["/willpower/permanent"], "model": {"type": "current_rating_multiplier", "multiplier": xp["willpower"]}},
+        {"id": "willpower_xp", "phase": "advancement", "budget": "xp", "targets": ["/willpower/permanent"], "model": {"type": "current_rating_multiplier", "multiplier": xp["willpower"]}, "refund_on_decrease": False},
     ]
 
     def distinct(paths):
@@ -369,10 +368,11 @@ def build(book):
                 "cancel_at_most": 1, "botch_at_most": 1, **extra}
     attr_ability = {"attribute": {"targets": all_attributes}, "ability": {"targets": all_abilities}}
     rolls = [
-        pool("test", "Teste (atributo + habilidade)", attr_ability, add(var("attribute"), var("ability"))),
+        # Wound penalty applied by the server to action pools (count_modifier, floored at 0).
+        pool("test", "Teste (atributo + habilidade)", attr_ability, add(var("attribute"), var("ability")), count_modifier=derived("wound_penalty")),
         pool("specialty_test", f"Teste com especialização (10 vale dois sucessos){PENDING}", attr_ability, add(var("attribute"), var("ability")),
-             bonus_at_least=10, bonus_successes=1),
-        pool("attribute", "Atributo sozinho", {"attribute": {"targets": all_attributes}}, var("attribute")),
+             bonus_at_least=10, bonus_successes=1, count_modifier=derived("wound_penalty")),
+        pool("attribute", "Atributo sozinho", {"attribute": {"targets": all_attributes}}, var("attribute"), count_modifier=derived("wound_penalty")),
         pool("virtue", "Virtude", {"virtue": {"targets": ["/virtues/*"]}}, var("virtue")),
         pool("willpower", "Força de Vontade", {}, ref("/willpower/permanent")),
         {"id": "initiative", "label": f"Iniciativa (1d10 + Destreza + Raciocínio){PENDING}", "strategy": "sum", "dice": "1d10", "modifier": derived("initiative")},
@@ -492,13 +492,13 @@ def common_rows(book):
         ("Humanity uses Conscience and Self-Control", "Humanity option fixes both virtue types", "high", "pending"),
         ("Dice pool: d10, difficulty 2–10 (default 6), each 1 cancels a success, botch = no successes and at least one 1", "roll `test` (strategy `pool`)", "high", "pending"),
         ("Specialty: a 10 counts as two successes", "separate roll `specialty_test` (`bonus_at_least: 10`); 1s may cancel the bonus success too", "medium", "pending"),
-        ("Health: 7 levels and wound penalties", "0, 0, −1, −1, −2, −2, −5, incapacitated; derived only, not applied to pools", "high", "pending"),
+        ("Health: 7 levels and wound penalties", "0, 0, −1, −1, −2, −2, −5, incapacitated; applied to action pools", "high", "pending"),
         ("Initiative", "1d10 + Dexterity + Wits", "high", "pending"),
         ("Attribute/ability/virtue names (en)", "compendium `labels.en`", "high", "pending"),
         ("Portuguese labels", "functional translations, not checked against the Brazilian edition", "low", "pending"),
         ("Merits and Flaws", "player-recorded collection; no freebie cost/bonus wired", "—", "missing"),
         ("Untrained Abilities (Skills +1 difficulty, Knowledges not rollable)", "not wired", "—", "missing"),
-        ("Wound penalty applied to dice pools", "not wired (needs a bounded pool modifier on rolls)", "—", "missing"),
+        ("Wound penalty applied to dice pools", "`count_modifier` on test / specialty / attribute pools (server-side)", "high", "pending"),
         ("Clan weaknesses other than Appearance 0", "not wired (narrative/situational)", "—", "missing"),
         ("Thaumaturgy/Necromancy secondary paths and rituals (costs)", "player-recorded collections, no costs", "—", "missing"),
         ("Background purchase with XP", "no advancement cost rule (raising a Background in advancement is refused)", "—", "missing"),
@@ -506,8 +506,8 @@ def common_rows(book):
         ("Archetypes (Nature/Demeanor) list and Willpower regain", "free text", "—", "missing"),
         ("Diablerie / generation change in play", "not wired", "—", "missing"),
         ("Soak, damage and combat maneuvers", "not wired (roll `attribute` covers Stamina)", "—", "missing"),
-        ("Engine: a cost rule that does not apply to some increments", f"modelled by pricing them at {NOT_PAYABLE} (above any balance) so the next rule pays; an unaffordable dot reports that price", "—", "missing capability (`applies_when`)"),
-        ("Engine: losing a trait in play (degeneration, permanent Willpower) without a refund", "lowering a rating refunds the XP that paid it", "—", "missing capability"),
+        ("Priority points only up to the creation cap; creation Discipline dots only in clan", "cost rule `applies_when` (engine 0.3.0)", "high", "implemented"),
+        ("Losing Humanity/Path or permanent Willpower in play", "`refund_on_decrease: false` on the XP rule (the loss stays on the ledger)", "high", "implemented"),
     ]
 
 

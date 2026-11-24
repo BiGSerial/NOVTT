@@ -64,6 +64,9 @@ final class RulesCompatibility
             if (($cost['model']['type'] ?? null) === 'formula') {
                 $this->formula($cost['model']['formula'], new FormulaContext(variables: ['current', 'new']), "/rules/costs/{$i}/model/formula");
             }
+            if (isset($cost['applies_when'])) {
+                $this->formula($cost['applies_when'], new FormulaContext(variables: ['current', 'new']), "/rules/costs/{$i}/applies_when");
+            }
         }
 
         $graph = [];
@@ -297,6 +300,9 @@ final class RulesCompatibility
                 }
             } else {
                 $this->formula($roll['count'], $context, $at . '/count');
+                if (isset($roll['count_modifier'])) {
+                    $this->formula($roll['count_modifier'], $context, $at . '/count_modifier');
+                }
                 $faces = (int) $roll['faces'];
                 $this->bounds($roll['difficulty'], $at . '/difficulty', 1, $faces);
                 $this->bounds($roll['required'] ?? null, $at . '/required', 0, 200);

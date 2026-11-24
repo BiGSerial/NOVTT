@@ -159,6 +159,15 @@
             "maximum": 100,
             "default": 0,
             "description": "Dots per target that cost nothing in this phase (e.g. a printed starting dot)."
+          },
+          "applies_when": {
+            "$ref": "#/$defs/formula",
+            "description": "Boolean formula over the sheet and the variables `current` / `new` (the increment being priced). When false, this rule does not price that increment and the next rule for the target is tried (e.g. priority points only up to 3, then freebies)."
+          },
+          "refund_on_decrease": {
+            "type": "boolean",
+            "default": true,
+            "description": "false: lowering a rating paid by this rule removes the paid levels without refunding them (losses such as degeneration)."
           }
         }
       }
@@ -870,6 +879,10 @@
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 1000
+              },
+              "count_modifier": {
+                "$ref": "#/$defs/formula",
+                "description": "Added to the dice count (result floored at 0), computed on the server from the sheet (e.g. a wound penalty)."
               }
             }
           },

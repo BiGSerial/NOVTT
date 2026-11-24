@@ -156,7 +156,11 @@ final readonly class PresetRolls
     /** @param array<string, mixed> $roll @param array<string, mixed> $params */
     private function pool(array $roll, SheetScope $scope, array $params): PoolRoll
     {
-        $count = max(0, $this->integer($roll['count'], $scope));
+        $count = $this->integer($roll['count'], $scope);
+        if (isset($roll['count_modifier'])) {
+            $count += $this->integer($roll['count_modifier'], $scope);
+        }
+        $count = max(0, $count);
 
         return new PoolRoll(
             $count,

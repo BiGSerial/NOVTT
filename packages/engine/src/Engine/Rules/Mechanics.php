@@ -503,6 +503,21 @@ final class Mechanics
         };
     }
 
+    /**
+     * Whether a cost rule's `applies_when` holds for the increment `$current` → `$current + 1`.
+     *
+     * @param array<string, mixed> $formula @param array<string, mixed> $sheet @param array<string, int> $grants
+     */
+    public function applies(array $formula, int $current, array $sheet, array $grants): bool
+    {
+        $value = (new FormulaEvaluator($this->scope($sheet, $grants)->withVariables(['current' => $current, 'new' => $current + 1])))->evaluate($formula);
+        if (!is_bool($value)) {
+            throw new FormulaException('formula.type_mismatch', ['expected' => 'boolean']);
+        }
+
+        return $value;
+    }
+
     /** @param array<string, mixed> $formula @param array<string, mixed> $sheet @param array<string, int> $grants */
     private function formulaCost(array $formula, int $current, array $sheet, array $grants): int
     {

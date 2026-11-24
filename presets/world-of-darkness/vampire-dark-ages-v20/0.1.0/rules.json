@@ -268,31 +268,21 @@
       "targets": [
         "/abilities/talents/*"
       ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "le",
+        "args": [
+          {
+            "var": "new"
+          },
+          {
+            "const": 3
+          }
+        ]
+      },
       "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "le",
-              "args": [
-                {
-                  "var": "new"
-                },
-                {
-                  "const": 3
-                }
-              ]
-            },
-            {
-              "const": 1
-            },
-            {
-              "const": 1000
-            }
-          ]
-        }
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -327,31 +317,21 @@
       "targets": [
         "/abilities/skills/*"
       ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "le",
+        "args": [
+          {
+            "var": "new"
+          },
+          {
+            "const": 3
+          }
+        ]
+      },
       "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "le",
-              "args": [
-                {
-                  "var": "new"
-                },
-                {
-                  "const": 3
-                }
-              ]
-            },
-            {
-              "const": 1
-            },
-            {
-              "const": 1000
-            }
-          ]
-        }
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -386,31 +366,21 @@
       "targets": [
         "/abilities/knowledges/*"
       ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "le",
+        "args": [
+          {
+            "var": "new"
+          },
+          {
+            "const": 3
+          }
+        ]
+      },
       "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "le",
-              "args": [
-                {
-                  "var": "new"
-                },
-                {
-                  "const": 3
-                }
-              ]
-            },
-            {
-              "const": 1
-            },
-            {
-              "const": 1000
-            }
-          ]
-        }
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -445,43 +415,33 @@
       "targets": [
         "/disciplines/animalism"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "gangrel": 1,
-                    "nosferatu": 1,
-                    "ravnos": 1,
-                    "tzimisce": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "gangrel": 1,
+              "nosferatu": 1,
+              "ravnos": 1,
+              "tzimisce": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -491,45 +451,35 @@
       "targets": [
         "/disciplines/auspex"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "cappadocian": 1,
-                    "malkavian": 1,
-                    "salubri": 1,
-                    "toreador": 1,
-                    "tremere": 1,
-                    "tzimisce": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "cappadocian": 1,
+              "malkavian": 1,
+              "salubri": 1,
+              "toreador": 1,
+              "tremere": 1,
+              "tzimisce": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -539,42 +489,32 @@
       "targets": [
         "/disciplines/celerity"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "assamite": 1,
-                    "brujah": 1,
-                    "toreador": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "assamite": 1,
+              "brujah": 1,
+              "toreador": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -584,40 +524,30 @@
       "targets": [
         "/disciplines/chimerstry"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "ravnos": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "ravnos": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -627,40 +557,30 @@
       "targets": [
         "/disciplines/dementation"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "malkavian": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "malkavian": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -670,42 +590,32 @@
       "targets": [
         "/disciplines/dominate"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "lasombra": 1,
-                    "tremere": 1,
-                    "ventrue": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "lasombra": 1,
+              "tremere": 1,
+              "ventrue": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -715,44 +625,34 @@
       "targets": [
         "/disciplines/fortitude"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "cappadocian": 1,
-                    "gangrel": 1,
-                    "ravnos": 1,
-                    "salubri": 1,
-                    "ventrue": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "cappadocian": 1,
+              "gangrel": 1,
+              "ravnos": 1,
+              "salubri": 1,
+              "ventrue": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -762,40 +662,30 @@
       "targets": [
         "/disciplines/mortis"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "cappadocian": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "cappadocian": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -805,40 +695,30 @@
       "targets": [
         "/disciplines/obeah"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "salubri": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "salubri": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -848,43 +728,33 @@
       "targets": [
         "/disciplines/obfuscate"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "assamite": 1,
-                    "followers_of_set": 1,
-                    "malkavian": 1,
-                    "nosferatu": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "assamite": 1,
+              "followers_of_set": 1,
+              "malkavian": 1,
+              "nosferatu": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -894,40 +764,30 @@
       "targets": [
         "/disciplines/obtenebration"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "lasombra": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "lasombra": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -937,42 +797,32 @@
       "targets": [
         "/disciplines/potence"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "brujah": 1,
-                    "lasombra": 1,
-                    "nosferatu": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "brujah": 1,
+              "lasombra": 1,
+              "nosferatu": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -982,43 +832,33 @@
       "targets": [
         "/disciplines/presence"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "brujah": 1,
-                    "followers_of_set": 1,
-                    "toreador": 1,
-                    "ventrue": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "brujah": 1,
+              "followers_of_set": 1,
+              "toreador": 1,
+              "ventrue": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -1028,40 +868,30 @@
       "targets": [
         "/disciplines/protean"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "gangrel": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "gangrel": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -1071,40 +901,30 @@
       "targets": [
         "/disciplines/quietus"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "assamite": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "assamite": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -1114,40 +934,30 @@
       "targets": [
         "/disciplines/serpentis"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "followers_of_set": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "followers_of_set": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -1157,40 +967,30 @@
       "targets": [
         "/disciplines/thaumaturgy"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "tremere": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "tremere": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -1200,40 +1000,30 @@
       "targets": [
         "/disciplines/vicissitude"
       ],
-      "model": {
-        "type": "formula",
-        "formula": {
-          "op": "if",
-          "args": [
-            {
-              "op": "compare",
-              "cmp": "eq",
-              "args": [
-                {
-                  "op": "lookup",
-                  "key": {
-                    "ref": "/clan/clan"
-                  },
-                  "table": {
-                    "tzimisce": 1
-                  },
-                  "default": {
-                    "const": 0
-                  }
-                },
-                {
-                  "const": 1
-                }
-              ]
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
             },
-            {
-              "const": 1
+            "table": {
+              "tzimisce": 1
             },
-            {
-              "const": 1000
+            "default": {
+              "const": 0
             }
-          ]
-        }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
       }
     },
     {
@@ -2304,7 +2094,8 @@
       "model": {
         "type": "current_rating_multiplier",
         "multiplier": 2
-      }
+      },
+      "refund_on_decrease": false
     },
     {
       "id": "willpower_creation",
@@ -2350,7 +2141,8 @@
       "model": {
         "type": "current_rating_multiplier",
         "multiplier": 1
-      }
+      },
+      "refund_on_decrease": false
     }
   ],
   "phase_limits": [],
@@ -4244,7 +4036,10 @@
         "max": 20
       },
       "cancel_at_most": 1,
-      "botch_at_most": 1
+      "botch_at_most": 1,
+      "count_modifier": {
+        "derived": "wound_penalty"
+      }
     },
     {
       "id": "specialty_test",
@@ -4291,7 +4086,10 @@
       "cancel_at_most": 1,
       "botch_at_most": 1,
       "bonus_at_least": 10,
-      "bonus_successes": 1
+      "bonus_successes": 1,
+      "count_modifier": {
+        "derived": "wound_penalty"
+      }
     },
     {
       "id": "attribute",
@@ -4321,7 +4119,10 @@
         "max": 20
       },
       "cancel_at_most": 1,
-      "botch_at_most": 1
+      "botch_at_most": 1,
+      "count_modifier": {
+        "derived": "wound_penalty"
+      }
     },
     {
       "id": "virtue",

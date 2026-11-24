@@ -286,10 +286,21 @@ final readonly class SheetChangeEngine
         // of how a storage engine orders object keys (PostgreSQL JSONB does not keep them).
         $order = array_flip(array_keys($touched));
         uksort($changes, static fn (string $a, string $b): int => [$order[$a] ?? PHP_INT_MAX, $a] <=> [$order[$b] ?? PHP_INT_MAX, $b]);
+        $noRefund = [];
+        foreach ($this->rules['costs'] as $rule) {
+            if (($rule['refund_on_decrease'] ?? true) === false) {
+                $noRefund[(string) $rule['id']] = true;
+            }
+        }
         foreach ($changes as $path => [$from, $to]) {
             if ($to < $from) {
                 foreach ($ledger as $i => $entry) {
-                    if ($entry['path'] === $path && (int) $entry['level'] > $to) {
+                    if ($entry['path'] === $path && (int) $entry['level'] > $to && !($entry['lost'] ?? false)) {
+                        if (isset($noRefund[(string) ($entry['rule'] ?? '')])) {
+                            // A loss (refund_on_decrease: false): the level goes, the spending stays on the ledger.
+                            $ledger[$i]['lost'] = true;
+                            continue;
+                        }
                         $balances[$entry['budget']] = ($balances[$entry['budget']] ?? 0) + (int) $entry['cost'];
                         unset($ledger[$i]);
                     }
@@ -310,6 +321,9 @@ final readonly class SheetChangeEngine
                         break;
                     }
                     try {
+                        if (isset($rule['applies_when']) && !$this->mechanics->applies($rule['applies_when'], $level - 1, $candidate, $grants)) {
+                            continue; // this rule does not price this increment: try the next one
+                        }
                         $cost = $this->mechanics->cost($rule['model'], $level - 1, $candidate, $grants);
                     } catch (FormulaException $e) {
                         $issues[] = new ValidationIssue($e->ruleId, Severity::Error, $touched[$path] ?? [], [$path], ['rule' => $rule['id']]);

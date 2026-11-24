@@ -28,6 +28,8 @@ final readonly class PresetDemoSeeder
         'presets/novtt-demo/demo-linhagens/1.0.0' => ['Linhagens da Névoa (demo)', 'Reserva de d10, prioridades e experiência. Crie seu personagem e envie ao mestre.'],
         'presets/novtt-demo/demo-heroico/1.0.0' => ['Heroico: a Estrada de Sal (demo)', 'd20 com modificadores e níveis por experiência ou marcos. Crie seu personagem e envie ao mestre.'],
         // Third-party presets under rights review: imported into the master's own library only.
+        'presets/world-of-darkness/vampire-v20/0.1.0' => ['Vampiro V20 (teste interno)', 'Uso interno: World of Darkness não é distribuído sem licença aplicável. Mecânicas e nomes para teste; nenhum texto dos livros.', false],
+        'presets/world-of-darkness/vampire-dark-ages-v20/0.1.0' => ['Vampiro: Idade das Trevas (teste interno)', 'Uso interno: World of Darkness não é distribuído sem licença aplicável. Mecânicas e nomes para teste; nenhum texto dos livros.', false],
         'presets/ordem-paranormal-rpg/livro-basico/0.1.1' => ['Ordem Paranormal (teste interno)', 'Conteúdo não oficial, publicado sob a Licença da Comunidade de Ordem Paranormal. Uso interno: publicação bloqueada até revisão jurídica.', false],
     ];
 

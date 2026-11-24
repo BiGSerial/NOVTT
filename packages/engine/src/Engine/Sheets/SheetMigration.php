@@ -40,7 +40,8 @@ final class SheetMigration
                 continue;
             }
             [$exists, $value] = self::read($out, (string) $entry['path']);
-            if ($exists && is_int($value) && $value >= (int) $entry['level']) {
+            // Losses stay recorded (their spending is not given back by adapting the sheet).
+            if (($entry['lost'] ?? false) === true || ($exists && is_int($value) && $value >= (int) $entry['level'])) {
                 $kept[] = $entry;
             }
         }
