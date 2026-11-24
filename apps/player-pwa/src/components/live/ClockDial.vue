@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 /** A threat clock as a dial of segments (click a segment to fill up to it; click the last to empty one). */
-const props = defineProps<{ label: string; segments: number; filled: number; size?: number; editable?: boolean }>()
+const props = defineProps<{ label: string; segments: number; filled: number; size?: number; editable?: boolean; tone?: string }>()
 const emit = defineEmits<{ set: [filled: number] }>()
 const R = 44
 const arcs = computed(() => Array.from({ length: props.segments }, (_, i) => {
@@ -18,7 +18,7 @@ function click(i: number): void {
 </script>
 
 <template>
-  <figure class="clock-dial" :class="{ full: filled >= segments }" :style="{ '--size': `${size ?? 54}px` }">
+  <figure class="clock-dial" :class="[`tone-${tone ?? 'threat'}`, { full: filled >= segments }]" :style="{ '--size': `${size ?? 54}px` }">
     <svg viewBox="0 0 100 100" role="group" :aria-label="`${label}: ${filled} de ${segments}`">
       <circle cx="50" cy="50" r="47" class="dial-rim" />
       <path

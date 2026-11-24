@@ -4,7 +4,8 @@ import ClockDial from '../../components/live/ClockDial.vue'
 import SceneArt from '../../components/live/SceneArt.vue'
 import { ART_LABELS } from '../../live/art'
 import { oracle } from '../../live/oracle'
-import { ART_KEYS, type ArtKey } from '../../live/types'
+import { ART_KEYS, type ArtKey, type Clock } from '../../live/types'
+import ClockDialog from './ClockDialog.vue'
 import { useMaster } from './context'
 import WeatherControl from './WeatherControl.vue'
 
@@ -30,8 +31,9 @@ async function saveAdhoc(now: boolean): Promise<void> {
   await m.addScene({ title: draft.value.title.trim(), goal: draft.value.goal.trim(), art: draft.value.art, read_aloud: draft.value.read_aloud.trim(), npcs: [], complication: '' }, now)
   adding.value = false
 }
-const newClock = ref('')
-function addClock(): void { m.addClock(newClock.value.trim() || 'Nova ameaça'); newClock.value = '' }
+// The clock dialog: null = closed, 'new' = create, a clock = edit it.
+const clockEdit = ref<Clock | 'new' | null>(null)
+const SEEN: Record<string, string> = { master: '🔒 só você', table: '👁 mesa', players: '👤 alguns' }
 const twist = ref('')
 </script>
 
@@ -62,15 +64,12 @@ const twist = ref('')
         </div>
         <blockquote v-if="readOpen && sc?.read_aloud" class="read-aloud">{{ sc.read_aloud }}</blockquote>
       </div>
-      <div class="scene-clocks" aria-label="Relógios de ameaça">
+      <div class="scene-clocks" aria-label="Relógios">
         <div v-for="c in m.compass.clocks" :key="c.id" class="clock-wrap">
-          <ClockDial :label="c.label" :segments="c.segments" :filled="c.filled" editable @set="f => m.setClock(c, f)" />
-          <button type="button" class="clock-x" :aria-label="`Remover relógio ${c.label}`" @click="m.removeClock(c)">×</button>
+          <ClockDial :label="c.label" :segments="c.segments" :filled="c.filled" :tone="c.tone" editable @set="f => m.setClock(c, f)" />
+          <button type="button" class="clock-edit" :title="`Editar ${c.label}`" :aria-label="`Editar relógio ${c.label}`" @click="clockEdit = c">{{ SEEN[c.visibility ?? 'master'] }} ✎</button>
         </div>
-        <form class="clock-new" @submit.prevent="addClock">
-          <input v-model="newClock" maxlength="80" placeholder="Nova ameaça" aria-label="Nome do novo relógio" />
-          <button type="submit" class="small-btn on-art">+ relógio</button>
-        </form>
+        <button type="button" class="clock-add" @click="clockEdit = 'new'">+ relógio</button>
       </div>
     </div>
     <ol v-if="total > 1" class="scene-steps" aria-label="Trama">
@@ -79,6 +78,7 @@ const twist = ref('')
       </li>
     </ol>
 
+    <ClockDialog v-if="clockEdit" :clock="clockEdit === 'new' ? null : clockEdit" @close="clockEdit = null" />
     <div v-if="adding" class="drawer-veil" @click.self="adding = false">
       <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="adhoc-title" @submit.prevent="saveAdhoc(true)" @keydown.escape="adding = false">
         <h2 id="adhoc-title">Cena improvisada</h2>

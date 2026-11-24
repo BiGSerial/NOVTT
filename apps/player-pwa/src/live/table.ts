@@ -1,7 +1,7 @@
 import type { Atmosphere } from './atmosphere'
 import { reactive } from 'vue'
 import type {
-  Clue, Compass, GameSession, Initiative, Plot, Stage, LiveState, MasterNote, OfficialRoll, RevealedNpc, RollRequest,
+  Clock, Clue, Compass, GameSession, Initiative, Plot, Stage, LiveState, MasterNote, OfficialRoll, RevealedNpc, RollRequest,
   SessionEvent, Suggestion, TableSnapshot, Whisper,
 } from './types'
 
@@ -151,6 +151,9 @@ export class TableState {
         this.hooks.onStage?.(stage)
         break
       }
+      case 'clocks.updated':
+        s.session.clocks = (p as { clocks: Clock[] }).clocks
+        break
       case 'atmosphere.updated': {
         const a = p as Atmosphere
         const before = s.session.atmosphere ?? null

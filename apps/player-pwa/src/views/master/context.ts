@@ -188,7 +188,12 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
     try { t.value.local.session(await sessionApi.compass(s.value.session.id, s.value.session.revision, { ...plain(compass), spotlight: { ...compass.spotlight } })) } catch (e) { fail(e) }
   }
   function setClock(c: Clock, filled: number): void { c.filled = filled; void saveCompass() }
-  function addClock(label = 'Nova ameaça', segments = 4): void { compass.clocks.push({ id: `c${Date.now().toString(36)}`, label, segments, filled: 0 }); void saveCompass() }
+  function addClock(c: Omit<Clock, 'id' | 'filled'> & { filled?: number }): void {
+    compass.clocks.push({ filled: 0, ...c, id: `c${Date.now().toString(36)}` }); void saveCompass()
+  }
+  function updateClock(c: Clock): void {
+    compass.clocks = compass.clocks.map(x => x.id === c.id ? { ...c, filled: Math.min(c.filled, c.segments) } : x); void saveCompass()
+  }
   function removeClock(c: Clock): void { compass.clocks = compass.clocks.filter(x => x.id !== c.id); void saveCompass() }
   function spotlight(id: string): void { compass.spotlight = { ...compass.spotlight, [id]: (compass.spotlight[id] ?? 0) + 1 }; void saveCompass() }
   const spotlightLow = computed(() => {
@@ -298,7 +303,7 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
   return {
     table, campaign, t, s, sheets, busy, cast, byId, selection, focus, selected, select, selectMany, clearSelection,
     inScene, toggleInScene, paths, togglePath, suggestionId, fromSuggestion, pathLabels, playerName, fail, request, dismiss, cancel, grant, reveal, pendingFor,
-    saveLive, adjustMany, conditionMany, compass, saveCompass, setClock, addClock, removeClock, spotlight, spotlightLow,
+    saveLive, adjustMany, conditionMany, compass, saveCompass, setClock, addClock, updateClock, removeClock, spotlight, spotlightLow,
     plot, currentScene, savePlot, goToScene, addScene, stage, showStage, showScene, atmosphere, setAtmosphere,
     initiative, initFrom, initMove, initRemove, nextTurn, endInitiative,
     players, whisper, revealClue, addClue, revealNpc, note, upload, setPortrait,

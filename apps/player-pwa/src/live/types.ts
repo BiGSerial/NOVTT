@@ -13,7 +13,10 @@ export interface ResourceTrack { id: string; label: string; current: number; max
 export interface Item { id: string; label: string; qty: number; note?: string }
 export interface LiveState { resources: ResourceTrack[]; conditions: string[]; items?: Item[]; revision: number }
 
-export interface Clock { id: string; label: string; segments: number; filled: number }
+export type ClockTone = 'threat' | 'progress' | 'mystery' | 'neutral'
+export type ClockVisibility = 'master' | 'table' | 'players'
+/** A clock; tone/visibility/player_ids only reach the master (players get their visible share). */
+export interface Clock { id: string; label: string; segments: number; filled: number; tone?: ClockTone; visibility?: ClockVisibility; player_ids?: string[] }
 export interface Compass { scene: string; objective: string; next_clue: string; clocks: Clock[]; spotlight: Record<string, number> }
 export interface InitiativeEntry { kind: 'character' | 'npc'; id: string; name: string }
 export interface Initiative { entries?: InitiativeEntry[]; turn?: number; round?: number }
@@ -52,6 +55,8 @@ export interface GameSession {
   stage?: Stage | null
   /** Weather and time of day the master set for the table (null until set). */
   atmosphere?: Atmosphere | null
+  /** Players only: the clocks shown to the table or to this player. */
+  clocks?: Clock[]
   last_seq: number
   revision: number
   started_at: string

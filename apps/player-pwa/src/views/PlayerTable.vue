@@ -5,6 +5,7 @@ import { provideAtmosphere } from '../live/useAtmosphere'
 import { computed, onMounted, ref, watch } from 'vue'
 import { ApiError } from '../api/client'
 import BrandMark from '../components/BrandMark.vue'
+import ClockDial from '../components/live/ClockDial.vue'
 import Inventory from '../components/live/Inventory.vue'
 import LinkBadge from '../components/live/LinkBadge.vue'
 import Portrait from '../components/live/Portrait.vue'
@@ -52,6 +53,8 @@ const stage = computed(() => s.value.session.stage ?? null)
 const sceneNew = ref(false)
 watch(() => stage.value?.shown_at, (v, o) => { if (v && v !== o && tab.value !== 'scene') sceneNew.value = true })
 watch(tab, v => { if (v === 'scene') sceneNew.value = false })
+// A clock shown or moved also flags the scene tab.
+watch(() => JSON.stringify(s.value.session.clocks ?? []), (v, o) => { if (o !== undefined && v !== o && tab.value !== 'scene') sceneNew.value = true })
 
 function fail(e: unknown): void {
   const code = e instanceof ApiError ? e.code : ''
@@ -186,6 +189,10 @@ async function pickPortrait(ev: Event): Promise<void> {
           </div>
         </article>
         <p v-else class="muted panel">Quando o mestre mostrar uma cena, ela aparece aqui.</p>
+        <section v-if="s.session.clocks?.length" class="player-clocks" aria-label="Relógios">
+          <h3 class="sheet-heading">Relógios</h3>
+          <ClockDial v-for="c in s.session.clocks" :key="c.id" :label="c.label" :segments="c.segments" :filled="c.filled" :tone="c.tone" :size="64" />
+        </section>
         <template v-if="s.session.revealed_npcs.length">
           <h2 class="sheet-heading">Quem vocês conheceram</h2>
           <article v-for="n in s.session.revealed_npcs" :key="n.id" class="met">
