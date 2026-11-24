@@ -109,6 +109,19 @@ export function buildHistory(events: SessionEvent[], ctx: HistoryContext): Histo
       case 'session.status':
         add('table', '⏸', p.status === 'paused' ? 'Sessão pausada' : p.status === 'ended' ? 'Sessão encerrada' : 'Sessão retomada')
         break
+      case 'places.updated': {
+        const places = (p.places as { name: string; character_ids: string[] }[] | undefined) ?? []
+        add('story', '🧭', places.length ? `Locais: ${places.map(x => `${x.name} (${x.character_ids.map(ctx.name).join(', ') || 'ninguém'})`).join(' · ')}` : 'O grupo está junto')
+        break
+      }
+      case 'item_offer.created':
+        add('player', '🎁', `${ctx.name(String(p.from_character_id))} oferece ${p.qty} ${p.item_label} a ${ctx.name(String(p.to_character_id))}`)
+        break
+      case 'item_offer.resolved': {
+        const verb = p.status === 'accepted' ? 'aceitou' : p.status === 'undone' ? 'teve desfeita pelo mestre a troca de' : 'recusou'
+        add('player', '🎁', p.status === 'undone' ? `Mestre desfez: ${p.qty} ${p.item_label} voltou para ${ctx.name(String(p.from_character_id))}` : `${ctx.name(String(p.to_character_id))} ${verb} ${p.qty} ${p.item_label}`)
+        break
+      }
       case 'portrait.updated':
         if (p.kind === 'character') add('player', '🖼', `${ctx.name(String(p.id))} ganhou um novo retrato`)
         break

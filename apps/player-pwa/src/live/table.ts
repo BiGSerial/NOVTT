@@ -1,7 +1,7 @@
 import type { Atmosphere } from './atmosphere'
 import { reactive } from 'vue'
 import type {
-  Clock, Clue, Compass, GameSession, Initiative, Plot, Stage, LiveState, MasterNote, OfficialRoll, RevealedNpc, RollRequest,
+  Clock, Clue, Compass, ItemOffer, Places, GameSession, Initiative, Plot, Stage, LiveState, MasterNote, OfficialRoll, RevealedNpc, RollRequest,
   SessionEvent, Suggestion, TableSnapshot, Whisper,
 } from './types'
 
@@ -18,6 +18,7 @@ export interface TableHooks {
   onRequest?: (r: RollRequest) => void
   onStage?: (stage: Stage | null) => void
   onAtmosphere?: (before: Atmosphere | null, after: Atmosphere) => void
+  onOffer?: (offer: ItemOffer) => void
 }
 
 export type Fetcher = (after: number) => Promise<{ data: SessionEvent[]; last_seq: number; has_more: boolean }>
@@ -153,6 +154,19 @@ export class TableState {
         s.session.stage = stage
         if (revision > s.session.revision) s.session.revision = revision
         this.hooks.onStage?.(stage)
+        break
+      }
+      case 'places.updated':
+        s.session.places = p as Places
+        break
+      case 'item_offer.created':
+      case 'item_offer.resolved': {
+        const o = p as ItemOffer
+        const list = (s.item_offers ??= [])
+        const keep = o.status === 'pending' || (this.isMaster && o.status === 'accepted')
+        const i = list.findIndex(x => x.id === o.id)
+        if (keep) { if (i >= 0) list[i] = o; else list.push(o) } else if (i >= 0) list.splice(i, 1)
+        this.hooks.onOffer?.(o)
         break
       }
       case 'clocks.updated':

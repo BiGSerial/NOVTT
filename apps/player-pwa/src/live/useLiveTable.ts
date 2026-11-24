@@ -107,6 +107,13 @@ export function useLiveTable(campaignId: string, opts: { connect?: () => Promise
         onWhisper: (w: Whisper) => { if (w.sender_user_id !== snap.me.user_id) toast(w.kind === 'clue' ? 'Uma pista chegou só para você' : 'Novo sussurro', 'whisper') },
         onClue: (c: Clue) => toast(`Pista revelada: ${c.title}`, 'clue'),
         onStage: st => { if (st && snap.role !== 'master') toast(`Nova cena: ${st.title}`, 'clue') },
+        onOffer: o => {
+          // Tell the people involved; names come from the snapshot (characters are table-visible).
+          const name = (id: string) => snap.characters.find(c => c.id === id)?.name ?? 'alguém'
+          if (o.status === 'pending' && snap.role !== 'master') toast(`${name(o.from_character_id)} oferece ${o.qty} ${o.item_label} a ${name(o.to_character_id)}`)
+          if (o.status === 'accepted') toast(`${name(o.to_character_id)} recebeu ${o.qty} ${o.item_label}`)
+          if (o.status === 'declined') toast(`Troca recusada: ${o.qty} ${o.item_label}`)
+        },
         onAtmosphere: (before, after) => { const line = snap.role !== 'master' ? describeChange(before, after) : null; if (line) toast(line) },
       })
       state.value = t

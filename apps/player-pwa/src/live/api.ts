@@ -1,7 +1,7 @@
 import type { Atmosphere } from './atmosphere'
 import { api, ApiError, ensureCsrfCookie } from '../api/client'
 import type {
-  AtlasEntry, Campaign, CarryOver, Clue, Item, Plot, Stage, Compass, DiceChoice, GameSession, LiveState, MasterNote, Me, OfficialRoll,
+  AtlasEntry, Campaign, CarryOver, Clue, Item, ItemOffer, Place, Places, Plot, Stage, Compass, DiceChoice, GameSession, LiveState, MasterNote, Me, OfficialRoll,
   ResourceTrack, RollRequest, Roteiro, RoteiroContent, SessionEvent, SheetUi, Suggestion, TableSnapshot, Whisper,
 } from './types'
 
@@ -32,6 +32,13 @@ export const campaigns = {
   list: () => api<{ data: Campaign[] }>('GET', '/campaigns?limit=100'),
   current: (campaignId: string) => api<{ session: GameSession | null }>('GET', `/campaigns/${campaignId}/sessions/current`),
   start: (campaignId: string, title: string, roteiroId: string | null) => mutate<GameSession>('POST', `/campaigns/${campaignId}/sessions`, { title, roteiro_id: roteiroId }, key()),
+}
+
+export const party = {
+  setPlaces: (sessionId: string, revision: number, places: Place[]) => mutate<Places>('PUT', `/sessions/${sessionId}/places`, { revision, places }),
+  offer: (sessionId: string, from: string, to: string, itemId: string, qty: number) =>
+    mutate<ItemOffer>('POST', `/sessions/${sessionId}/item-offers`, { from_character_id: from, to_character_id: to, item_id: itemId, qty }),
+  resolve: (offerId: string, action: 'accept' | 'decline' | 'undo') => mutate<ItemOffer>('POST', `/item-offers/${offerId}/${action}`),
 }
 
 export const session = {

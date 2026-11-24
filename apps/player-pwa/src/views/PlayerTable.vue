@@ -15,11 +15,12 @@ import RollFeed from '../components/live/RollFeed.vue'
 import SceneArt from '../components/live/SceneArt.vue'
 import StatBoard from '../components/live/StatBoard.vue'
 import Vitals from '../components/live/Vitals.vue'
-import { imageUrl, rolls, table as tableApi } from '../live/api'
+import { imageUrl, party, rolls, table as tableApi } from '../live/api'
 import { LONG_SECTION, readPointer, tabOf } from '../live/sheet'
 import type { useLiveTable } from '../live/useLiveTable'
 import { useSheets } from '../live/useSheets'
-import type { Campaign, OfficialRoll, RollRequest } from '../live/types'
+import { near, placeOf, type Campaign, type Item, type ItemOffer, type OfficialRoll, type RollRequest } from '../live/types'
+import ActionDialog from '../components/ui/ActionDialog.vue'
 
 /**
  * The player's phone (SPEC-MVP-003): the character up front (portrait, vitals, conditions), the
@@ -71,6 +72,30 @@ const tabHasRatings = computed(() => tabSections.value.some(x => x.numeric && !x
 const tabLead = computed(() => sheetTab.value === 'Ficha' && tabHasRatings.value)
 
 const myRequests = computed(() => s.value.requests.filter(r => r.roller_user_id === me.value))
+// ---- Party in space (NT-13/14): who is near, offers in and out ----
+const places = computed(() => s.value.session.places ?? null)
+const myPlace = computed(() => (charId.value ? placeOf(places.value, charId.value) : null))
+const isNear = (id: string) => !charId.value || near(places.value, charId.value, id)
+const mineIds = computed(() => new Set(mine.value.map(c => c.id)))
+const incoming = computed(() => (s.value.item_offers ?? []).filter(o => o.status === 'pending' && mineIds.value.has(o.to_character_id)))
+const outgoing = computed(() => (s.value.item_offers ?? []).filter(o => o.status === 'pending' && mineIds.value.has(o.from_character_id)))
+const charName = (id: string) => s.value.characters.find(c => c.id === id)?.name ?? '—'
+const giving = ref<Item | null>(null)
+const giveTo = ref('')
+const giveQty = ref(1)
+const nearby = computed(() => s.value.characters.filter(c => c.id !== charId.value && isNear(c.id)))
+function openGive(it: Item): void { giving.value = it; giveQty.value = 1; giveTo.value = nearby.value[0]?.id ?? '' }
+async function give(): Promise<void> {
+  if (!giving.value || !charId.value || !giveTo.value) return
+  try {
+    await party.offer(s.value.session.id, charId.value, giveTo.value, giving.value.id, giveQty.value)
+    props.table.toast(`Oferta enviada a ${charName(giveTo.value)}`)
+    giving.value = null
+  } catch (e) { fail(e) }
+}
+async function answer(o: ItemOffer, action: 'accept' | 'decline'): Promise<void> {
+  try { await party.resolve(o.id, action) } catch (e) { fail(e) }
+}
 const master = computed(() => s.value.members.find(x => x.role === 'master'))
 const unread = ref(0)
 watch(() => s.value.whispers.length + s.value.clues.filter(c => c.revealed_at).length, (n, o) => { if (n > (o ?? n) && tab.value !== 'diary') unread.value += n - (o ?? n) })
@@ -158,6 +183,17 @@ const turn = computed(() => s.value.session.initiative?.entries?.[s.value.sessio
     <p v-if="s.session.status === 'paused'" class="banner">Sessão pausada pelo mestre.</p>
     <p v-if="turn" class="turn-banner" :class="{ mine: turn.id === charId }">{{ turn.id === charId ? 'É a sua vez!' : `Vez de ${turn.name}` }}</p>
 
+    <section v-if="incoming.length || outgoing.length" class="offers" aria-label="Trocas de itens">
+      <article v-for="o in incoming" :key="o.id" class="offer-card">
+        <p>🎁 <b>{{ charName(o.from_character_id) }}</b> quer te dar <b>{{ o.qty }} {{ o.item_label }}</b></p>
+        <div class="row"><button type="button" class="primary small-btn" @click="answer(o, 'accept')">Aceitar</button><button type="button" class="ghost small-btn" @click="answer(o, 'decline')">Recusar</button></div>
+      </article>
+      <article v-for="o in outgoing" :key="o.id" class="offer-card mine">
+        <p>🎁 Você ofereceu {{ o.qty }} {{ o.item_label }} a <b>{{ charName(o.to_character_id) }}</b>. Aguardando.</p>
+        <button type="button" class="link" @click="answer(o, 'decline')">Desistir</button>
+      </article>
+    </section>
+
     <section v-if="myRequests.length" class="requests" aria-label="Pedidos do mestre">
       <RequestCard v-for="r in myRequests" :key="r.id" :request="r" :can-roll="s.session.status === 'active'" :busy="busy" @roll="roll" />
     </section>
@@ -190,7 +226,8 @@ const turn = computed(() => s.value.session.initiative?.entries?.[s.value.sessio
           <StatBoard v-if="tabSections.length" class="paper-stats" :sections="tabSections" :selected="picked" :selectable="tabHasRatings" :lead="tabLead" @toggle="toggle" />
           <section v-if="sheetTab === 'Itens'" class="paper-box">
             <h3 class="paper-title">Mochila</h3>
-            <Inventory :items="character.live?.items ?? []" />
+            <Inventory :items="character.live?.items ?? []" :givable="s.session.status === 'active' && nearby.length > 0" @give="openGive" />
+            <p v-if="!nearby.length && (character.live?.items ?? []).length" class="paper-note">Ninguém do grupo está perto para receber itens.</p>
             <p v-if="text('/gear/items')" class="paper-note">{{ text('/gear/items') }}</p>
           </section>
           <section v-if="sheetTab === 'Detalhes' && identity.length" class="paper-box">
@@ -230,11 +267,15 @@ const turn = computed(() => s.value.session.initiative?.entries?.[s.value.sessio
             <div><strong>{{ n.name }}</strong><p v-if="n.summary" class="small">{{ n.summary }}</p></div>
           </article>
         </template>
-        <h2 class="sheet-heading">O grupo</h2>
+        <h2 class="sheet-heading">O grupo<template v-if="myPlace"> · seu local: {{ myPlace.name }}</template></h2>
         <div class="party-grid">
-          <article v-for="c in s.characters" :key="c.id" class="party-member" :class="{ me: c.id === charId }">
+          <article v-for="c in s.characters" :key="c.id" class="party-member" :class="{ me: c.id === charId, far: !isNear(c.id) }" :title="isNear(c.id) ? 'Perto' : 'Longe: fora de alcance'">
             <Portrait :name="c.name" :image-id="c.portrait_image_id" :live="c.live" :size="52" />
-            <div><strong>{{ c.name }}</strong><small v-if="c.live?.conditions?.length">{{ c.live.conditions.join(' · ') }}</small></div>
+            <div>
+              <strong>{{ c.name }}</strong>
+              <small class="reach">{{ c.id === charId ? (myPlace ? myPlace.name : 'você') : isNear(c.id) ? 'perto' : `longe${placeOf(places, c.id) ? ` · ${placeOf(places, c.id)!.name}` : ''}` }}</small>
+              <small v-if="c.live?.conditions?.length" class="conds">{{ c.live.conditions.join(' · ') }}</small>
+            </div>
           </article>
         </div>
         <template v-if="s.session.initiative?.entries?.length">
@@ -271,5 +312,21 @@ const turn = computed(() => s.value.session.initiative?.entries?.[s.value.sessio
       <button type="button" :class="{ on: tab === 'diary' }" :aria-current="tab === 'diary' ? 'page' : undefined" @click="tab = 'diary'"><span aria-hidden="true">✎</span>Diário<span v-if="unread" class="badge">{{ unread }}</span></button>
       <button type="button" :class="{ on: tab === 'rolls' }" :aria-current="tab === 'rolls' ? 'page' : undefined" @click="tab = 'rolls'"><span aria-hidden="true">⬡</span>Rolagens</button>
     </nav>
+    <ActionDialog v-if="giving" :title="`Dar ${giving.label}`" @close="giving = null" @submit="give">
+      <label>Para quem (só quem está perto)
+        <select v-model="giveTo"><option v-for="c in nearby" :key="c.id" :value="c.id">{{ c.name }}</option></select>
+      </label>
+      <div class="field-row">
+        <span class="field-label">Quantidade</span>
+        <span class="stepper-inline">
+          <button type="button" class="step" aria-label="Menos" :disabled="giveQty <= 1" @click="giveQty--">−</button>
+          <output aria-live="polite">{{ giveQty }}</output>
+          <button type="button" class="step" aria-label="Mais" :disabled="giveQty >= giving.qty" @click="giveQty++">+</button>
+        </span>
+        <span class="muted small">de {{ giving.qty }}</span>
+      </div>
+      <p class="muted small">A pessoa precisa aceitar. O mestre vê a troca.</p>
+      <template #actions><span class="grow" /><button type="button" class="ghost" @click="giving = null">Cancelar</button><button type="submit" class="primary" :disabled="!giveTo">Oferecer</button></template>
+    </ActionDialog>
   </div>
 </template>

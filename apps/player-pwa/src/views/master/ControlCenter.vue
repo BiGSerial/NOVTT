@@ -5,6 +5,7 @@ import { world } from '../../live/api'
 import { oracle } from '../../live/oracle'
 import type { RoteiroContent } from '../../live/types'
 import { useMaster } from './context'
+import PlacesDialog from './PlacesDialog.vue'
 
 /**
  * The centre of the console when nobody is selected (NT-12): the current scene's prep as a
@@ -50,6 +51,14 @@ const wants = computed(() => s.value.characters.map(c => ({
   asks: s.value.suggestions.filter(x => x.campaign_character_id === c.id).length,
 })))
 const twist = ref('')
+const editingPlaces = ref(false)
+const placeGroups = computed(() => {
+  const places = m.places.value?.places ?? []
+  const placed = new Set(places.flatMap(p => p.character_ids))
+  const rest = s.value.characters.filter(c => !placed.has(c.id))
+  return [...places.map(p => ({ name: p.name, people: s.value.characters.filter(c => p.character_ids.includes(c.id)) })), ...(rest.length ? [{ name: places.length ? 'Com o grupo' : 'Todos juntos', people: rest }] : [])]
+})
+const nameOf = (id: string) => s.value.characters.find(c => c.id === id)?.name ?? '—'
 const rewards = computed(() => prep.value?.rewards?.filter(Boolean) ?? [])
 </script>
 
@@ -129,6 +138,23 @@ const rewards = computed(() => prep.value?.rewards?.filter(Boolean) ?? [])
         <button type="button" class="link" @click="m.selectMany(s.characters.map(c => ({ kind: 'character', id: c.id })))">Selecionar o grupo todo</button>
       </article>
 
+      <article class="cc-card cc-places">
+        <h3>Onde cada um está</h3>
+        <ul class="cc-list place-groups">
+          <li v-for="g in placeGroups" :key="g.name"><b>{{ g.name }}</b>: {{ g.people.map(p => p.name).join(', ') || 'ninguém' }}</li>
+        </ul>
+        <button type="button" class="small-btn" @click="editingPlaces = true">Separar o grupo</button>
+        <template v-if="m.offers.value.length">
+          <p class="cc-sub">Trocas de itens</p>
+          <ul class="cc-clues">
+            <li v-for="o in m.offers.value" :key="o.id">🎁 {{ nameOf(o.from_character_id) }} → {{ nameOf(o.to_character_id) }}: {{ o.qty }} {{ o.item_label }}
+              <span class="muted small">({{ o.status === 'pending' ? 'aguardando' : 'aceita' }})</span>
+              <button v-if="o.status === 'accepted'" type="button" class="link" @click="m.undoOffer(o)">desfazer</button>
+            </li>
+          </ul>
+        </template>
+      </article>
+
       <article v-if="place" class="cc-card">
         <h3>{{ place.name }}</h3>
         <ul class="cc-list"><li v-for="a in place.aspects" :key="a">{{ a }}</li></ul>
@@ -140,6 +166,7 @@ const rewards = computed(() => prep.value?.rewards?.filter(Boolean) ?? [])
       </article>
     </div>
 
+    <PlacesDialog v-if="editingPlaces" @close="editingPlaces = false" />
     <p v-if="loaded && !prep" class="cc-noprep muted small">
       Esta sessão não tem roteiro. <a :href="`#/roteiro/${m.campaign.id}`" target="_blank" rel="noopener">Monte um no Roteiro</a> para ver falas, desejos e segredos aqui.
     </p>

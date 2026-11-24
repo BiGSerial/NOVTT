@@ -1,13 +1,13 @@
 import { computed, inject, provide, reactive, ref, watch, type ComputedRef, type InjectionKey, type Ref } from 'vue'
 import { ApiError } from '../../api/client'
 import { DEFAULT_ATMOSPHERE, type Atmosphere } from '../../live/atmosphere'
-import { images, rolls, session as sessionApi, table as tableApi, type RequestInput } from '../../live/api'
+import { images, party, rolls, session as sessionApi, table as tableApi, type RequestInput } from '../../live/api'
 import { plain } from '../../live/sheet'
 import type { TableState } from '../../live/table'
 import type { useLiveTable } from '../../live/useLiveTable'
 import { useSheets } from '../../live/useSheets'
 import type {
-  Campaign, Clock, Compass, DiceChoice, Item, LiveState, OfficialRoll, Plot, PlotScene, ResourceTrack, RollRequest, Stage, Suggestion, TableSnapshot,
+  Campaign, Clock, Compass, ItemOffer, Place, DiceChoice, Item, LiveState, OfficialRoll, Plot, PlotScene, ResourceTrack, RollRequest, Stage, Suggestion, TableSnapshot,
 } from '../../live/types'
 
 export type SubjectKind = 'character' | 'npc'
@@ -271,6 +271,20 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
       table.toast(next ? 'Cena mostrada aos jogadores' : 'Tela dos jogadores recolhida')
     } catch (e) { fail(e) }
   }
+  // ---------- Places (who is near whom) and item offers ----------
+  const places = computed(() => s.value.session.places ?? null)
+  async function savePlaces(list: Place[]): Promise<boolean> {
+    try {
+      const saved = await party.setPlaces(s.value.session.id, places.value?.revision ?? 0, list)
+      s.value.session.places = saved
+      table.toast(list.length ? 'Locais atualizados' : 'O grupo está junto')
+      return true
+    } catch (e) { fail(e); return false }
+  }
+  const offers = computed(() => s.value.item_offers ?? [])
+  async function undoOffer(o: ItemOffer): Promise<void> {
+    try { await party.resolve(o.id, 'undo'); table.toast('Troca desfeita') } catch (e) { fail(e) }
+  }
   // ---------- Atmosphere (weather, time of day) ----------
   const atmosphere = computed<Atmosphere>(() => s.value.session.atmosphere ?? DEFAULT_ATMOSPHERE)
   let atmosphereTimer: ReturnType<typeof setTimeout> | undefined
@@ -347,7 +361,7 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
     table, campaign, t, s, sheets, busy, cast, byId, selection, focus, selected, select, selectMany, clearSelection,
     inScene, toggleInScene, paths, togglePath, suggestionId, fromSuggestion, pathLabels, playerName, fail, request, dismiss, cancel, grant, reveal, pendingFor,
     saveLive, adjustMany, conditionMany, compass, saveCompass, setClock, addClock, updateClock, removeClock, spotlight, spotlightLow,
-    plot, currentScene, savePlot, goToScene, addScene, stage, showStage, showScene, atmosphere, setAtmosphere,
+    places, savePlaces, offers, undoOffer, plot, currentScene, savePlot, goToScene, addScene, stage, showStage, showScene, atmosphere, setAtmosphere,
     initiative, initFrom, initMove, initRemove, nextTurn, endInitiative,
     players, whisper, revealClue, addClue, revealNpc, note, upload, setPortrait,
   }

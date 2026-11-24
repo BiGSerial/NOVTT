@@ -4,8 +4,8 @@ import type { Item } from '../../live/types'
 import ActionDialog from '../ui/ActionDialog.vue'
 
 /** Items carried (live state). The master grants, spends and removes; players read their own. */
-const props = defineProps<{ items: Item[]; editable?: boolean; busy?: boolean }>()
-const emit = defineEmits<{ save: [items: Item[]] }>()
+const props = defineProps<{ items: Item[]; editable?: boolean; busy?: boolean; givable?: boolean }>()
+const emit = defineEmits<{ save: [items: Item[]]; give: [item: Item] }>()
 const giving = ref(false)
 const form = ref({ label: '', qty: 1, note: '' })
 function open(): void { form.value = { label: '', qty: 1, note: '' }; giving.value = true }
@@ -28,6 +28,7 @@ const qty = (it: Item, d: number) => emit('save', props.items.map(i => (i.id ===
     <ul>
       <li v-for="it in items" :key="it.id" class="item">
         <span class="item-qty">{{ it.qty }}×</span><span class="item-label">{{ it.label }}<small v-if="it.note">{{ it.note }}</small></span>
+        <button v-if="givable" type="button" class="link item-give" :aria-label="`Dar ${it.label} a alguém`" @click="emit('give', it)">Dar…</button>
         <span v-if="editable" class="item-steps">
           <button type="button" :disabled="busy" :aria-label="`Gastar ${it.label}`" @click="qty(it, -1)">−</button>
           <button type="button" :disabled="busy" :aria-label="`Mais ${it.label}`" @click="qty(it, 1)">+</button>

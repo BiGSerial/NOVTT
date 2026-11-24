@@ -62,6 +62,8 @@ export interface GameSession {
   atmosphere?: Atmosphere | null
   /** Players only: the clocks shown to the table or to this player. */
   clocks?: Clock[]
+  /** Who is near whom (null until the master sets places). */
+  places?: Places | null
   last_seq: number
   revision: number
   started_at: string
@@ -119,6 +121,16 @@ export interface OfficialRoll {
 
 export interface Whisper { id: string; sender_user_id: string; recipient_user_id: string; kind: 'message' | 'clue'; body: string; created_at: string }
 export interface Clue { id: string; scene: string | null; title: string; body: string; revealed_to: 'table' | 'user' | null; revealed_user_id: string | null; revealed_at: string | null; image_id?: string | null }
+export interface Place { id: string; name: string; character_ids: string[] }
+export interface Places { revision: number; places: Place[] }
+export interface ItemOffer { id: string; session_id?: string; from_character_id: string; to_character_id: string; item_id: string; item_label: string; qty: number; status: 'pending' | 'accepted' | 'declined' | 'undone'; created_at?: string | null }
+/** Near when both share a place, or nobody/neither is placed (SPEC-MVP-003 NT-13). */
+export function placeOf(places: Places | null | undefined, characterId: string): Place | null {
+  return places?.places.find(p => p.character_ids.includes(characterId)) ?? null
+}
+export function near(places: Places | null | undefined, a: string, b: string): boolean {
+  return a === b || placeOf(places, a)?.id === placeOf(places, b)?.id
+}
 export interface Suggestion { id: string; campaign_character_id: string; character_name: string; player_user_id: string; paths: string[]; note: string | null; status: 'pending' | 'accepted' | 'dismissed' }
 export interface MasterNote { id: string; session_id: string | null; body: string; tags: string[]; pinned: boolean; revision: number; updated_at: string | null }
 
@@ -135,6 +147,7 @@ export interface TableSnapshot {
   whispers: Whisper[]
   clues: Clue[]
   suggestions: Suggestion[]
+  item_offers?: ItemOffer[]
   notes: MasterNote[]
 }
 
