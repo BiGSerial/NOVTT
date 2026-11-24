@@ -11,6 +11,7 @@ use App\Models\CampaignMember;
 use App\Models\CampaignNpc;
 use App\Models\Clue;
 use App\Models\GameSession;
+use App\Models\ItemOffer;
 use App\Models\LiveState;
 use App\Models\MasterNote;
 use App\Models\OfficialRoll;
@@ -40,6 +41,8 @@ final class TableSnapshot
             'revealed_npcs' => $s->revealed_npcs ?? [],
             'stage' => $s->stage,
             'atmosphere' => $s->atmosphere,
+            // Who is near whom: table-visible (players see who they can reach).
+            'places' => $s->places,
             'last_seq' => $s->last_seq,
             'revision' => $s->revision,
             'started_at' => $s->started_at->format(DATE_RFC3339_EXTENDED),
@@ -118,6 +121,10 @@ final class TableSnapshot
             'whispers' => $whispers->map(static fn (Whisper $w): array => LiveViews::whisper($w))->values(),
             'clues' => $clues->map(static fn (Clue $c): array => LiveViews::clue($c, $asMaster))->values(),
             'suggestions' => $suggestions->map(static fn (RollSuggestion $s): array => LiveViews::suggestion($s, (string) ($names[$s->campaign_character_id] ?? '')))->values(),
+            // Item offers this viewer is part of (the master sees all pending and accepted ones).
+            'item_offers' => ItemOffer::query()->where('session_id', $session->getKey())->whereIn('status', $asMaster ? ['pending', 'accepted'] : ['pending'])
+                ->when(! $asMaster, fn ($q) => $q->where(fn ($v) => $v->whereIn('from_character_id', $this->controlledBy($characters, $me))->orWhereIn('to_character_id', $this->controlledBy($characters, $me))))
+                ->orderBy('created_at')->limit(100)->get()->map(static fn (ItemOffer $o): array => \App\Http\Controllers\Api\V1\Live\PartyController::view($o))->values(),
             'notes' => $asMaster ? MasterNote::query()->where('campaign_id', $campaignId)->whereNull('deleted_at')->orderByDesc('pinned')->orderByDesc('updated_at')->limit(200)->get()
                 ->map(static fn (MasterNote $n): array => LiveViews::note($n))->values() : [],
         ];
@@ -139,6 +146,12 @@ final class TableSnapshot
     }
 
     /** @return list<string> */
+    /** @return list<string> ids of the characters a user controls */
+    private function controlledBy($characters, string $userId): array
+    {
+        return $characters->filter(static fn (CampaignCharacter $c): bool => ($c->custodian_user_id ?? $c->player_user_id) === $userId)->pluck('id')->map(static fn ($id): string => (string) $id)->values()->all();
+    }
+
     private function masterIds($members): array
     {
         return $members->filter(static fn ($m): bool => (is_string($m->role) ? $m->role : $m->role->value) === 'master')->pluck('user_id')->all();

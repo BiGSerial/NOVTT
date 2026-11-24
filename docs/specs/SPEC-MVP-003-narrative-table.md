@@ -112,6 +112,20 @@ hidden), not an empty prompt. The side column is for refinement: notes, roll rev
 history of everything that happened in the session (player actions and rolls). Master actions
 that need more than one control open in a dialog instead of expanding inline under a panel.
 
+### NT-13 Places: who is near whom (owner decision 2026-11-23)
+The master groups characters into named places (`PUT /sessions/{id}/places`, own revision,
+table event `places.updated`). Characters sharing a place are near; with no places, or when
+neither is placed, everyone is together. Players see the party with far members greyed out and
+every member's visible conditions.
+
+### NT-14 Item exchange between nearby characters (owner decision 2026-11-23)
+A player offers an item of their character to a nearby character; the receiver accepts or
+declines, the giver may withdraw. The server checks who controls the giver, the distance and the
+quantity at offer and again at acceptance, then moves the items (merged by name at the
+receiver) and emits `live.updated` for both. The master sees offers in the history and may undo
+an accepted one. Events `item_offer.created` / `item_offer.resolved` reach the master, the giver
+and the receiver only.
+
 ### Owner decisions 2026-11-23 (later phases)
 - Proximity: the master groups characters into named places; same place = near. Players see who
   is near, far members greyed as unreachable, and visible party conditions.

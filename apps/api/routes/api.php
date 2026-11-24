@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\LibraryController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\Live\ImageController;
 use App\Http\Controllers\Api\V1\Live\RollController;
+use App\Http\Controllers\Api\V1\Live\PartyController;
 use App\Http\Controllers\Api\V1\Live\SessionController;
 use App\Http\Controllers\Api\V1\Live\TableController;
 use App\Http\Controllers\Api\V1\Live\WorldController;
@@ -102,6 +103,11 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:novtt-api'])->group(f
     // Live table (SPEC-MVP-002).
     Route::get('campaigns/{campaignId}/sessions/current', [SessionController::class, 'current'])->whereUuid('campaignId');
     Route::post('campaigns/{campaignId}/sessions', [SessionController::class, 'start'])->whereUuid('campaignId');
+    Route::put('sessions/{sessionId}/places', [PartyController::class, 'places'])->whereUuid('sessionId');
+    Route::post('sessions/{sessionId}/item-offers', [PartyController::class, 'offer'])->whereUuid('sessionId');
+    Route::post('item-offers/{offerId}/accept', [PartyController::class, 'accept'])->whereUuid('offerId');
+    Route::post('item-offers/{offerId}/decline', [PartyController::class, 'decline'])->whereUuid('offerId');
+    Route::post('item-offers/{offerId}/undo', [PartyController::class, 'undo'])->whereUuid('offerId');
     Route::post('sessions/{sessionId}/{action}', [SessionController::class, 'transition'])->whereUuid('sessionId')->whereIn('action', ['pause', 'resume', 'end']);
     Route::get('sessions/{sessionId}/snapshot', [SessionController::class, 'snapshot'])->whereUuid('sessionId');
     Route::get('sessions/{sessionId}/events', [SessionController::class, 'events'])->whereUuid('sessionId');

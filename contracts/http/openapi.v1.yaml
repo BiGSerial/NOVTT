@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.10.0-me
+  version: 1.11.0-party
   license:
     name: MIT
     identifier: MIT
@@ -462,6 +462,65 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CampaignCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /sessions/{sessionId}/places:
+    put:
+      operationId: setSessionPlaces
+      tags: [live]
+      summary: Master groups characters into named places (who is near whom); table event places.updated
+      description: Characters sharing a place are near; with no places (or both unplaced) everyone is together. A character may be in one place only. Errors places.character_invalid / places.revision_mismatch (409).
+      parameters: [{ name: sessionId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [revision, places], properties: { revision: { type: integer, minimum: 0 }, places: { type: array, maxItems: 12, items: { $ref: '#/components/schemas/Place' } } } } } } }
+      responses:
+        '200': { description: Stored places, content: { application/json: { schema: { $ref: '#/components/schemas/Places' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /sessions/{sessionId}/item-offers:
+    post:
+      operationId: offerItem
+      tags: [live]
+      summary: A player offers an item of their character to a nearby character
+      description: Validated on the server (controller of the giver, same place, quantity). Events item_offer.created to the master, the giver and the receiver. Errors item.too_far / item.not_enough (409), item.not_yours (403).
+      parameters: [{ name: sessionId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [from_character_id, to_character_id, item_id, qty], properties: { from_character_id: { type: string, format: uuid }, to_character_id: { type: string, format: uuid }, item_id: { type: string, maxLength: 40 }, qty: { type: integer, minimum: 1, maximum: 999 } } } } } }
+      responses:
+        '201': { description: Pending offer, content: { application/json: { schema: { $ref: '#/components/schemas/ItemOffer' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /item-offers/{offerId}/accept:
+    post:
+      operationId: acceptItemOffer
+      tags: [live]
+      summary: "The receiver accepts: distance and quantity re-checked, items move (live.updated for both)"
+      parameters: [{ name: offerId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Resolved offer, content: { application/json: { schema: { $ref: '#/components/schemas/ItemOffer' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /item-offers/{offerId}/decline:
+    post:
+      operationId: declineItemOffer
+      tags: [live]
+      summary: The receiver declines or the giver withdraws
+      parameters: [{ name: offerId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Resolved offer, content: { application/json: { schema: { $ref: '#/components/schemas/ItemOffer' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /item-offers/{offerId}/undo:
+    post:
+      operationId: undoItemOffer
+      tags: [live]
+      summary: The master undoes an accepted offer (items move back)
+      parameters: [{ name: offerId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Resolved offer, content: { application/json: { schema: { $ref: '#/components/schemas/ItemOffer' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
   /me/preferences:
@@ -2399,6 +2458,7 @@ components:
         plot: { $ref: '#/components/schemas/Plot', description: Masters only }
         stage: { oneOf: [{ $ref: '#/components/schemas/Stage' }, { type: 'null' }], description: What the whole table sees now }
         atmosphere: { oneOf: [{ $ref: '#/components/schemas/Atmosphere' }, { type: 'null' }], description: Time of day and weather for the whole table; null until the master sets it }
+        places: { oneOf: [{ $ref: '#/components/schemas/Places' }, { type: 'null' }], description: Who is near whom (table-visible); null when the master never set places }
         clocks: { type: array, items: { $ref: '#/components/schemas/PlayerClock' }, description: 'Players only: the clocks shown to the table or to this player (no visibility metadata). Masters read compass.clocks instead.' }
         last_seq: { type: integer }
         revision: { type: integer }
@@ -2425,6 +2485,32 @@ components:
               visibility: { enum: [master, table, players], default: master, description: 'master: console only; table: every player; players: only player_ids' }
               player_ids: { type: array, maxItems: 20, items: { type: string, format: uuid }, description: 'User ids when visibility = players; ids that are not active players of the campaign are dropped' }
         spotlight: { type: object, additionalProperties: { type: integer, minimum: 0 }, description: 'Moments in the spotlight per character id' }
+    Place:
+      type: object
+      required: [id, name, character_ids]
+      properties:
+        id: { type: string, pattern: '^[a-z0-9-]{1,40}$' }
+        name: { type: string, minLength: 1, maxLength: 60 }
+        character_ids: { type: array, maxItems: 30, items: { type: string, format: uuid } }
+    Places:
+      type: object
+      required: [revision, places]
+      properties:
+        revision: { type: integer }
+        places: { type: array, items: { $ref: '#/components/schemas/Place' } }
+    ItemOffer:
+      type: object
+      required: [id, from_character_id, to_character_id, item_id, item_label, qty, status]
+      properties:
+        id: { type: string, format: uuid }
+        session_id: { type: string, format: uuid }
+        from_character_id: { type: string, format: uuid }
+        to_character_id: { type: string, format: uuid }
+        item_id: { type: string }
+        item_label: { type: string }
+        qty: { type: integer }
+        status: { enum: [pending, accepted, declined, undone] }
+        created_at: { type: [string, 'null'], format: date-time }
     Preferences:
       type: object
       required: [dice_sets, active_dice_set]
@@ -2744,6 +2830,7 @@ components:
         whispers: { type: array, items: { $ref: '#/components/schemas/Whisper' } }
         clues: { type: array, items: { $ref: '#/components/schemas/Clue' } }
         suggestions: { type: array, items: { $ref: '#/components/schemas/RollSuggestion' } }
+        item_offers: { type: array, description: 'Pending offers the viewer gives or receives (master: all pending and accepted)', items: { $ref: '#/components/schemas/ItemOffer' } }
         notes: { type: array, items: { $ref: '#/components/schemas/MasterNote' } }
     RoteiroContent:
       type: object
