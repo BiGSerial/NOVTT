@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.8.0-campaign-summaries
+  version: 1.9.0-sheet-versions
   license:
     name: MIT
     identifier: MIT
@@ -455,12 +455,63 @@ paths:
               properties:
                 name: { type: string, minLength: 1, maxLength: 120 }
                 library_character_id: { type: string, format: uuid }
+                from_campaign_character_id: { type: string, format: uuid, description: "One of the actor's characters in another campaign: same preset family carries the sheet (adapted to this campaign's version, points re-checked); another game brings only the name" }
       responses:
         '201':
           description: Created (status draft)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CampaignCharacter' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /campaigns/{campaignId}/preset-upgrades:
+    get:
+      operationId: listCampaignPresetUpgrades
+      tags: [Campaigns]
+      summary: Newer versions of the campaign's preset the actor may move to
+      parameters: [{ name: campaignId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200':
+          description: Current version and newer pinnable versions of the same preset
+          content: { application/json: { schema: { type: object, required: [current, data], properties: { current: { type: object, properties: { id: { type: string, format: uuid }, version: { type: string } } }, data: { type: array, items: { type: object, properties: { id: { type: string, format: uuid }, version: { type: string } } } } } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /campaigns/{campaignId}/preset-upgrade:
+    post:
+      operationId: upgradeCampaignPreset
+      tags: [Campaigns]
+      summary: Master moves the campaign to another version of the same preset
+      description: Characters keep their version until adapted (POST /campaign-characters/{id}/adaptation). Errors campaign.preset_upgrade_unavailable (422), campaign.revision_mismatch (409), campaign.master_only (403).
+      parameters: [{ name: campaignId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, additionalProperties: false, required: [preset_version_id, expected_revision], properties: { preset_version_id: { type: string, format: uuid }, expected_revision: { type: integer, minimum: 1 } } } } }
+      responses:
+        '200': { description: Updated campaign, content: { application/json: { schema: { $ref: '#/components/schemas/Campaign' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /campaign-characters/{campaignCharacterId}/adaptation:
+    parameters: [{ name: campaignCharacterId, in: path, required: true, schema: { type: string, format: uuid } }]
+    get:
+      operationId: previewCharacterAdaptation
+      tags: [Characters]
+      summary: What adapting the character to the campaign's sheet version keeps and drops (owner or master)
+      responses:
+        '200': { description: Adaptation report, content: { application/json: { schema: { $ref: '#/components/schemas/AdaptationReport' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      operationId: adaptCharacter
+      tags: [Characters]
+      summary: Adapt the character to the campaign's sheet version
+      description: Keeps valid values, drops the rest (reported), records the new revision, carries drafts over without operations on removed fields, withdraws active proposals; an approved character goes back to pending_approval. Errors character.revision_mismatch / character.already_current (409).
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, additionalProperties: false, required: [expected_sheet_revision], properties: { expected_sheet_revision: { type: integer, minimum: 0 } } } } }
+      responses:
+        '200': { description: Report and the adapted character, content: { application/json: { schema: { type: object, required: [report, character], properties: { report: { $ref: '#/components/schemas/AdaptationReport' }, character: { $ref: '#/components/schemas/CampaignCharacter' } } } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
   /campaign-characters/{campaignCharacterId}:
@@ -2302,6 +2353,20 @@ components:
               visibility: { enum: [master, table, players], default: master, description: 'master: console only; table: every player; players: only player_ids' }
               player_ids: { type: array, maxItems: 20, items: { type: string, format: uuid }, description: 'User ids when visibility = players; ids that are not active players of the campaign are dropped' }
         spotlight: { type: object, additionalProperties: { type: integer, minimum: 0 }, description: 'Moments in the spotlight per character id' }
+    AdaptationReport:
+      type: object
+      required: [needed, from_version, to_version, kept, dropped, draft_operations_dropped, needs_approval]
+      properties:
+        needed: { type: boolean }
+        from_version: { type: string }
+        to_version: { type: string }
+        from_version_id: { type: string, format: uuid }
+        to_version_id: { type: string, format: uuid }
+        kept: { type: integer }
+        dropped: { type: array, items: { type: object, required: [path, reason], properties: { path: { type: string }, reason: { enum: [field_removed, option_removed, out_of_range, type, length, pattern, incomplete, too_many_items] } } } }
+        draft_operations_dropped: { type: integer }
+        needs_approval: { type: boolean }
+        proposals_withdrawn: { type: integer }
     PlayerClock:
       type: object
       required: [id, label, segments, filled, tone]

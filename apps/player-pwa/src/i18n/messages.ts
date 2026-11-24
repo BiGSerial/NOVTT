@@ -40,6 +40,13 @@ const messages: Record<string, (p: Params) => string> = {
   'derived.evaluation_failed': () => 'Não foi possível calcular este valor com os dados atuais.',
   'character.creation_incomplete': () => 'A criação ainda tem etapas incompletas.',
   'character.locked_by_session': () => 'A ficha está travada durante a sessão ao vivo. Envie a proposta depois.',
+  'character.already_current': () => 'A ficha já está na versão da campanha.',
+  'character.revision_mismatch': () => 'A ficha mudou enquanto você olhava. Confira de novo.',
+  'character.source_unavailable': () => 'Esse personagem não pode ser trazido.',
+  'character.not_yours': () => 'Só o dono do personagem ou o mestre pode fazer isso.',
+  'campaign.preset_upgrade_unavailable': () => 'Essa versão não pode ser usada nesta campanha.',
+  'campaign.revision_mismatch': () => 'A campanha mudou em outra janela. Recarregue.',
+  'campaign.master_only': () => 'Só o mestre pode fazer isso.',
   // Campaign set-up and master review.
   'campaign.preset_unavailable': () => 'Este preset não está disponível para campanhas.',
   'campaign.archived': () => 'A campanha está arquivada.',

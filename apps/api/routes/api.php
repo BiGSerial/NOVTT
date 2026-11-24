@@ -35,6 +35,8 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:novtt-api'])->group(f
 
     Route::get('campaigns', [CampaignController::class, 'index']);
     Route::post('campaigns', [CampaignController::class, 'store']);
+    Route::get('campaigns/{campaignId}/preset-upgrades', [CampaignController::class, 'presetUpgrades'])->whereUuid('campaignId');
+    Route::post('campaigns/{campaignId}/preset-upgrade', [CampaignController::class, 'upgradePreset'])->whereUuid('campaignId');
     Route::get('campaigns/{campaignId}', [CampaignController::class, 'show'])->whereUuid('campaignId');
     Route::patch('campaigns/{campaignId}', [CampaignController::class, 'update'])->whereUuid('campaignId');
     Route::post('campaigns/{campaignId}/archive', [CampaignController::class, 'archive'])->whereUuid('campaignId');
@@ -57,6 +59,8 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:novtt-api'])->group(f
     Route::get('campaigns/{campaignId}/npcs', [CampaignCharacterController::class, 'npcs'])->whereUuid('campaignId');
     Route::post('campaigns/{campaignId}/npcs', [CampaignCharacterController::class, 'storeNpc'])->whereUuid('campaignId');
     Route::get('campaign-characters/{campaignCharacterId}', [CampaignCharacterController::class, 'show'])->whereUuid('campaignCharacterId');
+    Route::get('campaign-characters/{campaignCharacterId}/adaptation', [CampaignCharacterController::class, 'adaptation'])->whereUuid('campaignCharacterId');
+    Route::post('campaign-characters/{campaignCharacterId}/adaptation', [CampaignCharacterController::class, 'adapt'])->whereUuid('campaignCharacterId');
     Route::post('campaign-characters/{campaignCharacterId}/archive', [CampaignCharacterController::class, 'archive'])->whereUuid('campaignCharacterId');
     Route::post('campaign-characters/{campaignCharacterId}/transfer', [CampaignCharacterController::class, 'transfer'])->whereUuid('campaignCharacterId');
     Route::put('campaign-characters/{campaignCharacterId}/custody', [CampaignCharacterController::class, 'takeCustody'])->whereUuid('campaignCharacterId');

@@ -51,6 +51,62 @@ final class CampaignController extends ApiController
     }
 
     /**
+     * The master moves the campaign to another version of the same preset (e.g. 0.1.0 → 0.1.1).
+     * Characters keep their version until each one is adapted (owner or master), so nothing is
+     * rewritten behind anyone's back.
+     */
+    public function upgradePreset(Request $request, string $campaignId): JsonResponse
+    {
+        $actor = $this->actor($request);
+        $data = $this->input($request, ['preset_version_id' => ['required', 'uuid'], 'expected_revision' => ['required', 'integer', 'min:1']]);
+        $campaign = DB::transaction(function () use ($actor, $campaignId, $data): Campaign {
+            $campaign = Campaign::query()->lockForUpdate()->find($campaignId) ?? throw ApiProblem::notFound();
+            $role = CampaignMember::query()->where(['campaign_id' => $campaignId, 'user_id' => $actor->getKey(), 'status' => MemberStatus::Active])->value('role');
+            if ($role === null) {
+                throw ApiProblem::notFound();
+            }
+            if ((is_string($role) ? $role : $role->value) !== CampaignRole::Master->value) {
+                throw new ApiProblem(403, 'campaign.master_only');
+            }
+            if ($campaign->status !== CampaignStatus::Active) {
+                throw ApiProblem::conflict('campaign.archived');
+            }
+            if ($campaign->revision !== (int) $data['expected_revision']) {
+                throw ApiProblem::conflict('campaign.revision_mismatch', $campaign->revision);
+            }
+            $current = PresetVersion::query()->findOrFail($campaign->preset_version_id);
+            $target = PresetVersion::query()->find($data['preset_version_id']);
+            if ($target === null || $target->definition_id !== $current->definition_id || !Gate::forUser($actor)->allows('pin', $target) || $target->getKey() === $current->getKey()) {
+                throw ApiProblem::validation(new ValidationResult([new ValidationIssue('campaign.preset_upgrade_unavailable', Severity::Error, [], ['/preset_version_id'])]), 'campaign.preset_upgrade_unavailable');
+            }
+            $campaign->fill(['preset_version_id' => $target->getKey(), 'revision' => $campaign->revision + 1])->save();
+            $this->audit->record($actor, $campaignId, 'campaign.preset_upgraded', $campaign, ['from_version_id' => $current->getKey(), 'to_version_id' => $target->getKey()]);
+            $this->audit->emit($campaignId, 'campaign.updated', $campaign, ['campaign_id' => $campaignId, 'revision' => $campaign->revision]);
+
+            return $campaign;
+        });
+
+        return new JsonResponse(CampaignPresenter::toArray($campaign, CampaignRole::Master->value));
+    }
+
+    /** Newer versions of the campaign's preset the master may move to. */
+    public function presetUpgrades(Request $request, string $campaignId): JsonResponse
+    {
+        $actor = $this->actor($request);
+        $campaign = Campaign::query()->find($campaignId);
+        $role = $campaign === null ? null : CampaignMember::query()->where(['campaign_id' => $campaignId, 'user_id' => $actor->getKey(), 'status' => MemberStatus::Active])->value('role');
+        if ($role === null) {
+            throw ApiProblem::notFound();
+        }
+        $current = PresetVersion::query()->findOrFail($campaign->preset_version_id);
+        $versions = PresetVersion::query()->where('definition_id', $current->definition_id)->whereKeyNot($current->getKey())->get()
+            ->filter(fn (PresetVersion $v): bool => version_compare($v->version, $current->version, '>') && Gate::forUser($actor)->allows('pin', $v))
+            ->sortBy(fn (PresetVersion $v): string => $v->version, SORT_NATURAL)->values();
+
+        return new JsonResponse(['current' => ['id' => $current->getKey(), 'version' => $current->version], 'data' => $versions->map(static fn (PresetVersion $v): array => ['id' => $v->getKey(), 'version' => $v->version])->all()]);
+    }
+
+    /**
      * Who masters each campaign, how many play and the latest session, in three queries for the
      * whole page (no N+1). Only display names of fellow members: no e-mails.
      *
