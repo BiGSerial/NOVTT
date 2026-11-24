@@ -139,7 +139,14 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
       busy.value = false
     }
   }
-  const dismiss = async (sg: Suggestion) => { try { await rolls.dismiss(sg.id) } catch (e) { fail(e) } }
+  const dismiss = async (sg: Suggestion) => {
+    try {
+      await rolls.dismiss(sg.id)
+      // Don't wait for the event to clear the flag; the event is idempotent with this.
+      s.value.suggestions.splice(0, s.value.suggestions.length, ...s.value.suggestions.filter(x => x.id !== sg.id))
+      if (suggestionId.value === sg.id) suggestionId.value = null
+    } catch (e) { fail(e) }
+  }
   const cancel = async (r: RollRequest) => { try { t.value.local.request(await rolls.cancel(r.id)) } catch (e) { fail(e) } }
   const grant = async (r: RollRequest) => { try { t.value.local.request(await rolls.grant(r.id)) } catch (e) { fail(e) } }
   const reveal = async (roll: OfficialRoll) => { try { await rolls.reveal(roll.id); table.toast('Rolagem revelada à mesa') } catch (e) { fail(e) } }
@@ -184,18 +191,50 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
   // ---------- Compass, plot & stage ----------
   const compass = reactive<Compass>({ scene: '', objective: '', next_clue: '', clocks: [], spotlight: {} })
   watch(() => s.value.session.compass, c => { if (c) Object.assign(compass, plain({ ...c, spotlight: { ...(c.spotlight ?? {}) } })) }, { immediate: true, deep: true })
-  async function saveCompass(): Promise<void> {
-    try { t.value.local.session(await sessionApi.compass(s.value.session.id, s.value.session.revision, { ...plain(compass), spotlight: { ...compass.spotlight } })) } catch (e) { fail(e) }
+  /**
+   * Session edits are guarded by the session revision. When another window (a second master screen,
+   * the tablet) changed the session a moment before, catch up and apply the same intent once more,
+   * so the master's click is not lost to a race.
+   */
+  async function retrying<T>(op: () => Promise<T>): Promise<T> {
+    try { return await op() } catch (e) {
+      if (!(e instanceof ApiError) || e.code !== 'session.revision_mismatch') throw e
+      await t.value.catchUp()
+      // Some changes (pause/resume) carry no revision in their event; the 409 tells us the current one.
+      if (e.currentRevision !== undefined && s.value.session.revision < e.currentRevision) s.value.session.revision = e.currentRevision
+      return await op()
+    }
   }
-  function setClock(c: Clock, filled: number): void { c.filled = filled; void saveCompass() }
+  /** Applies a change to the compass and saves it; the change is re-applied on a revision race. */
+  async function editCompass(change: (c: Compass) => void): Promise<void> {
+    let first = true
+    try {
+      t.value.local.session(await retrying(() => {
+        // On the retry, start from the server's compass (the watcher may not have flushed yet).
+        if (!first && s.value.session.compass) Object.assign(compass, plain({ ...s.value.session.compass, spotlight: { ...(s.value.session.compass.spotlight ?? {}) } }))
+        first = false
+        change(compass)
+        return sessionApi.compass(s.value.session.id, s.value.session.revision, { ...plain(compass), spotlight: { ...compass.spotlight } })
+      }))
+    } catch (e) { fail(e) }
+  }
+  const saveCompass = () => editCompass(() => {})
+  function setClock(c: Clock, filled: number): void {
+    void editCompass(x => { x.clocks = x.clocks.map(k => (k.id === c.id ? { ...k, filled } : k)) })
+  }
   function addClock(c: Omit<Clock, 'id' | 'filled'> & { filled?: number }): void {
-    compass.clocks.push({ filled: 0, ...c, id: `c${Date.now().toString(36)}` }); void saveCompass()
+    const id = `c${Date.now().toString(36)}`
+    void editCompass(x => { if (!x.clocks.some(k => k.id === id)) x.clocks = [...x.clocks, { filled: 0, ...c, id }] })
   }
   function updateClock(c: Clock): void {
-    compass.clocks = compass.clocks.map(x => x.id === c.id ? { ...c, filled: Math.min(c.filled, c.segments) } : x); void saveCompass()
+    void editCompass(x => { x.clocks = x.clocks.map(k => (k.id === c.id ? { ...c, filled: Math.min(c.filled, c.segments) } : k)) })
   }
-  function removeClock(c: Clock): void { compass.clocks = compass.clocks.filter(x => x.id !== c.id); void saveCompass() }
-  function spotlight(id: string): void { compass.spotlight = { ...compass.spotlight, [id]: (compass.spotlight[id] ?? 0) + 1 }; void saveCompass() }
+  function removeClock(c: Clock): void { void editCompass(x => { x.clocks = x.clocks.filter(k => k.id !== c.id) }) }
+  function spotlight(id: string): void {
+    // Counted once even if the save is retried: the bump is computed from the state it lands on.
+    const target = (compass.spotlight[id] ?? 0) + 1
+    void editCompass(x => { x.spotlight = { ...x.spotlight, [id]: Math.max(target, x.spotlight[id] ?? 0) } })
+  }
   const spotlightLow = computed(() => {
     const counts = s.value.characters.map(c => compass.spotlight[c.id] ?? 0)
     const min = Math.min(...counts)
@@ -204,27 +243,31 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
 
   const plot = computed<Plot>(() => s.value.session.plot ?? { scenes: [], current: null })
   const currentScene = computed<PlotScene | null>(() => (plot.value.current === null ? null : plot.value.scenes[plot.value.current] ?? null))
-  async function savePlot(next: Plot): Promise<boolean> {
-    try { t.value.local.session(await sessionApi.plot(s.value.session.id, s.value.session.revision, plain(next))); return true } catch (e) { fail(e); return false }
+  /** Saves the plot built from the latest state (rebuilt after a revision race). */
+  async function savePlot(build: () => Plot): Promise<boolean> {
+    try { t.value.local.session(await retrying(() => sessionApi.plot(s.value.session.id, s.value.session.revision, plain(build())))); return true } catch (e) { fail(e); return false }
   }
   /** Walks the story: the compass follows the new scene; its NPCs come on stage in this window. */
   async function goToScene(index: number): Promise<void> {
     if (index < 0 || index >= plot.value.scenes.length) return
-    if (await savePlot({ ...plot.value, current: index })) {
+    if (await savePlot(() => ({ ...plot.value, current: index }))) {
       bringSceneNpcs(plot.value.scenes[index] ?? null)
       table.toast(`Cena: ${plot.value.scenes[index]?.title}`)
     }
   }
   async function addScene(scene: Omit<PlotScene, 'id' | 'status'>, makeCurrent = false): Promise<void> {
-    const scenes = [...plot.value.scenes, { ...scene, id: `s${Date.now().toString(36)}`, status: 'pending' as const }]
-    if (await savePlot({ scenes, current: makeCurrent ? scenes.length - 1 : plot.value.current ?? 0 })) {
-      if (makeCurrent) bringSceneNpcs(scenes[scenes.length - 1])
+    const added = { ...scene, id: `s${Date.now().toString(36)}`, status: 'pending' as const }
+    if (await savePlot(() => {
+      const scenes = [...plot.value.scenes.filter(x => x.id !== added.id), added]
+      return { scenes, current: makeCurrent ? scenes.length - 1 : plot.value.current ?? 0 }
+    })) {
+      if (makeCurrent) bringSceneNpcs(added)
     }
   }
   const stage = computed<Stage | null>(() => s.value.session.stage ?? null)
   async function showStage(next: Omit<Stage, 'shown_at'> | null): Promise<void> {
     try {
-      t.value.local.session(await sessionApi.stage(s.value.session.id, s.value.session.revision, next))
+      t.value.local.session(await retrying(() => sessionApi.stage(s.value.session.id, s.value.session.revision, next)))
       table.toast(next ? 'Cena mostrada aos jogadores' : 'Tela dos jogadores recolhida')
     } catch (e) { fail(e) }
   }
@@ -249,7 +292,7 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
   // ---------- Initiative ----------
   const initiative = computed(() => s.value.session.initiative?.entries ?? [])
   async function saveInitiative(entries: Subject[], turn: number, round: number): Promise<void> {
-    try { t.value.local.session(await sessionApi.initiative(s.value.session.id, s.value.session.revision, entries, turn, round)) } catch (e) { fail(e) }
+    try { t.value.local.session(await retrying(() => sessionApi.initiative(s.value.session.id, s.value.session.revision, entries, turn, round))) } catch (e) { fail(e) }
   }
   const initFrom = (list: Subject[]) => saveInitiative(list, 0, 1)
   function initMove(i: number, d: number): void {
