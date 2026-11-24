@@ -27,6 +27,9 @@ final readonly class PresetDemoSeeder
     public const CAMPAIGNS = [
         'presets/novtt-demo/demo-linhagens/1.0.0' => ['Linhagens da Névoa (demo)', 'Reserva de d10, prioridades e experiência. Crie seu personagem e envie ao mestre.'],
         'presets/novtt-demo/demo-heroico/1.0.0' => ['Heroico: a Estrada de Sal (demo)', 'd20 com modificadores e níveis por experiência ou marcos. Crie seu personagem e envie ao mestre.'],
+        // SRD presets (CC BY 4.0): public catalogue, attribution in the package.
+        'presets/dnd-5e/srd-5.2.1/0.1.0' => ['D&D 5e 2024 (SRD 5.2.1)', 'Regras de 2024 a partir do SRD 5.2.1 (CC BY 4.0). Só o conteúdo do SRD: uma subclasse por classe.'],
+        'presets/dnd-5e/srd-5.1/0.1.0' => ['D&D 5e 2014 (SRD 5.1)', 'Regras de 2014 a partir do SRD 5.1 (CC BY 4.0). Só o conteúdo do SRD: uma subclasse por classe.'],
         // Third-party presets under rights review: imported into the master's own library only.
         'presets/world-of-darkness/vampire-v20/0.1.0' => ['Vampiro V20 (teste interno)', 'Uso interno: World of Darkness não é distribuído sem licença aplicável. Mecânicas e nomes para teste; nenhum texto dos livros.', false],
         'presets/world-of-darkness/vampire-dark-ages-v20/0.1.0' => ['Vampiro: Idade das Trevas (teste interno)', 'Uso interno: World of Darkness não é distribuído sem licença aplicável. Mecânicas e nomes para teste; nenhum texto dos livros.', false],

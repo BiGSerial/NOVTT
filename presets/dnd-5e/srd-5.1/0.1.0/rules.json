@@ -1181,7 +1181,7 @@
       "inputs": {"ability": {"targets": ["/checks/*"]}},
       "modifier": {"var": "ability"},
       "target": {"min": 1, "max": 40},
-      "edge": {"extra_dice": 1}
+      "edge": {"extra_dice": 1, "force": {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/conditions/exhaustion"}, {"const": 1}]}, {"const": "disadvantage"}, {"const": "normal"}]}}
     },
     {
       "id": "saving_throw",
@@ -1191,7 +1191,7 @@
       "inputs": {"save": {"targets": ["/saves/*"]}},
       "modifier": {"var": "save"},
       "target": {"min": 1, "max": 40},
-      "edge": {"extra_dice": 1}
+      "edge": {"extra_dice": 1, "force": {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/conditions/exhaustion"}, {"const": 3}]}, {"const": "disadvantage"}, {"const": "normal"}]}}
     },
     {
       "id": "skill_check",
@@ -1201,7 +1201,7 @@
       "inputs": {"skill": {"targets": ["/skill_bonus/*"]}},
       "modifier": {"var": "skill"},
       "target": {"min": 1, "max": 40},
-      "edge": {"extra_dice": 1}
+      "edge": {"extra_dice": 1, "force": {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/conditions/exhaustion"}, {"const": 1}]}, {"const": "disadvantage"}, {"const": "normal"}]}}
     },
     {
       "id": "initiative",
@@ -1219,9 +1219,17 @@
       "inputs": {"bonus": {"targets": ["/combat/attack/*"]}},
       "modifier": {"var": "bonus"},
       "target": {"min": 1, "max": 40},
-      "critical_at_least": 20,
+      "critical_at_least": {"op": "subtract", "args": [{"const": 20}, {"op": "add", "args": [{"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/subclass"}, {"const": "champion"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 3}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/subclass"}, {"const": "champion"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 15}]}]}, {"const": 1}, {"const": 0}]}]}]},
       "fumble_at_most": 1,
-      "edge": {"extra_dice": 1}
+      "edge": {"extra_dice": 1, "force": {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/conditions/exhaustion"}, {"const": 3}]}, {"const": "disadvantage"}, {"const": "normal"}]}}
+    },
+    {
+      "id": "hit_die",
+      "label": "Dado de Vida (descanso curto)",
+      "strategy": "sum",
+      "dice": "1d6",
+      "faces": {"derived": "hit_die"},
+      "modifier": {"derived": "mod_con"}
     },
     {
       "id": "death_save",

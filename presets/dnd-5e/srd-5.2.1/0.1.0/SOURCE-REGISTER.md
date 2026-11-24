@@ -42,7 +42,7 @@ filled in; labels are pt-BR translations by the NOVTT team (a change from the SR
 | Species traits (9), lineages/legacies/ancestries, Keen Senses, Skillful, Versatile | SRD 5.2.1 pp. 83–86 | verified | choices `species`, `lineage`, `lineage_ability`, `keen_senses`, `species_feat`; size held or chosen |
 | Species/feat spells, breath weapon, resistances, Heroic Inspiration timing | SRD 5.2.1 pp. 84–87 | pending | recorded by the player (`/features`, `/spells`) |
 | Feats (Origin, General, Fighting Style, Epic Boon) | SRD 5.2.1 pp. 87–88 | verified | compendium `feat.*`; player records chosen feats in `/feats` |
-| Champion Improved/Superior Critical (19–20, 18–20) | SRD 5.2.1 p. 49 | missing | engine: `critical_at_least` is a constant (needs a formula) |
+| Champion Improved/Superior Critical (19–20, 18–20) | SRD 5.2.1 p. 49 | verified | attack roll `critical_at_least` formula |
 | Imposed Advantage/Disadvantage (conditions, Feral Instinct, Powerful Build…) | various | missing | engine: `edge` is chosen per request; no rule-forced edge |
 | Hit Point Die roll per class (d6–d12) | SRD 5.2.1 p. 18 | missing | engine: roll faces are constants (needs faces from a formula) |
 | Multiclassing | SRD 5.2.1 p. 24 | not included | single class per sheet |

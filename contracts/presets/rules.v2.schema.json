@@ -768,14 +768,30 @@
                 }
               },
               "critical_at_least": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 1000
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "$ref": "#/$defs/formula"
+                  }
+                ],
+                "description": "A face, or a formula over the sheet (e.g. a wider critical range from a feature)."
               },
               "fumble_at_most": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 1000
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "$ref": "#/$defs/formula"
+                  }
+                ],
+                "description": "A face, or a formula over the sheet (e.g. a wider critical range from a feature)."
               },
               "edge": {
                 "type": "object",
@@ -786,8 +802,16 @@
                     "minimum": 1,
                     "maximum": 5,
                     "default": 1
+                  },
+                  "force": {
+                    "$ref": "#/$defs/formula",
+                    "description": "Advantage imposed by the rules: formula returning \"advantage\", \"disadvantage\" or \"normal\". Combined with the requested edge; advantage and disadvantage cancel."
                   }
                 }
+              },
+              "faces": {
+                "$ref": "#/$defs/formula",
+                "description": "Optional: faces of the first dice group from a formula (e.g. the class hit die). Must be 2–1000."
               }
             }
           },
@@ -944,14 +968,30 @@
                 }
               },
               "critical_at_least": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 1000
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "$ref": "#/$defs/formula"
+                  }
+                ],
+                "description": "A face, or a formula over the sheet (e.g. a wider critical range from a feature)."
               },
               "fumble_at_most": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 1000
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "$ref": "#/$defs/formula"
+                  }
+                ],
+                "description": "A face, or a formula over the sheet (e.g. a wider critical range from a feature)."
               }
             }
           }

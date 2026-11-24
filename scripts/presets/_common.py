@@ -626,16 +626,24 @@ def build(cfg: dict) -> dict:
     pen = mul(const(ed["exhaustion_d20_penalty"]), exh) if ed["exhaustion_d20_penalty"] else None
     def with_pen(f): return sub(f, pen) if pen else f
     target = {"min": 1, "max": 40}
+    # Champion (SRD, both editions): Improved Critical at 3 (19–20), Superior Critical at 15 (18–20).
+    is_champion = eq(SUBCLASS, const("champion"))
+    attack_crit = sub(const(20), add(if_(and_(is_champion, ge(LEVEL, const(3))), const(1), const(0)), if_(and_(is_champion, ge(LEVEL, const(15))), const(1), const(0))))
+    # 2014 exhaustion imposes disadvantage (level 1: ability checks; level 3: attacks and saves).
+    def forced(level):
+        return {"force": if_(ge(exh, const(level)), const("disadvantage"), const("normal"))} if ed.get("exhaustion_disadvantage") else {}
     rolls = [
         {"id": "ability_check", "label": "Teste de atributo", "strategy": "sum", "dice": "1d20", "inputs": {"ability": {"targets": ["/checks/*"]}},
-         "modifier": with_pen(var("ability")), "target": target, "edge": {"extra_dice": 1}},
+         "modifier": with_pen(var("ability")), "target": target, "edge": {"extra_dice": 1, **forced(1)}},
         {"id": "saving_throw", "label": "Salvaguarda", "strategy": "sum", "dice": "1d20", "inputs": {"save": {"targets": ["/saves/*"]}},
-         "modifier": with_pen(var("save")), "target": target, "edge": {"extra_dice": 1}},
+         "modifier": with_pen(var("save")), "target": target, "edge": {"extra_dice": 1, **forced(3)}},
         {"id": "skill_check", "label": "Teste de perícia", "strategy": "sum", "dice": "1d20", "inputs": {"skill": {"targets": ["/skill_bonus/*"]}},
-         "modifier": with_pen(var("skill")), "target": target, "edge": {"extra_dice": 1}},
+         "modifier": with_pen(var("skill")), "target": target, "edge": {"extra_dice": 1, **forced(1)}},
         {"id": "initiative", "label": "Iniciativa", "strategy": "sum", "dice": "1d20", "modifier": with_pen(der("initiative")), "edge": {"extra_dice": 1}},
         {"id": "attack", "label": "Jogada de ataque", "strategy": "sum", "dice": "1d20", "inputs": {"bonus": {"targets": ["/combat/attack/*"]}},
-         "modifier": with_pen(var("bonus")), "target": {"min": 1, "max": 40}, "critical_at_least": 20, "fumble_at_most": 1, "edge": {"extra_dice": 1}},
+         "modifier": with_pen(var("bonus")), "target": {"min": 1, "max": 40}, "critical_at_least": attack_crit, "fumble_at_most": 1, "edge": {"extra_dice": 1, **forced(3)}},
+        # Spending a Hit Die: the class die (faces from the sheet) + Constitution modifier.
+        {"id": "hit_die", "label": "Dado de Vida (descanso curto)", "strategy": "sum", "dice": "1d6", "faces": der("hit_die"), "modifier": mod["con"]},
         {"id": "death_save", "label": "Salvaguarda contra a morte", "strategy": "sum", "dice": "1d20", **({"modifier": with_pen(const(0))} if pen else {}),
          "target": {"default": 10, "min": 10, "max": 10}, "critical_at_least": 20, "fumble_at_most": 1, "edge": {"extra_dice": 1}},
         *ed.get("extra_rolls", []),

@@ -49,4 +49,25 @@ final class FaithfulPresetPackagesTest extends TestCase
             self::assertSame(422, $problem->status);
         }
     }
+
+    /** @return iterable<string, array{0: string}> */
+    public static function publishablePackages(): iterable
+    {
+        yield 'D&D 5e SRD 5.1 (2014)' => ['dnd-5e/srd-5.1/0.1.0'];
+        yield 'D&D 5e SRD 5.2.1 (2024)' => ['dnd-5e/srd-5.2.1/0.1.0'];
+    }
+
+    #[DataProvider('publishablePackages')]
+    public function test_an_srd_package_validates_and_enters_the_public_catalogue_with_its_attribution(string $directory): void
+    {
+        [$raw, $missing] = PresetImporter::readDirectory(__DIR__ . '/../../../../../presets/' . $directory);
+        self::assertNotNull($raw, "missing {$missing}");
+        $importer = app(PresetImporter::class);
+        [$package, $objects] = $importer->parse((string) $raw);
+        self::assertSame([], $importer->validate($package)->toArray()['issues']);
+        [$version] = $importer->import($this->makeUser('Equipe'), $package, $objects, canonical: true);
+        self::assertNull($version->definition->owner_user_id, 'public catalogue');
+        self::assertSame('approved', $version->rights_status);
+        self::assertStringContainsString('Creative Commons', (string) $version->manifest['license']['attribution']);
+    }
 }

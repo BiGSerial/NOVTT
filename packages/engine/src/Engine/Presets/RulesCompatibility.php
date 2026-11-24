@@ -274,11 +274,22 @@ final class RulesCompatibility
                 }
             }
             $context = new FormulaContext(variables: array_map('strval', $inputs));
+            foreach (['critical_at_least', 'fumble_at_most'] as $face) {
+                if (isset($roll[$face]) && is_array($roll[$face])) {
+                    $this->formula($roll[$face], $context, "{$at}/{$face}");
+                }
+            }
             if ($roll['strategy'] === 'sum') {
                 try {
                     DiceExpression::parse((string) $roll['dice']);
                 } catch (InvalidArgumentException $e) {
                     $this->error($e->getMessage(), $at . '/dice');
+                }
+                if (isset($roll['faces'])) {
+                    $this->formula($roll['faces'], $context, $at . '/faces');
+                }
+                if (isset($roll['edge']['force'])) {
+                    $this->formula($roll['edge']['force'], $context, $at . '/edge/force');
                 }
                 if (isset($roll['modifier'])) {
                     $this->formula($roll['modifier'], $context, $at . '/modifier');
@@ -294,7 +305,7 @@ final class RulesCompatibility
                 }
                 $this->bounds($roll['target'] ?? null, $at . '/target', -100_000, 100_000);
                 foreach (['critical_at_least', 'fumble_at_most'] as $face) {
-                    if (isset($roll[$face]) && (int) $roll[$face] > (int) $roll['faces']) {
+                    if (isset($roll[$face]) && is_int($roll[$face]) && $roll[$face] > (int) $roll['faces']) {
                         $this->error('rules.face_out_of_bounds', "{$at}/{$face}", ['faces' => (int) $roll['faces']]);
                     }
                 }

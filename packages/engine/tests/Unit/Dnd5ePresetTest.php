@@ -460,4 +460,22 @@ final class Dnd5ePresetTest extends TestCase
         $this->assertSame(3, $bard->derived('initiative'), 'DEX +2 and half of PB 2');
         $this->assertSame(3, $bard->derived('skill_stealth'));
     }
+
+    public function test_the_champion_crits_on_19_from_level_3_and_18_from_level_15(): void
+    {
+        foreach (['dnd-5e/srd-5.1/0.1.0', 'dnd-5e/srd-5.2.1/0.1.0'] as $package) {
+            $preset = DemoPreset::package($package);
+            $rolls = new \Novtt\Engine\Resolution\PresetRolls($preset->parts['rules'], new \Novtt\Engine\Presets\SchemaNavigator($preset->parts['sheet_schema']));
+            $crit = function (int $level, int $face) use ($preset, $rolls): bool {
+                $scope = $preset->mechanics()->scope(['character' => ['class' => 'fighter', 'subclass' => 'champion'], 'progress' => ['level' => $level]], []);
+                $target = (new \Novtt\Engine\Presets\SchemaNavigator($preset->parts['sheet_schema']))->expand('/combat/attack/*')[0]->toString();
+
+                return in_array('critical', $rolls->roll('attack', $scope, new \Novtt\Engine\Tests\Support\SequenceRandom([$face]), ['inputs' => ['bonus' => $target]])->flags, true);
+            };
+            $this->assertFalse($crit(2, 19), $package);
+            $this->assertTrue($crit(3, 19), $package);
+            $this->assertFalse($crit(14, 18), $package);
+            $this->assertTrue($crit(15, 18), $package);
+        }
+    }
 }

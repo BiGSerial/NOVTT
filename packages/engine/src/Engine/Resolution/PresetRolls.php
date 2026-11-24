@@ -113,13 +113,31 @@ final readonly class PresetRolls
     {
         $modifier = isset($roll['modifier']) ? $this->integer($roll['modifier'], $scope) : 0;
         $target = $this->bounded($roll['target'] ?? null, $params['target'] ?? null, 'target');
-        $base = DiceExpression::parse((string) $roll['dice'], $target, $roll['critical_at_least'] ?? null, $roll['fumble_at_most'] ?? null);
-        $spec = new SumRoll($base->groups, $base->modifier + $modifier, $target, $base->criticalAtLeast, $base->fumbleAtMost);
-        $edge = $params['edge'] ?? 'normal';
-        if ($edge !== 'normal') {
-            if (!isset($roll['edge']) || !in_array($edge, ['advantage', 'disadvantage'], true)) {
-                throw new RollRejected('roll.edge_not_allowed');
+        $base = DiceExpression::parse((string) $roll['dice'], $target, $this->face($roll['critical_at_least'] ?? null, $scope), $this->face($roll['fumble_at_most'] ?? null, $scope));
+        $groups = $base->groups;
+        if (isset($roll['faces'])) {
+            // Faces from the sheet (e.g. the class hit die), bounded like any die.
+            $faces = $this->integer($roll['faces'], $scope);
+            if ($faces < 2 || $faces > 1000) {
+                throw new RollRejected('roll.faces_out_of_bounds', ['faces' => $faces]);
             }
+            $first = $groups[0];
+            $groups[0] = new DiceGroup($first->count, $faces, $first->sign, $first->keepMode, $first->keep);
+        }
+        $spec = new SumRoll($groups, $base->modifier + $modifier, $target, $base->criticalAtLeast, $base->fumbleAtMost);
+        $requested = $params['edge'] ?? 'normal';
+        if ($requested !== 'normal' && (!isset($roll['edge']) || !in_array($requested, ['advantage', 'disadvantage'], true))) {
+            throw new RollRejected('roll.edge_not_allowed');
+        }
+        // Advantage imposed by the rules (conditions, exhaustion) combines with the requested one:
+        // the same twice is still one; advantage and disadvantage cancel.
+        $forced = isset($roll['edge']['force']) ? (new FormulaEvaluator($scope))->evaluate($roll['edge']['force']) : 'normal';
+        if (!in_array($forced, ['advantage', 'disadvantage', 'normal'], true)) {
+            throw new RollRejected('roll.edge_force_invalid');
+        }
+        $edges = array_values(array_unique(array_filter([$requested, $forced], static fn (string $e): bool => $e !== 'normal')));
+        $edge = count($edges) === 1 ? $edges[0] : 'normal';
+        if ($edge !== 'normal') {
             $spec = $spec->withEdge($edge === 'advantage' ? 'highest' : 'lowest', (int) ($roll['edge']['extra_dice'] ?? 1));
         }
 
@@ -150,7 +168,7 @@ final readonly class PresetRolls
             throw new RollRejected('roll.edge_not_allowed');
         }
 
-        return new SumRoll([new DiceGroup($count, (int) $roll['faces'], 1, $mode, $keep)], $modifier, $target, $roll['critical_at_least'] ?? null, $roll['fumble_at_most'] ?? null);
+        return new SumRoll([new DiceGroup($count, (int) $roll['faces'], 1, $mode, $keep)], $modifier, $target, $this->face($roll['critical_at_least'] ?? null, $scope), $this->face($roll['fumble_at_most'] ?? null, $scope));
     }
 
     /** @param array<string, mixed> $roll @param array<string, mixed> $params */
@@ -197,6 +215,16 @@ final readonly class PresetRolls
         }
 
         return $requested;
+    }
+
+    /** A critical/fumble face: a constant or a formula over the sheet (null = none). */
+    private function face(mixed $value, SheetScope $scope): ?int
+    {
+        if ($value === null || is_int($value)) {
+            return $value;
+        }
+
+        return $this->integer($value, $scope);
     }
 
     private function integer(mixed $formula, SheetScope $scope): int

@@ -45,11 +45,12 @@ has no ability score generation rules. It stays PENDING until the owner confirms
 | Ability checks, saving throws, attack rolls: d20 + modifier; advantage/disadvantage | SRD 5.1 pp. 76–77 | verified | rolls with `edge` |
 | Attack: natural 20 critical, natural 1 miss | SRD 5.1 pp. 93–94 Making an Attack | verified | roll `attack` |
 | Conditions (14) and exhaustion (6 levels) | SRD 5.1 pp. 358–359 | verified | compendium `condition.*`, sheet `/conditions/*` |
-| Exhaustion effects (disadvantage, halved speed, HP max halved) | SRD 5.1 p. 358 | missing | engine: no rule-forced disadvantage; master applies |
+| Exhaustion disadvantage (level 1 checks; level 3 attacks and saves) | SRD 5.1 p. 358 | verified | roll `edge.force` on checks, saves and attacks; halved speed / HP max: master applies |
 | Carrying capacity = Strength × 15 | SRD 5.1 p. 79 Lifting and Carrying | verified | derived `capacity`, `carried` (not enforced) |
 | Grappler feat | SRD 5.1 p. 75 | verified | compendium `feat.grappler`; recorded in `/feats` |
-| Champion Improved/Superior Critical; Remarkable Athlete | SRD 5.1 p. 25 | missing | engine: `critical_at_least` is a constant; half-PB rounded up to STR/DEX/CON checks not wired |
-| Hit Die roll per class | SRD 5.1 pp. 8–52 | missing | engine: roll faces are constants |
+| Champion Improved/Superior Critical (19–20 at 3, 18–20 at 15) | SRD 5.1 p. 25 | verified | attack roll `critical_at_least` formula |
+| Champion Remarkable Athlete | SRD 5.1 p. 25 | missing | half proficiency rounded up to STR/DEX/CON checks not wired |
+| Hit Die roll per class | SRD 5.1 pp. 8–52 | verified | roll `hit_die`: faces from derived `hit_die` + CON modifier |
 | Multiclassing | SRD 5.1 pp. 56–58 | not included | single class per sheet |
 | Spell list and descriptions | Spells chapter | not included | player-recorded `/spells` |
 

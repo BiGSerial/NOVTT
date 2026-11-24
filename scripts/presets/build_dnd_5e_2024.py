@@ -295,7 +295,7 @@ REGISTER = [
     ("Species traits (9), lineages/legacies/ancestries, Keen Senses, Skillful, Versatile", pp(83, 86), V, "choices `species`, `lineage`, `lineage_ability`, `keen_senses`, `species_feat`; size held or chosen"),
     ("Species/feat spells, breath weapon, resistances, Heroic Inspiration timing", pp(84, 87), P, "recorded by the player (`/features`, `/spells`)"),
     ("Feats (Origin, General, Fighting Style, Epic Boon)", pp(87, 88), V, "compendium `feat.*`; player records chosen feats in `/feats`"),
-    ("Champion Improved/Superior Critical (19–20, 18–20)", pg(49), M, "engine: `critical_at_least` is a constant (needs a formula)"),
+    ("Champion Improved/Superior Critical (19–20, 18–20)", pg(49), V, "attack roll `critical_at_least` formula"),
     ("Imposed Advantage/Disadvantage (conditions, Feral Instinct, Powerful Build…)", "various", M, "engine: `edge` is chosen per request; no rule-forced edge"),
     ("Hit Point Die roll per class (d6–d12)", pg(18), M, "engine: roll faces are constants (needs faces from a formula)"),
     ("Multiclassing", pg(24), X, "single class per sheet"),
