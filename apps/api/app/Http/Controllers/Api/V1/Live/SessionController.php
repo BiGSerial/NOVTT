@@ -168,9 +168,9 @@ final class SessionController extends ApiController
         $data = $this->input($request, [
             'revision' => ['required', 'integer', 'min:1'],
             'compass' => ['required', 'array'],
-            'compass.scene' => ['present', 'string', 'max:120'],
-            'compass.objective' => ['present', 'string', 'max:300'],
-            'compass.next_clue' => ['present', 'string', 'max:300'],
+            'compass.scene' => ['present', 'nullable', 'string', 'max:120'],
+            'compass.objective' => ['present', 'nullable', 'string', 'max:300'],
+            'compass.next_clue' => ['present', 'nullable', 'string', 'max:300'],
             'compass.clocks' => ['present', 'array', 'max:8'],
             'compass.clocks.*.id' => ['required', 'string', 'max:40'],
             'compass.clocks.*.label' => ['required', 'string', 'max:80'],
@@ -185,7 +185,8 @@ final class SessionController extends ApiController
         ]);
         $players = $this->access->playerIds($session->campaign_id);
         $compass = [
-            'scene' => $data['compass']['scene'], 'objective' => $data['compass']['objective'], 'next_clue' => $data['compass']['next_clue'],
+            // Improvised sessions have no scene yet: empty text arrives as null and is stored as ''.
+            'scene' => (string) ($data['compass']['scene'] ?? ''), 'objective' => (string) ($data['compass']['objective'] ?? ''), 'next_clue' => (string) ($data['compass']['next_clue'] ?? ''),
             // Only active players of this campaign can be named on a clock.
             'clocks' => array_map(static fn (array $c): array => Clocks::normalize($c, $players), $data['compass']['clocks']),
             'spotlight' => (object) $data['compass']['spotlight'],

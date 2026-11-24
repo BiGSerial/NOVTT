@@ -106,6 +106,16 @@ final class ClockVisibilityApiTest extends TestCase
         self::assertSame([], $this->snapshotClocks($this->ana));
     }
 
+    public function test_a_session_without_a_prepared_scene_saves_clocks(): void
+    {
+        // An improvised session has an empty scene/objective/next clue; empty strings arrive as null.
+        $this->actingAs($this->master)->putJson("/api/v1/sessions/{$this->sessionId}/compass", [
+            'revision' => 1,
+            'compass' => ['scene' => '', 'objective' => '', 'next_clue' => '', 'spotlight' => [], 'clocks' => [$this->clock('lorde', 'table')]],
+        ])->assertOk()->assertJsonPath('compass.scene', '')->assertJsonPath('compass.clocks.0.visibility', 'table');
+        self::assertSame(['lorde'], array_column($this->snapshotClocks($this->ana), 'id'));
+    }
+
     public function test_invalid_tone_or_visibility_is_rejected_and_players_cannot_set_clocks(): void
     {
         $this->setClocks([$this->clock('a', 'everyone')])->assertStatus(422);
