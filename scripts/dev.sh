@@ -56,6 +56,12 @@ case "${1:-help}" in
     docker run --rm --network container:novtt-player-1 -v "$PWD/scripts/e2e":/e2e:ro -v "$PWD/e2e-output":/out \
       mcr.microsoft.com/playwright:v1.65.1-noble sh -c "cd /tmp && npm i -s playwright@1.65.1 >/dev/null 2>&1 && cp /e2e/atmosphere.mjs . && node atmosphere.mjs; status=\$?; chown -R $(id -u):$(id -g) /out; exit \$status"
     ;;
+  e2e-request)
+    # A player's roll request on the master's cast token and sheet (needs: sh scripts/dev.sh demo).
+    mkdir -p e2e-output
+    docker run --rm --network container:novtt-player-1 -v "$PWD/scripts/e2e":/e2e:ro -v "$PWD/e2e-output":/out \
+      mcr.microsoft.com/playwright:v1.65.1-noble sh -c "cd /tmp && npm i -s playwright@1.65.1 >/dev/null 2>&1 && cp /e2e/player-request.mjs . && node player-request.mjs; status=\$?; chown -R $(id -u):$(id -g) /out; exit \$status"
+    ;;
   e2e-presets)
     # Guided creation on the demo preset, master review and activation (needs: sh scripts/dev.sh demo-reset).
     mkdir -p e2e-output
