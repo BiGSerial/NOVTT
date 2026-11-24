@@ -79,11 +79,34 @@ final readonly class SheetChangeEngine
             $touched[$op->path->toString()][] = $op->key;
         }
         // A selected option may hold fields (`fixes`): writing another value there is refused;
-        // choosing the option writes them (and refunds points spent on them via the ledger).
-        foreach ($this->mechanics->fixedFields($candidate, $grants) as $path => $fix) {
+        // choosing the option writes them. Held values are given, not bought (no budget charge),
+        // and when the option is left the fields it held go back to their default.
+        $choiceOps = [];
+        foreach ($this->rules['creation']['choices'] ?? [] as $choice) {
+            $choiceOps[(string) $choice['id']] = $touched[JsonPointer::parse((string) $choice['path'])->toString()] ?? [];
+        }
+        $held = $this->mechanics->fixedFields($candidate, $grants);
+        foreach ($this->mechanics->fixedFields($sheet, $grants) as $path => $before) {
+            if (isset($held[$path]) || isset($touched[$path])) {
+                continue;
+            }
             $pointer = JsonPointer::parse($path);
-            [, $current] = SheetProjector::read($candidate, $pointer->segments);
-            if ($current === $fix['value']) {
+            $node = $schema->at($pointer) ?? [];
+            if (array_key_exists('default', $node)) {
+                SheetProjector::write($candidate, $pointer->segments, $node['default']);
+            } else {
+                self::remove($candidate, $pointer->segments);
+            }
+            $touched[$path] = $choiceOps[$before['choice']] ?? [];
+        }
+        foreach ($held as $path => $fix) {
+            $pointer = JsonPointer::parse($path);
+            [$exists, $current] = SheetProjector::read($candidate, $pointer->segments);
+            if (!$exists) {
+                $node = $schema->at($pointer) ?? [];
+                $current = $node['default'] ?? null;
+            }
+            if (Mechanics::holds($current, $fix)) {
                 continue;
             }
             if (isset($touched[$path])) {
@@ -91,13 +114,7 @@ final readonly class SheetChangeEngine
                 continue;
             }
             SheetProjector::write($candidate, $pointer->segments, $fix['value']);
-            $choicePath = null;
-            foreach ($this->rules['creation']['choices'] ?? [] as $choice) {
-                if ($choice['id'] === $fix['choice']) {
-                    $choicePath = JsonPointer::parse((string) $choice['path'])->toString();
-                }
-            }
-            $touched[$path] = $touched[$choicePath] ?? [];
+            $touched[$path] = $choiceOps[$fix['choice']] ?? [];
         }
         if ($issues !== []) {
             return new ChangeOutcome(new ValidationResult($issues), $sheet, $this->balances($sheet, $grants));
@@ -110,7 +127,7 @@ final readonly class SheetChangeEngine
             $issues[] = new ValidationIssue($issue->ruleId, $issue->severity, $this->opsFor($issue->paths, $touched), $issue->paths, $issue->params);
         }
 
-        [$candidate, $budgetIssues] = $this->settleBudgets($sheet, $candidate, $phase, $grants, $schema, $touched);
+        [$candidate, $budgetIssues] = $this->settleBudgets($sheet, $candidate, $phase, $grants, $schema, $touched, array_map(static fn (array $f): int => is_numeric($f['value']) ? (int) $f['value'] : PHP_INT_MAX, $held));
         $issues = [...$issues, ...$budgetIssues, ...$this->phaseLimits($candidate, $phase, $schema, $touched), ...$this->dependencies($candidate, $touched)];
         foreach ($this->mechanics->check($sheet, $candidate, $phase, $grants, array_keys($touched)) as $issue) {
             $issues[] = new ValidationIssue($issue->ruleId, $issue->severity, $this->opsFor($issue->paths, $touched), $issue->paths, $issue->params);
@@ -244,9 +261,10 @@ final readonly class SheetChangeEngine
      * @param array<string, mixed> $candidate
      * @param array<string, int> $grants
      * @param array<string, list<string>> $touched
+     * @param array<string, int> $held pointer => level up to which a selected option gives the field (not charged)
      * @return array{0: array<string, mixed>, 1: list<ValidationIssue>}
      */
-    private function settleBudgets(array $base, array $candidate, Phase $phase, array $grants, SchemaNavigator $schema, array $touched): array
+    private function settleBudgets(array $base, array $candidate, Phase $phase, array $grants, SchemaNavigator $schema, array $touched, array $held = []): array
     {
         $issues = [];
         $ledger = array_values((array) ($base[self::LEDGER] ?? []));
@@ -281,6 +299,9 @@ final readonly class SheetChangeEngine
         foreach ($changes as $path => [$from, $to, $costRules]) {
             $phaseRules = array_values(array_filter($costRules, static fn (array $r): bool => $r['phase'] === $phase->value));
             for ($level = $from + 1; $level <= $to; $level++) {
+                if ($level <= ($held[$path] ?? PHP_INT_MIN)) {
+                    continue; // held by a choice: given, not bought
+                }
                 $paid = false;
                 $needed = null;
                 foreach ($phaseRules as $rule) {

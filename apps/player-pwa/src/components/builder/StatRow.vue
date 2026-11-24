@@ -17,6 +17,8 @@ const props = defineProps<{
   errors?: string[]
   /** Held by a choice (e.g. "Linhagem: Brasa"): both buttons off and the reason shown. */
   locked?: string | null
+  /** A note under the control (e.g. a minimum given by a choice). */
+  hint?: string | null
 }>()
 const emit = defineEmits<{ set: [value: number] }>()
 const signed = (v: unknown) => String(v)
@@ -37,6 +39,7 @@ const signed = (v: unknown) => String(v)
       <button type="button" class="stat-btn" :disabled="!!locked || value >= max || !canRaise" :aria-label="`Aumentar ${label}`" :title="!canRaise && value < max ? 'Sem pontos para distribuir' : undefined" @click="emit('set', value + 1)">+</button>
     </div>
     <p v-if="locked" class="stat-locked">🔒 Fixado por {{ locked }}</p>
+    <p v-else-if="hint" class="stat-locked">{{ hint }}</p>
     <p v-for="(e, i) in errors" :key="i" class="stat-error" role="alert">{{ e }}</p>
   </div>
 </template>

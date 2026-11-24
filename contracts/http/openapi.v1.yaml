@@ -2125,6 +2125,7 @@ components:
                 path: { type: string }
                 value: { type: [string, integer, number, boolean, 'null'] }
                 label: { type: [string, 'null'] }
+                mode: { enum: [exact, at_least], description: 'exact: locked at value; at_least: minimum, may go higher' }
     SheetPreview:
       type: object
       description: >-

@@ -71,11 +71,54 @@ final class ChoiceFixesAndKeepRollTest extends TestCase
         $preset = self::preset();
         $chosen = $preset->evaluate([], [...self::PRIORITIES, DemoPreset::set('l', '/origin/lineage', 'brasa')]);
         $lineage = array_values(array_filter($preset->mechanics()->choiceAvailability($chosen->sheet, []), static fn (array $c): bool => $c['id'] === 'lineage'))[0];
-        $this->assertSame([['path' => '/attributes/social/aparencia', 'value' => 0, 'label' => 'Marcas da brasa']], $lineage['fixes']);
+        $this->assertSame([['path' => '/attributes/social/aparencia', 'value' => 0, 'label' => 'Marcas da brasa', 'mode' => 'exact']], $lineage['fixes']);
 
         $other = $preset->evaluate($chosen->sheet, [DemoPreset::set('l2', '/origin/lineage', 'aurora'), DemoPreset::set('a', '/attributes/social/aparencia', 2)]);
         $this->assertTrue($other->result->isValid(), json_encode($other->result->toArray()));
         $this->assertSame(2, $other->sheet['attributes']['social']['aparencia']);
+    }
+
+    /** "aurora" gives Luta at least 2 (an origin that trains a skill, which can still grow). */
+    private static function atLeastPreset(): DemoPreset
+    {
+        $preset = self::preset();
+        foreach ($preset->parts['rules']['creation']['choices'] as $c => $choice) {
+            foreach ($choice['options'] as $o => $option) {
+                if ($option['value'] === 'aurora') {
+                    $preset->parts['rules']['creation']['choices'][$c]['options'][$o]['fixes'] = [['path' => '/skills/luta', 'value' => ['const' => 2], 'mode' => 'at_least']];
+                }
+            }
+        }
+
+        return $preset;
+    }
+
+    public function test_an_at_least_hold_is_given_free_can_grow_with_points_and_not_drop(): void
+    {
+        $preset = self::atLeastPreset();
+        $chosen = $preset->evaluate([], [...self::PRIORITIES, DemoPreset::set('l', '/origin/lineage', 'aurora')]);
+        $this->assertTrue($chosen->result->isValid(), json_encode($chosen->result->toArray()));
+        $this->assertSame(2, $chosen->sheet['skills']['luta']);
+        $this->assertSame(6, $chosen->balances['skill_points'], 'the held levels are not paid');
+
+        $grown = $preset->evaluate($chosen->sheet, [DemoPreset::set('up', '/skills/luta', 3)]);
+        $this->assertTrue($grown->result->isValid(), json_encode($grown->result->toArray()));
+        $this->assertSame(5, $grown->balances['skill_points'], 'only the level above the hold costs');
+
+        $this->assertSame(['choice.fixed_value'], DemoPreset::ruleIds($preset->evaluate($grown->sheet, [DemoPreset::set('down', '/skills/luta', 1)])));
+    }
+
+    public function test_leaving_the_option_returns_held_fields_to_their_default_and_refunds_paid_levels(): void
+    {
+        $preset = self::atLeastPreset();
+        $chosen = $preset->evaluate([], [...self::PRIORITIES, DemoPreset::set('l', '/origin/lineage', 'aurora')]);
+        $grown = $preset->evaluate($chosen->sheet, [DemoPreset::set('up', '/skills/luta', 3)]);
+        $left = $preset->evaluate($grown->sheet, [DemoPreset::set('l2', '/origin/lineage', 'nevoa')]);
+
+        $this->assertTrue($left->result->isValid(), json_encode($left->result->toArray()));
+        $default = $preset->parts['sheet_schema']['properties']['skills']['properties']['luta']['default'] ?? null;
+        $this->assertSame($default, $left->sheet['skills']['luta'] ?? null, 'no free training survives a change of option');
+        $this->assertSame(6, $left->balances['skill_points'], 'the paid level is refunded');
     }
 
     public function test_a_sheet_that_breaks_a_fix_is_reported_by_the_mechanics_check(): void

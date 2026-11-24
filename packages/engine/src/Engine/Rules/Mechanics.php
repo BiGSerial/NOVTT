@@ -257,7 +257,7 @@ final class Mechanics
         }
 
         foreach ($this->fixedFields($candidate, $grants) as $path => $fix) {
-            if ($scope->pointer($path) !== $fix['value']) {
+            if (!self::holds($scope->pointer($path), $fix)) {
                 $issues[] = $this->issue('choice.fixed_value', [$path], ['choice' => $fix['choice'], 'option' => (string) $fix['option'], 'value' => $fix['value']]);
             }
         }
@@ -412,7 +412,7 @@ final class Mechanics
         foreach ($this->fixedFields($sheet, $grants) as $path => $fix) {
             foreach ($out as $i => $row) {
                 if ($row['id'] === $fix['choice']) {
-                    $out[$i]['fixes'][] = ['path' => $path, 'value' => $fix['value'], 'label' => $fix['label']];
+                    $out[$i]['fixes'][] = ['path' => $path, 'value' => $fix['value'], 'label' => $fix['label'], 'mode' => $fix['mode']];
                 }
             }
         }
@@ -427,7 +427,7 @@ final class Mechanics
      *
      * @param array<string, mixed> $sheet
      * @param array<string, int> $grants
-     * @return array<string, array{value: int|float|bool|string|null, choice: string, option: mixed, label: string|null}>
+     * @return array<string, array{value: int|float|bool|string|null, choice: string, option: mixed, label: string|null, mode: string}>
      */
     public function fixedFields(array $sheet, array $grants): array
     {
@@ -450,13 +450,23 @@ final class Mechanics
                         continue;
                     }
                     $fixed[JsonPointer::parse((string) $fix['path'])->toString()] = [
-                        'value' => $result, 'choice' => (string) $choice['id'], 'option' => $option['value'], 'label' => $fix['label'] ?? null,
+                        'value' => $result, 'choice' => (string) $choice['id'], 'option' => $option['value'], 'label' => $fix['label'] ?? null, 'mode' => (string) ($fix['mode'] ?? 'exact'),
                     ];
                 }
             }
         }
 
         return $fixed;
+    }
+
+    /** Whether a value satisfies a hold: equal (exact) or not below it (at_least). @param array{value: mixed, mode: string} $fix */
+    public static function holds(mixed $value, array $fix): bool
+    {
+        if ($fix['mode'] === 'at_least') {
+            return is_numeric($value) && is_numeric($fix['value']) && $value >= $fix['value'];
+        }
+
+        return $value === $fix['value'];
     }
 
     /** @param list<string> $paths @param array<string, mixed> $step */

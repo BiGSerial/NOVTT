@@ -25,7 +25,9 @@ SPEC-PRESET-ENGINE-001 §Open items 1 and 4 for **development**; publication gat
 - `creation.choices[].options[].fixes`: while an option is selected a field holds a value and is
   locked (e.g. a clan that sets Appearance to 0). The engine writes it when the option is chosen,
   refunds points spent on it, rejects other values (`choice.fixed_value`) and reports the holds in
-  the choice availability so clients lock the control and say why.
+  the choice availability so clients lock the control and say why. Mode `at_least` raises the
+  field to a minimum that may still grow (e.g. a skill an origin trains). Held levels are given,
+  not bought; leaving the option returns held fields to their default and refunds paid levels.
 - Roll strategy `keep`: N dice, keep the K highest or lowest, both from formulas (Ordem
   Paranormal: a d20 per attribute point keeping the best; at 0, two keeping the worst).
 

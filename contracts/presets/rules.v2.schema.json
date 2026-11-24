@@ -494,7 +494,7 @@
                     "fixes": {
                       "type": "array",
                       "maxItems": 16,
-                      "description": "While this option is selected, each path holds the given value and cannot be changed (e.g. a lineage that sets a trait to 0). The engine writes it when the option is chosen and rejects other values.",
+                      "description": "While this option is selected, each path holds the given value (exact) or at least it (at_least). Held levels are given, not bought; leaving the option returns the field to its default.",
                       "items": {
                         "type": "object",
                         "additionalProperties": false,
@@ -513,6 +513,14 @@
                             "type": "string",
                             "minLength": 1,
                             "maxLength": 120
+                          },
+                          "mode": {
+                            "enum": [
+                              "exact",
+                              "at_least"
+                            ],
+                            "default": "exact",
+                            "description": "exact: the field holds the value; at_least: the field is raised to the value and may go higher (levels up to it are free)."
                           }
                         }
                       }

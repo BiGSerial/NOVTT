@@ -15,7 +15,7 @@ export interface BuilderRules {
 
 export interface StepProgress { id: string; available: boolean; complete: boolean; missing: string[]; condition_met: boolean; issues: number }
 export interface CreationProgress { complete: boolean; steps: StepProgress[]; issues: ValidationIssue[] }
-export interface ChoiceAvailability { id: string; path: string; value: Scalar; options: { value: Scalar; available: boolean }[]; fixes?: { path: string; value: Scalar; label: string | null }[] }
+export interface ChoiceAvailability { id: string; path: string; value: Scalar; options: { value: Scalar; available: boolean }[]; fixes?: { path: string; value: Scalar; label: string | null; mode?: 'exact' | 'at_least' }[] }
 export interface TraceEntry {
   derived: string
   path: string

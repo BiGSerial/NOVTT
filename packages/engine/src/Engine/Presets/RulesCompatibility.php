@@ -234,6 +234,9 @@ final class RulesCompatibility
                     if ($fixed !== null && !$this->schema->isScalar($fixed)) {
                         $this->error('rules.fix_path_not_scalar', $fixAt . '/path', ['path' => $fix['path']]);
                     }
+                    if ($fixed !== null && ($fix['mode'] ?? 'exact') === 'at_least' && !$this->schema->isInteger($fixed)) {
+                        $this->error('rules.fix_at_least_not_integer', $fixAt . '/path', ['path' => $fix['path']]);
+                    }
                     if ($fixed !== null && $fixed->toString() === $pointer->toString()) {
                         $this->error('rules.fix_on_own_choice', $fixAt . '/path', ['path' => $fix['path']]);
                     }
