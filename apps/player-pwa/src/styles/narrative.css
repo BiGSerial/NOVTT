@@ -599,3 +599,65 @@ input, select, textarea { font-family: var(--font-ui); }
 .inspector-sheet .medallions { grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; }
 .inspector-sheet .medallion-value { font-size: 32px; }
 .inspector-sheet .medallion-label { font-size: 11px; letter-spacing: .08em; }
+
+/* The player's sheet as a printed character sheet: parchment page, ink, ruled fields and boxed
+   sections. Tokens are re-pointed inside the page so StatBoard and Inventory ink themselves. */
+.player-sheet { --paper-accent: color-mix(in srgb, var(--accent) 50%, var(--parchment-ink)); }
+.paper-sheet {
+  --text: var(--parchment-ink);
+  --muted: color-mix(in srgb, var(--parchment-ink) 62%, var(--parchment));
+  --line: color-mix(in srgb, var(--parchment-ink) 22%, transparent);
+  --line-strong: color-mix(in srgb, var(--parchment-ink) 45%, transparent);
+  --surface: color-mix(in srgb, var(--parchment) 88%, var(--parchment-ink) 12%);
+  --surface-2: color-mix(in srgb, var(--parchment) 78%, var(--parchment-ink) 22%);
+  --bg: var(--parchment);
+  --ornament: color-mix(in srgb, var(--parchment-ink) 55%, transparent);
+  --accent: var(--paper-accent);
+  --glow: color-mix(in srgb, var(--paper-accent) 22%, transparent);
+  position: relative; display: grid; gap: 14px; padding: 18px 16px 22px; color: var(--text);
+  background:
+    radial-gradient(120% 80% at 50% 0%, transparent 60%, color-mix(in srgb, var(--parchment-ink) 10%, transparent)),
+    var(--parchment);
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45), inset 0 0 0 6px var(--parchment), inset 0 0 0 7px var(--line-strong), inset 0 0 0 9px var(--parchment), inset 0 0 0 10px var(--line);
+}
+.paper-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: start; padding-bottom: 12px; border-bottom: 2px solid var(--line-strong); }
+.paper-portrait { margin: 0; }
+.paper-portrait .portrait-frame { border-radius: 8px; border-color: var(--line-strong); background: var(--surface); }
+.paper-portrait .portrait-frame .portrait { border-radius: 4px; }
+.paper-id { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+.paper-field { min-width: 0; display: grid; }
+.paper-field.wide { grid-column: 1 / -1; }
+.paper-field dd { order: 1; margin: 0; padding: 0 2px 2px; border-bottom: 1px solid var(--line-strong); font: 16px/1.3 var(--font-story); overflow-wrap: anywhere; }
+.paper-field dt { order: 2; font: 700 10px var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.paper-field dd.paper-name { font: 700 24px/1.1 var(--font-display); }
+.paper-conditions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 4px; }
+.paper-label, .paper-title { font: 700 11px var(--font-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.paper-label { margin-right: 4px; }
+.paper-stamp { padding: 1px 8px; border: 2px solid color-mix(in srgb, var(--lose) 75%, var(--parchment-ink)); border-radius: 4px; color: color-mix(in srgb, var(--lose) 75%, var(--parchment-ink)); font: 800 12px var(--font-ui); text-transform: uppercase; letter-spacing: .06em; transform: rotate(-2deg); }
+.paper-none { font: italic 14px var(--font-story); color: var(--muted); }
+.paper-hint { margin: 0; font: italic 14px var(--font-story); color: var(--muted); text-align: center; }
+.paper-box { padding: 10px 12px 12px; border: 1px solid var(--line-strong); border-radius: 4px; }
+.paper-title { margin: -20px 0 8px; width: fit-content; padding: 0 8px; background: var(--parchment); }
+.paper-note { margin: 6px 0 0; font: italic 14px var(--font-story); color: var(--muted); }
+.paper-lines { margin: 0; display: grid; gap: 8px; }
+.paper-lines dd { margin: 0; padding-bottom: 2px; font: 16px/1.5 var(--font-story); background: repeating-linear-gradient(transparent 0 23px, var(--line) 23px 24px); white-space: pre-wrap; }
+.paper-lines dt { font: 700 10px var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+/* Attributes as boxed scores, skills as ruled lines. */
+.paper-stats .medallions { gap: 8px; }
+.paper-stats .medallion { border-radius: 6px; background: var(--parchment); border: 2px solid var(--line-strong); box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--line); padding: 10px 6px 8px; }
+.paper-stats .medallion-value { color: var(--text); text-shadow: none; font-size: 34px; }
+.paper-stats .medallion.on { background: color-mix(in srgb, var(--paper-accent) 18%, var(--parchment)); border-color: var(--accent); box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--accent); transform: none; }
+.paper-stats .skill-block { margin-top: 10px; padding: 10px 12px 6px; border: 1px solid var(--line-strong); border-radius: 4px; }
+.paper-stats .skill-block .sheet-heading { margin: -20px 0 4px; width: fit-content; padding: 0 8px; background: var(--parchment); color: var(--muted); font-size: 11px; }
+.paper-stats .skill-block .sheet-heading::after { display: none; }
+.paper-stats .skills { gap: 0 14px; }
+.paper-stats .skill { min-height: 40px; padding: 6px 4px; border: 0; border-bottom: 1px dotted var(--line-strong); border-radius: 0; background: transparent; }
+.paper-stats .skill.on { background: var(--glow); border-bottom-color: var(--accent); }
+.paper-stats .skill.zero { color: var(--muted); }
+.paper-sheet .inventory .item { border-color: var(--line); background: transparent; }
+@media (max-width: 380px) { .paper-head { grid-template-columns: 1fr; justify-items: center; } }
+/* On the paper sheet the picture is a photo box, not a token. */
+.paper-portrait .portrait, .paper-portrait .portrait-face, .paper-portrait .portrait-face img, .paper-portrait .portrait-face svg { border-radius: 3px; }
+.paper-stats .skill.on { background: color-mix(in srgb, var(--paper-accent) 26%, var(--parchment)); border-bottom: 2px solid var(--accent); box-shadow: inset 4px 0 0 var(--accent); }
+.paper-stats .skill.on .skill-label { font-weight: 800; }

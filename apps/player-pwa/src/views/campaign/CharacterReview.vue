@@ -3,12 +3,14 @@ import { computed, onMounted, ref } from 'vue'
 import { ApiError } from '../../api/client'
 import { t } from '../../i18n/messages'
 import { ACTIVE_REQUEST, optionLabelsOf, review, STATUS_LABEL, type CampaignCharacterView, type ChangeRequestView, type PresetVersionFull } from '../../live/campaign'
+import PortraitPicker from '../../components/builder/PortraitPicker.vue'
 import ProposalReview from './ProposalReview.vue'
 
 /** One character for the master: creation progress, balances, the active proposal, grants, activation. */
 const props = defineProps<{ character: CampaignCharacterView; preset: PresetVersionFull; labels: Map<string, string> }>()
 const emit = defineEmits<{ changed: [] }>()
 
+const portrait = ref<string | null>(props.character.portrait_image_id ?? null)
 const balances = ref<Record<string, number>>({})
 const request = ref<ChangeRequestView | null>(null)
 const status = ref('')
@@ -73,6 +75,7 @@ function finalized(): void {
 <template>
   <article class="character-review parchment-panel" :aria-labelledby="`cr-${character.id}`">
     <header class="review-head">
+      <PortraitPicker :campaign-id="character.campaign_id" :character-id="character.id" :name="character.name" :image-id="portrait" :size="64" editable @change="id => portrait = id" />
       <h2 :id="`cr-${character.id}`">{{ character.name }}</h2>
       <span class="status-pill" :class="character.status">{{ STATUS_LABEL[character.status] }}</span>
       <span class="muted small">revisão {{ character.sheet_revision }}</span>

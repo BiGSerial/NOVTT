@@ -49,6 +49,7 @@ export interface CampaignCharacterView {
   sheet_revision: number
   player_user_id: string
   preset_version_id: string
+  portrait_image_id?: string | null
   sheet: Record<string, unknown>
   creation?: { complete: boolean; steps: CreationStep[]; issues: { rule_id: string; paths: string[] }[] }
 }

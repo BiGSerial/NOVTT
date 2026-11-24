@@ -143,3 +143,6 @@
   .builder-actions { position: sticky; bottom: 0; background: color-mix(in srgb, var(--bg) 94%, transparent); margin: 18px -20px 0; padding: 12px 20px; }
   .builder-actions .primary-cta { flex: 1; }
 }
+
+.review-sheet { display: grid; gap: 12px; }
+@media (min-width: 640px) { .review-sheet { grid-template-columns: auto minmax(0, 1fr); align-items: start; } .review-sheet .portrait-picker { margin-top: 18px; } }

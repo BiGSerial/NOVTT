@@ -6,6 +6,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { ApiError } from '../api/client'
 import BrandMark from '../components/BrandMark.vue'
 import ClockDial from '../components/live/ClockDial.vue'
+import PortraitPicker from '../components/builder/PortraitPicker.vue'
 import Inventory from '../components/live/Inventory.vue'
 import LinkBadge from '../components/live/LinkBadge.vue'
 import Portrait from '../components/live/Portrait.vue'
@@ -14,7 +15,7 @@ import RollFeed from '../components/live/RollFeed.vue'
 import SceneArt from '../components/live/SceneArt.vue'
 import StatBoard from '../components/live/StatBoard.vue'
 import Vitals from '../components/live/Vitals.vue'
-import { imageUrl, images, rolls, table as tableApi } from '../live/api'
+import { imageUrl, rolls, table as tableApi } from '../live/api'
 import { readPointer } from '../live/sheet'
 import type { useLiveTable } from '../live/useLiveTable'
 import { useSheets } from '../live/useSheets'
@@ -43,6 +44,9 @@ onMounted(() => { if (character.value) void sheets.character(character.value.id,
 watch(charId, id => { const c = mine.value.find(x => x.id === id); if (c) void sheets.character(c.id, c.preset_version_id) })
 const text = (p: string) => { const v = sheet.value ? readPointer(sheet.value.raw, p) : undefined; return typeof v === 'string' ? v : '' }
 const concept = computed(() => character.value?.concept || text('/identity/concept'))
+// Identity prose from the preset's own identity section (name and concept are in the header).
+const identity = computed(() => (sheet.value?.sections.find(x => x.id === 'identity')?.fields ?? [])
+  .filter(f => !/\/(name|concept)$/.test(f.path) && typeof f.value === 'string' && f.value.trim()))
 
 const myRequests = computed(() => s.value.requests.filter(r => r.roller_user_id === me.value))
 const master = computed(() => s.value.members.find(x => x.role === 'master'))
@@ -103,16 +107,6 @@ async function send(): Promise<void> {
 const clues = computed(() => s.value.clues.filter(c => c.revealed_at).slice().reverse())
 const turn = computed(() => s.value.session.initiative?.entries?.[s.value.session.initiative.turn ?? 0])
 
-const file = ref<HTMLInputElement | null>(null)
-async function pickPortrait(ev: Event): Promise<void> {
-  const f = (ev.target as HTMLInputElement).files?.[0]
-  if (!f || !character.value) return
-  try {
-    const img = await images.upload(props.campaign.id, f, 'portrait')
-    await images.setPortrait(props.campaign.id, 'character', character.value.id, img.id)
-    t.value.local.portrait('character', character.value.id, img.id)
-  } catch (e) { fail(e) } finally { if (file.value) file.value.value = '' }
-}
 </script>
 
 <template>
@@ -129,11 +123,7 @@ async function pickPortrait(ev: Event): Promise<void> {
         <LinkBadge :state="table.link.value" />
       </div>
       <div v-if="character" class="hero-char">
-        <button type="button" class="portrait-btn" title="Trocar retrato" @click="file?.click()">
-          <Portrait :name="character.name" :image-id="character.portrait_image_id" :live="character.live" :size="92" />
-          <span class="portrait-edit">Trocar</span>
-        </button>
-        <input ref="file" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" aria-label="Retrato do personagem" @change="pickPortrait" />
+        <Portrait :name="character.name" :image-id="character.portrait_image_id" :live="character.live" :size="92" />
         <div class="hero-id">
           <h1 class="char-name">{{ character.name }}</h1>
           <p v-if="concept" class="char-concept">{{ concept }}</p>
@@ -153,23 +143,38 @@ async function pickPortrait(ev: Event): Promise<void> {
     <main class="player-main">
       <section v-if="tab === 'sheet'" aria-label="Ficha" class="player-sheet">
         <select v-if="mine.length > 1" v-model="charId" aria-label="Personagem"><option v-for="c in mine" :key="c.id" :value="c.id">{{ c.name }}</option></select>
-        <template v-if="sheet">
-          <p class="sheet-hint">Toque em um atributo e uma perícia para sugerir uma rolagem ao mestre.</p>
-          <StatBoard :sections="sheet.sections" :selected="picked" selectable :hide="['identity', 'gear']" @toggle="toggle" />
-          <section class="prose-block">
-            <h3 class="sheet-heading">Mochila</h3>
-            <Inventory :items="character?.live?.items ?? []" />
-            <p v-if="text('/gear/items')" class="small muted">{{ text('/gear/items') }}</p>
+        <article v-if="sheet && character" class="paper-sheet" aria-label="Ficha do personagem">
+          <header class="paper-head">
+            <PortraitPicker
+              class="paper-portrait" :campaign-id="campaign.id" :character-id="character.id" :name="character.name"
+              :image-id="character.portrait_image_id" :size="108" editable @change="id => t.local.portrait('character', character!.id, id)"
+            />
+            <dl class="paper-id">
+              <div class="paper-field wide"><dt>Personagem</dt><dd class="paper-name">{{ character.name }}</dd></div>
+              <div v-if="concept" class="paper-field wide"><dt>Conceito</dt><dd>{{ concept }}</dd></div>
+              <div class="paper-field"><dt>Jogador</dt><dd>{{ s.me.name }}</dd></div>
+              <div class="paper-field"><dt>Campanha</dt><dd>{{ campaign.name }}</dd></div>
+            </dl>
+          </header>
+          <section class="paper-conditions" aria-label="Condições">
+            <span class="paper-label">Condições</span>
+            <span v-for="c in character.live?.conditions ?? []" :key="c" class="paper-stamp">{{ c }}</span>
+            <span v-if="!character.live?.conditions?.length" class="paper-none">nenhuma</span>
           </section>
-          <section class="prose-block identity">
-            <h3 class="sheet-heading">Quem é</h3>
-            <dl>
-              <template v-if="text('/identity/motivation')"><dt>O que quer</dt><dd>{{ text('/identity/motivation') }}</dd></template>
-              <template v-if="text('/identity/fear')"><dt>Do que tem medo</dt><dd>{{ text('/identity/fear') }}</dd></template>
-              <template v-if="text('/identity/bonds')"><dt>Laços</dt><dd>{{ text('/identity/bonds') }}</dd></template>
+          <p class="paper-hint">Toque em um atributo e uma perícia para sugerir uma rolagem ao mestre.</p>
+          <StatBoard class="paper-stats" :sections="sheet.sections" :selected="picked" selectable :hide="['identity', 'gear']" @toggle="toggle" />
+          <section class="paper-box">
+            <h3 class="paper-title">Mochila</h3>
+            <Inventory :items="character.live?.items ?? []" />
+            <p v-if="text('/gear/items')" class="paper-note">{{ text('/gear/items') }}</p>
+          </section>
+          <section v-if="identity.length" class="paper-box">
+            <h3 class="paper-title">Quem é</h3>
+            <dl class="paper-lines">
+              <div v-for="f in identity" :key="f.path"><dt>{{ f.label }}</dt><dd>{{ f.value }}</dd></div>
             </dl>
           </section>
-        </template>
+        </article>
         <p v-else-if="character" role="status">Abrindo a ficha…</p>
         <div v-if="picked.length" class="suggest-bar">
           <p><strong>{{ pickedLabel }}</strong></p>

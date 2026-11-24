@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { api, ApiError } from '../api/client'
 import ChoiceGroup, { type ChoiceCard } from '../components/builder/ChoiceGroup.vue'
+import PortraitPicker from '../components/builder/PortraitPicker.vue'
 import SheetSummary, { type SummaryGroup } from '../components/builder/SheetSummary.vue'
 import StatRow from '../components/builder/StatRow.vue'
 import SheetEditor from '../components/SheetEditor.vue'
@@ -15,7 +16,7 @@ import '../styles/builder.css'
 
 const props = defineProps<{ characterId: string; fetcher?: typeof fetch }>()
 
-interface Character extends Partial<SheetView> { id: string; campaign_id?: string; name: string; status: string; sheet_revision: number; preset_version_id: string; sheet: Sheet }
+interface Character extends Partial<SheetView> { id: string; campaign_id?: string; portrait_image_id?: string | null; name: string; status: string; sheet_revision: number; preset_version_id: string; sheet: Sheet }
 interface CompendiumEntry { canonical_id: string; kind: string; labels: Record<string, string>; summary: string | null }
 interface PresetVersion {
   display_name?: string
@@ -430,7 +431,13 @@ onBeforeUnmount(() => clearTimeout(autosave))
             </template>
 
             <template v-else>
-              <SheetSummary v-bind="summary" large />
+              <div class="review-sheet">
+                <PortraitPicker
+                v-if="character?.campaign_id" :campaign-id="character.campaign_id" :character-id="character.id" :name="summary.name || character.name"
+                :image-id="character.portrait_image_id" :size="132" :editable="character.status !== 'archived'" @change="id => { if (character) character.portrait_image_id = id }"
+              />
+                <SheetSummary v-bind="summary" large />
+              </div>
               <div class="review-box">
                 <h3>{{ progress?.complete ? 'Tudo pronto para o mestre' : 'Antes de enviar' }}</h3>
                 <ul class="review-steps">
@@ -457,6 +464,10 @@ onBeforeUnmount(() => clearTimeout(autosave))
 
           <aside v-if="!isReview" class="builder-side" aria-label="Sua ficha até agora">
             <p class="side-title">Sua ficha</p>
+            <PortraitPicker
+                v-if="character?.campaign_id" :campaign-id="character.campaign_id" :character-id="character.id" :name="summary.name || character.name"
+                :image-id="character.portrait_image_id" :size="96" :editable="character.status !== 'archived'" @change="id => { if (character) character.portrait_image_id = id }"
+              />
             <SheetSummary v-bind="summary" />
           </aside>
         </div>
