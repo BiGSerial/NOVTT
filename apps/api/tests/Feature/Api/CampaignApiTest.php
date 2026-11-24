@@ -131,4 +131,29 @@ final class CampaignApiTest extends TestCase
         $this->assertSame($v1->getKey(), CampaignCharacter::query()->findOrFail($character->getKey())->preset_version_id);
         $this->addMember($campaign, $this->makeUser(), CampaignRole::Master);
     }
+
+    public function test_the_list_tells_who_masters_how_many_play_and_the_latest_session(): void
+    {
+        $master = $this->makeUser('Mestra Lia');
+        $ana = $this->makeUser('Ana');
+        $campaign = $this->makeCampaign($master);
+        $this->addMember($campaign, $ana);
+        $quiet = $this->makeCampaign($master);
+
+        $this->actingAs($ana)->getJson('/api/v1/campaigns')->assertOk()
+            ->assertJsonPath('data.0.masters.0.name', 'Mestra Lia')
+            ->assertJsonPath('data.0.players_count', 1)
+            ->assertJsonPath('data.0.last_session', null)
+            ->assertJsonMissingPath('data.0.masters.0.email');
+
+        $first = $this->actingAs($master)->postJson("/api/v1/campaigns/{$campaign->getKey()}/sessions", ['title' => 'Primeira'], ['Idempotency-Key' => (string) \Illuminate\Support\Str::uuid()])->assertCreated()->json('id');
+        $this->actingAs($master)->postJson("/api/v1/sessions/{$first}/end")->assertOk();
+        $this->travel(1)->hours();
+        $this->actingAs($master)->postJson("/api/v1/campaigns/{$campaign->getKey()}/sessions", ['title' => 'Segunda'], ['Idempotency-Key' => (string) \Illuminate\Support\Str::uuid()])->assertCreated();
+
+        $list = collect($this->actingAs($master)->getJson('/api/v1/campaigns')->assertOk()->json('data'))->keyBy('id');
+        self::assertSame('Segunda', $list[$campaign->getKey()]['last_session']['title']);
+        self::assertSame('active', $list[$campaign->getKey()]['last_session']['status']);
+        self::assertNull($list[$quiet->getKey()]['last_session']);
+    }
 }

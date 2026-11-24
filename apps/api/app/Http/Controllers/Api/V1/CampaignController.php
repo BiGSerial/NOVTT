@@ -13,6 +13,7 @@ use App\Http\Problems\ApiProblem;
 use App\Http\Resources\CampaignPresenter;
 use App\Models\Campaign;
 use App\Models\CampaignMember;
+use App\Models\GameSession;
 use App\Models\PresetVersion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -40,10 +41,54 @@ final class CampaignController extends ApiController
             ->orderBy('campaign_id')
             ->cursorPaginate($limit);
 
+        $ids = array_map(static fn (CampaignMember $m): string => $m->campaign_id, $page->items());
+        $summaries = $this->summaries($ids);
+
         return new JsonResponse([
-            'data' => array_map(static fn (CampaignMember $m): array => CampaignPresenter::toArray($m->campaign, $m->role->value), $page->items()),
+            'data' => array_map(static fn (CampaignMember $m): array => CampaignPresenter::toArray($m->campaign, $m->role->value) + ($summaries[$m->campaign_id] ?? []), $page->items()),
             'next_cursor' => $page->nextCursor()?->encode(),
         ]);
+    }
+
+    /**
+     * Who masters each campaign, how many play and the latest session, in three queries for the
+     * whole page (no N+1). Only display names of fellow members: no e-mails.
+     *
+     * @param list<string> $ids
+     * @return array<string, array<string, mixed>>
+     */
+    private function summaries(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+        $out = array_fill_keys($ids, ['masters' => [], 'players_count' => 0, 'last_session' => null]);
+        $members = CampaignMember::query()->join('users', 'users.id', '=', 'campaign_members.user_id')
+            ->whereIn('campaign_members.campaign_id', $ids)->where('campaign_members.status', MemberStatus::Active)
+            ->orderBy('users.name')
+            ->get(['campaign_members.campaign_id', 'campaign_members.role', 'campaign_members.user_id', 'users.name']);
+        foreach ($members as $m) {
+            $role = is_string($m->role) ? $m->role : $m->role->value;
+            if ($role === CampaignRole::Master->value) {
+                $out[$m->campaign_id]['masters'][] = ['user_id' => $m->user_id, 'name' => $m->name];
+            } else {
+                $out[$m->campaign_id]['players_count']++;
+            }
+        }
+        $latest = GameSession::query()->whereIn('campaign_id', $ids)
+            ->select(['campaign_id', 'title', 'status', 'started_at', 'ended_at'])
+            ->whereIn('id', GameSession::query()->selectRaw('DISTINCT ON (campaign_id) id')->whereIn('campaign_id', $ids)->orderBy('campaign_id')->orderByDesc('started_at'))
+            ->get();
+        foreach ($latest as $session) {
+            $out[$session->campaign_id]['last_session'] = [
+                'title' => $session->title,
+                'status' => $session->status,
+                'started_at' => $session->started_at?->format(DATE_RFC3339_EXTENDED),
+                'ended_at' => $session->ended_at?->format(DATE_RFC3339_EXTENDED),
+            ];
+        }
+
+        return $out;
     }
 
     public function store(Request $request, Idempotency $idempotency): JsonResponse
