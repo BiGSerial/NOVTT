@@ -20,16 +20,24 @@ use Novtt\Engine\Validation\ValidationResult;
 final class DemoPreset
 {
     public const ROOT = __DIR__ . '/../../../../presets/novtt-demo';
+    public const PRESETS = __DIR__ . '/../../../../presets';
+
+    public static function package(string $relative): self
+    {
+        return new self(basename(dirname($relative)), null, self::PRESETS . '/' . $relative);
+    }
 
     /** @var array<string, array<string, mixed>> */
     public array $parts = [];
 
     /** @param array<string, mixed>|null $rulesOverride */
-    public function __construct(public readonly string $variant, ?array $rulesOverride = null)
+    /** @param string|null $directory a package directory (default: presets/novtt-demo/<variant>/1.0.0) */
+    public function __construct(public readonly string $variant, ?array $rulesOverride = null, ?string $directory = null)
     {
+        $directory ??= self::ROOT . "/{$variant}/1.0.0";
         foreach (['manifest', 'sheet_schema' => 'sheet.schema', 'sheet_ui' => 'sheet.ui', 'rules', 'compendium'] as $key => $file) {
             $key = is_int($key) ? $file : $key;
-            $this->parts[$key] = self::json(self::ROOT . "/{$variant}/1.0.0/{$file}.json");
+            $this->parts[$key] = self::json("{$directory}/{$file}.json");
         }
         if ($rulesOverride !== null) {
             $this->parts['rules'] = $rulesOverride;

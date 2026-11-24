@@ -1,0 +1,6928 @@
+{
+  "contract": "novtt.rules/2",
+  "budgets": [
+    {
+      "id": "atributos",
+      "kind": "initial",
+      "label": "Pontos de atributo",
+      "amount": {
+        "op": "add",
+        "args": [
+          {
+            "const": 4
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/agi"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/for"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/int"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/pre"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/vig"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "pericias",
+      "kind": "initial",
+      "label": "Perícias treinadas a escolher · a conferir",
+      "amount": {
+        "op": "max",
+        "args": [
+          {
+            "const": 0
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "lookup",
+                "key": {
+                  "ref": "/classe/classe"
+                },
+                "table": {
+                  "combatente": 1,
+                  "especialista": 7,
+                  "ocultista": 3
+                },
+                "default": {
+                  "const": 0
+                }
+              },
+              {
+                "ref": "/atributos/int"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "aumento_atributo",
+      "kind": "other",
+      "label": "Aumentos de atributo por NEX · a conferir",
+      "amount": {
+        "op": "add",
+        "args": [
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "ge",
+                "args": [
+                  {
+                    "ref": "/progresso/nex_nivel"
+                  },
+                  {
+                    "const": 4
+                  }
+                ]
+              },
+              {
+                "const": 1
+              },
+              {
+                "const": 0
+              }
+            ]
+          },
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "ge",
+                "args": [
+                  {
+                    "ref": "/progresso/nex_nivel"
+                  },
+                  {
+                    "const": 10
+                  }
+                ]
+              },
+              {
+                "const": 1
+              },
+              {
+                "const": 0
+              }
+            ]
+          },
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "ge",
+                "args": [
+                  {
+                    "ref": "/progresso/nex_nivel"
+                  },
+                  {
+                    "const": 16
+                  }
+                ]
+              },
+              {
+                "const": 1
+              },
+              {
+                "const": 0
+              }
+            ]
+          },
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "ge",
+                "args": [
+                  {
+                    "ref": "/progresso/nex_nivel"
+                  },
+                  {
+                    "const": 19
+                  }
+                ]
+              },
+              {
+                "const": 1
+              },
+              {
+                "const": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "graus_treinamento",
+      "kind": "other",
+      "label": "Graus de treinamento por NEX · a conferir",
+      "amount": {
+        "op": "add",
+        "args": [
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "ge",
+                "args": [
+                  {
+                    "ref": "/progresso/nex_nivel"
+                  },
+                  {
+                    "const": 7
+                  }
+                ]
+              },
+              {
+                "op": "max",
+                "args": [
+                  {
+                    "const": 0
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "const": 2
+                      },
+                      {
+                        "ref": "/atributos/int"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 0
+              }
+            ]
+          },
+          {
+            "op": "if",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "ge",
+                "args": [
+                  {
+                    "ref": "/progresso/nex_nivel"
+                  },
+                  {
+                    "const": 14
+                  }
+                ]
+              },
+              {
+                "op": "max",
+                "args": [
+                  {
+                    "const": 0
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "const": 2
+                      },
+                      {
+                        "ref": "/atributos/int"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "const": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "marcos_nex",
+      "kind": "other",
+      "label": "Etapas de NEX concedidas pelo mestre",
+      "initial_amount": 0
+    }
+  ],
+  "costs": [
+    {
+      "id": "atributos_criacao",
+      "phase": "creation",
+      "budget": "atributos",
+      "targets": [
+        "/atributos/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "pericias_criacao",
+      "phase": "creation",
+      "budget": "pericias",
+      "targets": [
+        "/pericias/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "atributos_nex",
+      "phase": "advancement",
+      "budget": "aumento_atributo",
+      "targets": [
+        "/atributos/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "pericias_nex",
+      "phase": "advancement",
+      "budget": "graus_treinamento",
+      "targets": [
+        "/pericias/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    }
+  ],
+  "phase_limits": [
+    {
+      "id": "atributo_maximo_inicial",
+      "phase": "creation",
+      "targets": [
+        "/atributos/*"
+      ],
+      "max": 3
+    },
+    {
+      "id": "pericia_treinada_na_criacao",
+      "phase": "creation",
+      "targets": [
+        "/pericias/*"
+      ],
+      "max": 1
+    }
+  ],
+  "dependencies": [],
+  "derived": [
+    {
+      "id": "nex",
+      "path": "/progresso/nex",
+      "label": "NEX (%)",
+      "formula": {
+        "op": "min",
+        "args": [
+          {
+            "op": "multiply",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 5
+              }
+            ]
+          },
+          {
+            "const": 99
+          }
+        ]
+      }
+    },
+    {
+      "id": "pv_max",
+      "path": "/derivados/pv_max",
+      "label": "PV máximo · a conferir",
+      "formula": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ne",
+            "args": [
+              {
+                "ref": "/classe/classe"
+              },
+              {
+                "const": ""
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "lookup",
+                "key": {
+                  "ref": "/classe/classe"
+                },
+                "table": {
+                  "combatente": 20,
+                  "especialista": 16,
+                  "ocultista": 12
+                },
+                "default": {
+                  "const": 0
+                }
+              },
+              {
+                "ref": "/atributos/vig"
+              },
+              {
+                "op": "multiply",
+                "args": [
+                  {
+                    "op": "subtract",
+                    "args": [
+                      {
+                        "ref": "/progresso/nex_nivel"
+                      },
+                      {
+                        "const": 1
+                      }
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "lookup",
+                        "key": {
+                          "ref": "/classe/classe"
+                        },
+                        "table": {
+                          "combatente": 4,
+                          "especialista": 3,
+                          "ocultista": 2
+                        },
+                        "default": {
+                          "const": 0
+                        }
+                      },
+                      {
+                        "ref": "/atributos/vig"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "pe_max",
+      "path": "/derivados/pe_max",
+      "label": "PE máximo · a conferir",
+      "formula": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ne",
+            "args": [
+              {
+                "ref": "/classe/classe"
+              },
+              {
+                "const": ""
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "lookup",
+                "key": {
+                  "ref": "/classe/classe"
+                },
+                "table": {
+                  "combatente": 2,
+                  "especialista": 3,
+                  "ocultista": 4
+                },
+                "default": {
+                  "const": 0
+                }
+              },
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "op": "multiply",
+                "args": [
+                  {
+                    "op": "subtract",
+                    "args": [
+                      {
+                        "ref": "/progresso/nex_nivel"
+                      },
+                      {
+                        "const": 1
+                      }
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "lookup",
+                        "key": {
+                          "ref": "/classe/classe"
+                        },
+                        "table": {
+                          "combatente": 2,
+                          "especialista": 3,
+                          "ocultista": 4
+                        },
+                        "default": {
+                          "const": 0
+                        }
+                      },
+                      {
+                        "ref": "/atributos/pre"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "san_max",
+      "path": "/derivados/san_max",
+      "label": "Sanidade máxima · a conferir",
+      "formula": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ne",
+            "args": [
+              {
+                "ref": "/classe/classe"
+              },
+              {
+                "const": ""
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "lookup",
+                "key": {
+                  "ref": "/classe/classe"
+                },
+                "table": {
+                  "combatente": 12,
+                  "especialista": 16,
+                  "ocultista": 20
+                },
+                "default": {
+                  "const": 0
+                }
+              },
+              {
+                "op": "multiply",
+                "args": [
+                  {
+                    "op": "subtract",
+                    "args": [
+                      {
+                        "ref": "/progresso/nex_nivel"
+                      },
+                      {
+                        "const": 1
+                      }
+                    ]
+                  },
+                  {
+                    "op": "lookup",
+                    "key": {
+                      "ref": "/classe/classe"
+                    },
+                    "table": {
+                      "combatente": 3,
+                      "especialista": 4,
+                      "ocultista": 5
+                    },
+                    "default": {
+                      "const": 0
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "defesa",
+      "path": "/derivados/defesa",
+      "label": "Defesa · a conferir",
+      "formula": {
+        "op": "add",
+        "args": [
+          {
+            "const": 10
+          },
+          {
+            "ref": "/atributos/agi"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pe_por_rodada",
+      "path": "/derivados/pe_por_rodada",
+      "label": "Limite de PE por rodada · a conferir",
+      "formula": {
+        "ref": "/progresso/nex_nivel"
+      }
+    },
+    {
+      "id": "dt_ritual",
+      "path": "/derivados/dt_ritual",
+      "label": "DT de rituais · a conferir",
+      "formula": {
+        "op": "add",
+        "args": [
+          {
+            "const": 10
+          },
+          {
+            "ref": "/progresso/nex_nivel"
+          },
+          {
+            "ref": "/atributos/pre"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_acrobacia",
+      "path": "/bonus/acrobacia",
+      "label": "Bônus de Acrobacia · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/acrobacia"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_adestramento",
+      "path": "/bonus/adestramento",
+      "label": "Bônus de Adestramento · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/adestramento"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_artes",
+      "path": "/bonus/artes",
+      "label": "Bônus de Artes · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/artes"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_atletismo",
+      "path": "/bonus/atletismo",
+      "label": "Bônus de Atletismo · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/atletismo"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_atualidades",
+      "path": "/bonus/atualidades",
+      "label": "Bônus de Atualidades · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/atualidades"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_ciencias",
+      "path": "/bonus/ciencias",
+      "label": "Bônus de Ciências · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/ciencias"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_crime",
+      "path": "/bonus/crime",
+      "label": "Bônus de Crime · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/crime"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_diplomacia",
+      "path": "/bonus/diplomacia",
+      "label": "Bônus de Diplomacia · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/diplomacia"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_enganacao",
+      "path": "/bonus/enganacao",
+      "label": "Bônus de Enganação · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/enganacao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_fortitude",
+      "path": "/bonus/fortitude",
+      "label": "Bônus de Fortitude · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/fortitude"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_furtividade",
+      "path": "/bonus/furtividade",
+      "label": "Bônus de Furtividade · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/furtividade"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_iniciativa",
+      "path": "/bonus/iniciativa",
+      "label": "Bônus de Iniciativa · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/iniciativa"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_intimidacao",
+      "path": "/bonus/intimidacao",
+      "label": "Bônus de Intimidação · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/intimidacao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_intuicao",
+      "path": "/bonus/intuicao",
+      "label": "Bônus de Intuição · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/intuicao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_investigacao",
+      "path": "/bonus/investigacao",
+      "label": "Bônus de Investigação · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/investigacao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_luta",
+      "path": "/bonus/luta",
+      "label": "Bônus de Luta · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/luta"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_medicina",
+      "path": "/bonus/medicina",
+      "label": "Bônus de Medicina · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/medicina"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_ocultismo",
+      "path": "/bonus/ocultismo",
+      "label": "Bônus de Ocultismo · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/ocultismo"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_percepcao",
+      "path": "/bonus/percepcao",
+      "label": "Bônus de Percepção · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/percepcao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_pilotagem",
+      "path": "/bonus/pilotagem",
+      "label": "Bônus de Pilotagem · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/pilotagem"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_pontaria",
+      "path": "/bonus/pontaria",
+      "label": "Bônus de Pontaria · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/pontaria"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_profissao",
+      "path": "/bonus/profissao",
+      "label": "Bônus de Profissão · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/profissao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_reflexos",
+      "path": "/bonus/reflexos",
+      "label": "Bônus de Reflexos · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/reflexos"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_religiao",
+      "path": "/bonus/religiao",
+      "label": "Bônus de Religião · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/religiao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_sobrevivencia",
+      "path": "/bonus/sobrevivencia",
+      "label": "Bônus de Sobrevivência · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/sobrevivencia"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_tatica",
+      "path": "/bonus/tatica",
+      "label": "Bônus de Tática · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/tatica"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_tecnologia",
+      "path": "/bonus/tecnologia",
+      "label": "Bônus de Tecnologia · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/tecnologia"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "bonus_vontade",
+      "path": "/bonus/vontade",
+      "label": "Bônus de Vontade · a conferir",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/vontade"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    }
+  ],
+  "effects": [],
+  "constraints": [
+    {
+      "id": "um_atributo_zero",
+      "label": "No máximo um atributo pode ser reduzido a 0",
+      "assert": {
+        "op": "compare",
+        "cmp": "le",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/agi"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/for"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/int"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/pre"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              },
+              {
+                "op": "if",
+                "args": [
+                  {
+                    "op": "compare",
+                    "cmp": "eq",
+                    "args": [
+                      {
+                        "ref": "/atributos/vig"
+                      },
+                      {
+                        "const": 0
+                      }
+                    ]
+                  },
+                  {
+                    "const": 1
+                  },
+                  {
+                    "const": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "paths": [
+        "/atributos/agi",
+        "/atributos/for",
+        "/atributos/int",
+        "/atributos/pre",
+        "/atributos/vig"
+      ]
+    },
+    {
+      "id": "grau_2_acrobacia",
+      "phase": "advancement",
+      "label": "Acrobacia: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/acrobacia"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/acrobacia"
+      ]
+    },
+    {
+      "id": "grau_3_acrobacia",
+      "phase": "advancement",
+      "label": "Acrobacia: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/acrobacia"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/acrobacia"
+      ]
+    },
+    {
+      "id": "grau_2_adestramento",
+      "phase": "advancement",
+      "label": "Adestramento: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/adestramento"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/adestramento"
+      ]
+    },
+    {
+      "id": "grau_3_adestramento",
+      "phase": "advancement",
+      "label": "Adestramento: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/adestramento"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/adestramento"
+      ]
+    },
+    {
+      "id": "grau_2_artes",
+      "phase": "advancement",
+      "label": "Artes: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/artes"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/artes"
+      ]
+    },
+    {
+      "id": "grau_3_artes",
+      "phase": "advancement",
+      "label": "Artes: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/artes"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/artes"
+      ]
+    },
+    {
+      "id": "grau_2_atletismo",
+      "phase": "advancement",
+      "label": "Atletismo: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/atletismo"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/atletismo"
+      ]
+    },
+    {
+      "id": "grau_3_atletismo",
+      "phase": "advancement",
+      "label": "Atletismo: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/atletismo"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/atletismo"
+      ]
+    },
+    {
+      "id": "grau_2_atualidades",
+      "phase": "advancement",
+      "label": "Atualidades: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/atualidades"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/atualidades"
+      ]
+    },
+    {
+      "id": "grau_3_atualidades",
+      "phase": "advancement",
+      "label": "Atualidades: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/atualidades"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/atualidades"
+      ]
+    },
+    {
+      "id": "grau_2_ciencias",
+      "phase": "advancement",
+      "label": "Ciências: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/ciencias"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/ciencias"
+      ]
+    },
+    {
+      "id": "grau_3_ciencias",
+      "phase": "advancement",
+      "label": "Ciências: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/ciencias"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/ciencias"
+      ]
+    },
+    {
+      "id": "grau_2_crime",
+      "phase": "advancement",
+      "label": "Crime: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/crime"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/crime"
+      ]
+    },
+    {
+      "id": "grau_3_crime",
+      "phase": "advancement",
+      "label": "Crime: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/crime"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/crime"
+      ]
+    },
+    {
+      "id": "grau_2_diplomacia",
+      "phase": "advancement",
+      "label": "Diplomacia: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/diplomacia"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/diplomacia"
+      ]
+    },
+    {
+      "id": "grau_3_diplomacia",
+      "phase": "advancement",
+      "label": "Diplomacia: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/diplomacia"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/diplomacia"
+      ]
+    },
+    {
+      "id": "grau_2_enganacao",
+      "phase": "advancement",
+      "label": "Enganação: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/enganacao"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/enganacao"
+      ]
+    },
+    {
+      "id": "grau_3_enganacao",
+      "phase": "advancement",
+      "label": "Enganação: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/enganacao"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/enganacao"
+      ]
+    },
+    {
+      "id": "grau_2_fortitude",
+      "phase": "advancement",
+      "label": "Fortitude: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/fortitude"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/fortitude"
+      ]
+    },
+    {
+      "id": "grau_3_fortitude",
+      "phase": "advancement",
+      "label": "Fortitude: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/fortitude"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/fortitude"
+      ]
+    },
+    {
+      "id": "grau_2_furtividade",
+      "phase": "advancement",
+      "label": "Furtividade: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/furtividade"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/furtividade"
+      ]
+    },
+    {
+      "id": "grau_3_furtividade",
+      "phase": "advancement",
+      "label": "Furtividade: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/furtividade"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/furtividade"
+      ]
+    },
+    {
+      "id": "grau_2_iniciativa",
+      "phase": "advancement",
+      "label": "Iniciativa: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/iniciativa"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/iniciativa"
+      ]
+    },
+    {
+      "id": "grau_3_iniciativa",
+      "phase": "advancement",
+      "label": "Iniciativa: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/iniciativa"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/iniciativa"
+      ]
+    },
+    {
+      "id": "grau_2_intimidacao",
+      "phase": "advancement",
+      "label": "Intimidação: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/intimidacao"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/intimidacao"
+      ]
+    },
+    {
+      "id": "grau_3_intimidacao",
+      "phase": "advancement",
+      "label": "Intimidação: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/intimidacao"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/intimidacao"
+      ]
+    },
+    {
+      "id": "grau_2_intuicao",
+      "phase": "advancement",
+      "label": "Intuição: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/intuicao"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/intuicao"
+      ]
+    },
+    {
+      "id": "grau_3_intuicao",
+      "phase": "advancement",
+      "label": "Intuição: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/intuicao"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/intuicao"
+      ]
+    },
+    {
+      "id": "grau_2_investigacao",
+      "phase": "advancement",
+      "label": "Investigação: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/investigacao"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/investigacao"
+      ]
+    },
+    {
+      "id": "grau_3_investigacao",
+      "phase": "advancement",
+      "label": "Investigação: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/investigacao"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/investigacao"
+      ]
+    },
+    {
+      "id": "grau_2_luta",
+      "phase": "advancement",
+      "label": "Luta: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/luta"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/luta"
+      ]
+    },
+    {
+      "id": "grau_3_luta",
+      "phase": "advancement",
+      "label": "Luta: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/luta"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/luta"
+      ]
+    },
+    {
+      "id": "grau_2_medicina",
+      "phase": "advancement",
+      "label": "Medicina: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/medicina"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/medicina"
+      ]
+    },
+    {
+      "id": "grau_3_medicina",
+      "phase": "advancement",
+      "label": "Medicina: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/medicina"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/medicina"
+      ]
+    },
+    {
+      "id": "grau_2_ocultismo",
+      "phase": "advancement",
+      "label": "Ocultismo: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/ocultismo"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/ocultismo"
+      ]
+    },
+    {
+      "id": "grau_3_ocultismo",
+      "phase": "advancement",
+      "label": "Ocultismo: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/ocultismo"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/ocultismo"
+      ]
+    },
+    {
+      "id": "grau_2_percepcao",
+      "phase": "advancement",
+      "label": "Percepção: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/percepcao"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/percepcao"
+      ]
+    },
+    {
+      "id": "grau_3_percepcao",
+      "phase": "advancement",
+      "label": "Percepção: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/percepcao"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/percepcao"
+      ]
+    },
+    {
+      "id": "grau_2_pilotagem",
+      "phase": "advancement",
+      "label": "Pilotagem: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/pilotagem"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/pilotagem"
+      ]
+    },
+    {
+      "id": "grau_3_pilotagem",
+      "phase": "advancement",
+      "label": "Pilotagem: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/pilotagem"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/pilotagem"
+      ]
+    },
+    {
+      "id": "grau_2_pontaria",
+      "phase": "advancement",
+      "label": "Pontaria: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/pontaria"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/pontaria"
+      ]
+    },
+    {
+      "id": "grau_3_pontaria",
+      "phase": "advancement",
+      "label": "Pontaria: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/pontaria"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/pontaria"
+      ]
+    },
+    {
+      "id": "grau_2_profissao",
+      "phase": "advancement",
+      "label": "Profissão: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/profissao"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/profissao"
+      ]
+    },
+    {
+      "id": "grau_3_profissao",
+      "phase": "advancement",
+      "label": "Profissão: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/profissao"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/profissao"
+      ]
+    },
+    {
+      "id": "grau_2_reflexos",
+      "phase": "advancement",
+      "label": "Reflexos: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/reflexos"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/reflexos"
+      ]
+    },
+    {
+      "id": "grau_3_reflexos",
+      "phase": "advancement",
+      "label": "Reflexos: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/reflexos"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/reflexos"
+      ]
+    },
+    {
+      "id": "grau_2_religiao",
+      "phase": "advancement",
+      "label": "Religião: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/religiao"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/religiao"
+      ]
+    },
+    {
+      "id": "grau_3_religiao",
+      "phase": "advancement",
+      "label": "Religião: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/religiao"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/religiao"
+      ]
+    },
+    {
+      "id": "grau_2_sobrevivencia",
+      "phase": "advancement",
+      "label": "Sobrevivência: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/sobrevivencia"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/sobrevivencia"
+      ]
+    },
+    {
+      "id": "grau_3_sobrevivencia",
+      "phase": "advancement",
+      "label": "Sobrevivência: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/sobrevivencia"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/sobrevivencia"
+      ]
+    },
+    {
+      "id": "grau_2_tatica",
+      "phase": "advancement",
+      "label": "Tática: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/tatica"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/tatica"
+      ]
+    },
+    {
+      "id": "grau_3_tatica",
+      "phase": "advancement",
+      "label": "Tática: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/tatica"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/tatica"
+      ]
+    },
+    {
+      "id": "grau_2_tecnologia",
+      "phase": "advancement",
+      "label": "Tecnologia: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/tecnologia"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/tecnologia"
+      ]
+    },
+    {
+      "id": "grau_3_tecnologia",
+      "phase": "advancement",
+      "label": "Tecnologia: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/tecnologia"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/tecnologia"
+      ]
+    },
+    {
+      "id": "grau_2_vontade",
+      "phase": "advancement",
+      "label": "Vontade: grau 2 exige NEX 35% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/vontade"
+              },
+              {
+                "const": 2
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 7
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/vontade"
+      ]
+    },
+    {
+      "id": "grau_3_vontade",
+      "phase": "advancement",
+      "label": "Vontade: grau 3 exige NEX 70% · a conferir",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "lt",
+            "args": [
+              {
+                "ref": "/pericias/vontade"
+              },
+              {
+                "const": 3
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/progresso/nex_nivel"
+              },
+              {
+                "const": 14
+              }
+            ]
+          }
+        ]
+      },
+      "paths": [
+        "/pericias/vontade"
+      ]
+    }
+  ],
+  "creation": {
+    "steps": [
+      {
+        "id": "identidade",
+        "label": "Identidade",
+        "paths": [
+          "/identidade/*"
+        ],
+        "required": [
+          "/identidade/nome"
+        ]
+      },
+      {
+        "id": "atributos",
+        "label": "Atributos",
+        "paths": [
+          "/atributos/*"
+        ],
+        "complete_when": {
+          "op": "compare",
+          "cmp": "eq",
+          "args": [
+            {
+              "budget": "atributos",
+              "of": "balance"
+            },
+            {
+              "const": 0
+            }
+          ]
+        }
+      },
+      {
+        "id": "origem",
+        "label": "Origem",
+        "paths": [
+          "/origem/*"
+        ],
+        "required": [
+          "/origem/origem"
+        ]
+      },
+      {
+        "id": "classe",
+        "label": "Classe",
+        "paths": [
+          "/classe/classe",
+          "/classe/pericia_ataque",
+          "/classe/pericia_defesa"
+        ],
+        "required": [
+          "/classe/classe"
+        ],
+        "complete_when": {
+          "op": "or",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "ne",
+              "args": [
+                {
+                  "ref": "/classe/classe"
+                },
+                {
+                  "const": "combatente"
+                }
+              ]
+            },
+            {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "ne",
+                  "args": [
+                    {
+                      "ref": "/classe/pericia_ataque"
+                    },
+                    {
+                      "const": ""
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ne",
+                  "args": [
+                    {
+                      "ref": "/classe/pericia_defesa"
+                    },
+                    {
+                      "const": ""
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "pericias",
+        "label": "Perícias",
+        "paths": [
+          "/pericias/*"
+        ],
+        "complete_when": {
+          "op": "compare",
+          "cmp": "eq",
+          "args": [
+            {
+              "budget": "pericias",
+              "of": "balance"
+            },
+            {
+              "const": 0
+            }
+          ]
+        }
+      },
+      {
+        "id": "equipamento",
+        "label": "Equipamento",
+        "paths": [
+          "/inventario",
+          "/ataques",
+          "/combate/*"
+        ],
+        "complete_when": {
+          "const": true
+        }
+      },
+      {
+        "id": "revisao",
+        "label": "Revisão",
+        "paths": [
+          "/descricao/*",
+          "/recursos/*"
+        ],
+        "complete_when": {
+          "const": true
+        }
+      }
+    ],
+    "choices": [
+      {
+        "id": "origem",
+        "path": "/origem/origem",
+        "label": "Origem",
+        "options": [
+          {
+            "value": "academico",
+            "label": "Acadêmico",
+            "compendium_id": "origem.academico",
+            "fixes": [
+              {
+                "path": "/pericias/ciencias",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/investigacao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "agente_de_saude",
+            "label": "Agente de Saúde",
+            "compendium_id": "origem.agente_de_saude",
+            "fixes": [
+              {
+                "path": "/pericias/intuicao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/medicina",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "amnesico",
+            "label": "Amnésico",
+            "compendium_id": "origem.amnesico"
+          },
+          {
+            "value": "artista",
+            "label": "Artista",
+            "compendium_id": "origem.artista",
+            "fixes": [
+              {
+                "path": "/pericias/artes",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/enganacao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "atleta",
+            "label": "Atleta",
+            "compendium_id": "origem.atleta",
+            "fixes": [
+              {
+                "path": "/pericias/acrobacia",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/atletismo",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "chef",
+            "label": "Chef",
+            "compendium_id": "origem.chef",
+            "fixes": [
+              {
+                "path": "/pericias/fortitude",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/profissao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "criminoso",
+            "label": "Criminoso",
+            "compendium_id": "origem.criminoso",
+            "fixes": [
+              {
+                "path": "/pericias/crime",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/furtividade",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "cultista_arrependido",
+            "label": "Cultista Arrependido",
+            "compendium_id": "origem.cultista_arrependido",
+            "fixes": [
+              {
+                "path": "/pericias/ocultismo",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/religiao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "desgarrado",
+            "label": "Desgarrado",
+            "compendium_id": "origem.desgarrado",
+            "fixes": [
+              {
+                "path": "/pericias/fortitude",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/sobrevivencia",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "engenheiro",
+            "label": "Engenheiro",
+            "compendium_id": "origem.engenheiro",
+            "fixes": [
+              {
+                "path": "/pericias/profissao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/tecnologia",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "executivo",
+            "label": "Executivo",
+            "compendium_id": "origem.executivo",
+            "fixes": [
+              {
+                "path": "/pericias/diplomacia",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/profissao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "investigador",
+            "label": "Investigador",
+            "compendium_id": "origem.investigador",
+            "fixes": [
+              {
+                "path": "/pericias/investigacao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/percepcao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "lutador",
+            "label": "Lutador",
+            "compendium_id": "origem.lutador",
+            "fixes": [
+              {
+                "path": "/pericias/luta",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/reflexos",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "magnata",
+            "label": "Magnata",
+            "compendium_id": "origem.magnata",
+            "fixes": [
+              {
+                "path": "/pericias/diplomacia",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/pilotagem",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "mercenario",
+            "label": "Mercenário",
+            "compendium_id": "origem.mercenario",
+            "fixes": [
+              {
+                "path": "/pericias/iniciativa",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/intimidacao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "militar",
+            "label": "Militar",
+            "compendium_id": "origem.militar",
+            "fixes": [
+              {
+                "path": "/pericias/pontaria",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/tatica",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "operario",
+            "label": "Operário",
+            "compendium_id": "origem.operario",
+            "fixes": [
+              {
+                "path": "/pericias/fortitude",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/profissao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "policial",
+            "label": "Policial",
+            "compendium_id": "origem.policial",
+            "fixes": [
+              {
+                "path": "/pericias/percepcao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/pontaria",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "religioso",
+            "label": "Religioso",
+            "compendium_id": "origem.religioso",
+            "fixes": [
+              {
+                "path": "/pericias/religiao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/vontade",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "servidor_publico",
+            "label": "Servidor Público",
+            "compendium_id": "origem.servidor_publico",
+            "fixes": [
+              {
+                "path": "/pericias/intuicao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/vontade",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "teorico_da_conspiracao",
+            "label": "Teórico da Conspiração",
+            "compendium_id": "origem.teorico_da_conspiracao",
+            "fixes": [
+              {
+                "path": "/pericias/investigacao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/ocultismo",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "ti",
+            "label": "T.I.",
+            "compendium_id": "origem.ti",
+            "fixes": [
+              {
+                "path": "/pericias/investigacao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/tecnologia",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "trabalhador_rural",
+            "label": "Trabalhador Rural",
+            "compendium_id": "origem.trabalhador_rural",
+            "fixes": [
+              {
+                "path": "/pericias/adestramento",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/sobrevivencia",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "trambiqueiro",
+            "label": "Trambiqueiro",
+            "compendium_id": "origem.trambiqueiro",
+            "fixes": [
+              {
+                "path": "/pericias/crime",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/enganacao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "universitario",
+            "label": "Universitário",
+            "compendium_id": "origem.universitario",
+            "fixes": [
+              {
+                "path": "/pericias/atualidades",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/investigacao",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "vitima",
+            "label": "Vítima",
+            "compendium_id": "origem.vitima",
+            "fixes": [
+              {
+                "path": "/pericias/reflexos",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/vontade",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da origem · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "classe",
+        "path": "/classe/classe",
+        "label": "Classe",
+        "options": [
+          {
+            "value": "combatente",
+            "label": "Combatente",
+            "compendium_id": "classe.combatente",
+            "fixes": [
+              {
+                "path": "/proficiencias/armas_simples",
+                "value": {
+                  "const": true
+                },
+                "label": "proficiência da classe · a conferir",
+                "mode": "exact"
+              },
+              {
+                "path": "/proficiencias/armas_taticas",
+                "value": {
+                  "const": true
+                },
+                "label": "proficiência da classe · a conferir",
+                "mode": "exact"
+              },
+              {
+                "path": "/proficiencias/protecoes_leves",
+                "value": {
+                  "const": true
+                },
+                "label": "proficiência da classe · a conferir",
+                "mode": "exact"
+              }
+            ]
+          },
+          {
+            "value": "especialista",
+            "label": "Especialista",
+            "compendium_id": "classe.especialista",
+            "fixes": [
+              {
+                "path": "/proficiencias/armas_simples",
+                "value": {
+                  "const": true
+                },
+                "label": "proficiência da classe · a conferir",
+                "mode": "exact"
+              },
+              {
+                "path": "/proficiencias/protecoes_leves",
+                "value": {
+                  "const": true
+                },
+                "label": "proficiência da classe · a conferir",
+                "mode": "exact"
+              }
+            ]
+          },
+          {
+            "value": "ocultista",
+            "label": "Ocultista",
+            "compendium_id": "classe.ocultista",
+            "fixes": [
+              {
+                "path": "/pericias/ocultismo",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da classe · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/pericias/vontade",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia da classe · a conferir",
+                "mode": "at_least"
+              },
+              {
+                "path": "/proficiencias/armas_simples",
+                "value": {
+                  "const": true
+                },
+                "label": "proficiência da classe · a conferir",
+                "mode": "exact"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "combatente_ataque",
+        "path": "/classe/pericia_ataque",
+        "label": "Perícia de ataque",
+        "options": [
+          {
+            "value": "luta",
+            "label": "Luta",
+            "requires": {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "ref": "/classe/classe"
+                },
+                {
+                  "const": "combatente"
+                }
+              ]
+            },
+            "fixes": [
+              {
+                "path": "/pericias/luta",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia de ataque do combatente · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "pontaria",
+            "label": "Pontaria",
+            "requires": {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "ref": "/classe/classe"
+                },
+                {
+                  "const": "combatente"
+                }
+              ]
+            },
+            "fixes": [
+              {
+                "path": "/pericias/pontaria",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia de ataque do combatente · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "combatente_defesa",
+        "path": "/classe/pericia_defesa",
+        "label": "Perícia de resistência",
+        "options": [
+          {
+            "value": "fortitude",
+            "label": "Fortitude",
+            "requires": {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "ref": "/classe/classe"
+                },
+                {
+                  "const": "combatente"
+                }
+              ]
+            },
+            "fixes": [
+              {
+                "path": "/pericias/fortitude",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia de resistência do combatente · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          },
+          {
+            "value": "reflexos",
+            "label": "Reflexos",
+            "requires": {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "ref": "/classe/classe"
+                },
+                {
+                  "const": "combatente"
+                }
+              ]
+            },
+            "fixes": [
+              {
+                "path": "/pericias/reflexos",
+                "value": {
+                  "const": 1
+                },
+                "label": "perícia de resistência do combatente · a conferir",
+                "mode": "at_least"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "trilha",
+        "path": "/classe/trilha",
+        "label": "Trilha",
+        "options": [
+          {
+            "value": "aniquilador",
+            "label": "Aniquilador",
+            "compendium_id": "trilha.aniquilador",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "combatente"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "comandante_de_campo",
+            "label": "Comandante de Campo",
+            "compendium_id": "trilha.comandante_de_campo",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "combatente"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "guerreiro",
+            "label": "Guerreiro",
+            "compendium_id": "trilha.guerreiro",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "combatente"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "operacoes_especiais",
+            "label": "Operações Especiais",
+            "compendium_id": "trilha.operacoes_especiais",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "combatente"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "tropa_de_choque",
+            "label": "Tropa de Choque",
+            "compendium_id": "trilha.tropa_de_choque",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "combatente"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "atirador_de_elite",
+            "label": "Atirador de Elite",
+            "compendium_id": "trilha.atirador_de_elite",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "especialista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "infiltrador",
+            "label": "Infiltrador",
+            "compendium_id": "trilha.infiltrador",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "especialista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "medico_de_campo",
+            "label": "Médico de Campo",
+            "compendium_id": "trilha.medico_de_campo",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "especialista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "negociador",
+            "label": "Negociador",
+            "compendium_id": "trilha.negociador",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "especialista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "tecnico",
+            "label": "Técnico",
+            "compendium_id": "trilha.tecnico",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "especialista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "conduite",
+            "label": "Conduíte",
+            "compendium_id": "trilha.conduite",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "ocultista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "flagelador",
+            "label": "Flagelador",
+            "compendium_id": "trilha.flagelador",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "ocultista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "graduado",
+            "label": "Graduado",
+            "compendium_id": "trilha.graduado",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "ocultista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "intuitivo",
+            "label": "Intuitivo",
+            "compendium_id": "trilha.intuitivo",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "ocultista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "value": "lamina_paranormal",
+            "label": "Lâmina Paranormal",
+            "compendium_id": "trilha.lamina_paranormal",
+            "requires": {
+              "op": "and",
+              "args": [
+                {
+                  "op": "compare",
+                  "cmp": "eq",
+                  "args": [
+                    {
+                      "ref": "/classe/classe"
+                    },
+                    {
+                      "const": "ocultista"
+                    }
+                  ]
+                },
+                {
+                  "op": "compare",
+                  "cmp": "ge",
+                  "args": [
+                    {
+                      "ref": "/progresso/nex_nivel"
+                    },
+                    {
+                      "const": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "progression": {
+    "tracks": [
+      {
+        "id": "nex",
+        "label": "NEX",
+        "path": "/progresso/nex_nivel",
+        "max_step": 1,
+        "measure": {
+          "op": "add",
+          "args": [
+            {
+              "const": 1
+            },
+            {
+              "budget": "marcos_nex",
+              "of": "granted"
+            }
+          ]
+        },
+        "thresholds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      }
+    ]
+  },
+  "resources": [
+    {
+      "id": "pv",
+      "label": "Pontos de Vida",
+      "path": "/recursos/pv",
+      "max": {
+        "derived": "pv_max"
+      },
+      "min": -999,
+      "recovery": "rest"
+    },
+    {
+      "id": "pe",
+      "label": "Pontos de Esforço",
+      "path": "/recursos/pe",
+      "max": {
+        "derived": "pe_max"
+      },
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "san",
+      "label": "Sanidade",
+      "path": "/recursos/san",
+      "max": {
+        "derived": "san_max"
+      },
+      "min": 0,
+      "recovery": "manual"
+    }
+  ],
+  "rolls": [
+    {
+      "id": "atributo",
+      "label": "Teste de atributo",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "var": "atributo"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "var": "atributo"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "var": "atributo"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "const": 0
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      },
+      "inputs": {
+        "atributo": {
+          "targets": [
+            "/atributos/*"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pericia_acrobacia",
+      "label": "Acrobacia",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/agi"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/acrobacia"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_adestramento",
+      "label": "Adestramento",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/pre"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/adestramento"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_artes",
+      "label": "Artes",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/pre"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/artes"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_atletismo",
+      "label": "Atletismo",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/for"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/for"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/for"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/atletismo"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_atualidades",
+      "label": "Atualidades",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/int"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/atualidades"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_ciencias",
+      "label": "Ciências",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/int"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/ciencias"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_crime",
+      "label": "Crime",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/agi"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/crime"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_diplomacia",
+      "label": "Diplomacia",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/pre"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/diplomacia"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_enganacao",
+      "label": "Enganação",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/pre"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/enganacao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_fortitude",
+      "label": "Fortitude",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/vig"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/vig"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/vig"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/fortitude"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_furtividade",
+      "label": "Furtividade",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/agi"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/furtividade"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_iniciativa",
+      "label": "Iniciativa",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/agi"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/iniciativa"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_intimidacao",
+      "label": "Intimidação",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/pre"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/intimidacao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_intuicao",
+      "label": "Intuição",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/pre"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/intuicao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_investigacao",
+      "label": "Investigação",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/int"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/investigacao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_luta",
+      "label": "Luta",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/for"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/for"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/for"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/luta"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_medicina",
+      "label": "Medicina",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/int"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/medicina"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_ocultismo",
+      "label": "Ocultismo",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/int"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/ocultismo"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_percepcao",
+      "label": "Percepção",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/pre"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/percepcao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_pilotagem",
+      "label": "Pilotagem",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/agi"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/pilotagem"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_pontaria",
+      "label": "Pontaria",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/agi"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/pontaria"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_profissao",
+      "label": "Profissão",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/int"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/profissao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_reflexos",
+      "label": "Reflexos",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/agi"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/agi"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/reflexos"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_religiao",
+      "label": "Religião",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/pre"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/religiao"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_sobrevivencia",
+      "label": "Sobrevivência",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/int"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/sobrevivencia"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_tatica",
+      "label": "Tática",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/int"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/tatica"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_tecnologia",
+      "label": "Tecnologia",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/int"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/int"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/tecnologia"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
+      "id": "pericia_vontade",
+      "label": "Vontade",
+      "strategy": "keep",
+      "faces": 20,
+      "count": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "ref": "/atributos/pre"
+          },
+          {
+            "const": 2
+          }
+        ]
+      },
+      "keep_mode": {
+        "op": "if",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/atributos/pre"
+              },
+              {
+                "const": 1
+              }
+            ]
+          },
+          {
+            "const": "highest"
+          },
+          {
+            "const": "lowest"
+          }
+        ]
+      },
+      "modifier": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/pericias/vontade"
+          },
+          {
+            "const": 5
+          }
+        ]
+      },
+      "target": {
+        "default": 15,
+        "min": 0,
+        "max": 60
+      }
+    }
+  ],
+  "governance": {
+    "lock_during_session": true
+  }
+}

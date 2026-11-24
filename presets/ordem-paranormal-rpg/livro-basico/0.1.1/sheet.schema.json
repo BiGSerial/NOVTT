@@ -1,0 +1,742 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ordem-paranormal-rpg livro-basico 0.1.1 sheet",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "identidade": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nome": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "jogador": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "conceito": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "origem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "origem": {
+          "type": "string",
+          "enum": [
+            "academico",
+            "agente_de_saude",
+            "amnesico",
+            "artista",
+            "atleta",
+            "chef",
+            "criminoso",
+            "cultista_arrependido",
+            "desgarrado",
+            "engenheiro",
+            "executivo",
+            "investigador",
+            "lutador",
+            "magnata",
+            "mercenario",
+            "militar",
+            "operario",
+            "policial",
+            "religioso",
+            "servidor_publico",
+            "teorico_da_conspiracao",
+            "ti",
+            "trabalhador_rural",
+            "trambiqueiro",
+            "universitario",
+            "vitima"
+          ]
+        }
+      }
+    },
+    "classe": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "classe": {
+          "type": "string",
+          "enum": [
+            "combatente",
+            "especialista",
+            "ocultista"
+          ]
+        },
+        "trilha": {
+          "type": "string",
+          "enum": [
+            "aniquilador",
+            "comandante_de_campo",
+            "guerreiro",
+            "operacoes_especiais",
+            "tropa_de_choque",
+            "atirador_de_elite",
+            "infiltrador",
+            "medico_de_campo",
+            "negociador",
+            "tecnico",
+            "conduite",
+            "flagelador",
+            "graduado",
+            "intuitivo",
+            "lamina_paranormal"
+          ]
+        },
+        "pericia_ataque": {
+          "type": "string",
+          "enum": [
+            "luta",
+            "pontaria"
+          ]
+        },
+        "pericia_defesa": {
+          "type": "string",
+          "enum": [
+            "fortitude",
+            "reflexos"
+          ]
+        }
+      }
+    },
+    "progresso": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nex_nivel": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 1
+        },
+        "nex": {
+          "type": "integer"
+        },
+        "patente": {
+          "type": "string",
+          "enum": [
+            "recruta",
+            "operador",
+            "agente_especial",
+            "oficial_de_operacoes",
+            "agente_de_elite"
+          ],
+          "default": "recruta"
+        },
+        "prestigio": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9999,
+          "default": 0
+        }
+      }
+    },
+    "atributos": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "agi": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 1
+        },
+        "for": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 1
+        },
+        "int": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 1
+        },
+        "pre": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 1
+        },
+        "vig": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 1
+        }
+      }
+    },
+    "pericias": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "acrobacia": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "adestramento": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "artes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "atletismo": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "atualidades": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "ciencias": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "crime": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "diplomacia": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "enganacao": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "fortitude": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "furtividade": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "iniciativa": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "intimidacao": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "intuicao": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "investigacao": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "luta": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "medicina": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "ocultismo": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "percepcao": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "pilotagem": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "pontaria": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "profissao": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "reflexos": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "religiao": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "sobrevivencia": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "tatica": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "tecnologia": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        },
+        "vontade": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0
+        }
+      }
+    },
+    "bonus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "acrobacia": {
+          "type": "integer"
+        },
+        "adestramento": {
+          "type": "integer"
+        },
+        "artes": {
+          "type": "integer"
+        },
+        "atletismo": {
+          "type": "integer"
+        },
+        "atualidades": {
+          "type": "integer"
+        },
+        "ciencias": {
+          "type": "integer"
+        },
+        "crime": {
+          "type": "integer"
+        },
+        "diplomacia": {
+          "type": "integer"
+        },
+        "enganacao": {
+          "type": "integer"
+        },
+        "fortitude": {
+          "type": "integer"
+        },
+        "furtividade": {
+          "type": "integer"
+        },
+        "iniciativa": {
+          "type": "integer"
+        },
+        "intimidacao": {
+          "type": "integer"
+        },
+        "intuicao": {
+          "type": "integer"
+        },
+        "investigacao": {
+          "type": "integer"
+        },
+        "luta": {
+          "type": "integer"
+        },
+        "medicina": {
+          "type": "integer"
+        },
+        "ocultismo": {
+          "type": "integer"
+        },
+        "percepcao": {
+          "type": "integer"
+        },
+        "pilotagem": {
+          "type": "integer"
+        },
+        "pontaria": {
+          "type": "integer"
+        },
+        "profissao": {
+          "type": "integer"
+        },
+        "reflexos": {
+          "type": "integer"
+        },
+        "religiao": {
+          "type": "integer"
+        },
+        "sobrevivencia": {
+          "type": "integer"
+        },
+        "tatica": {
+          "type": "integer"
+        },
+        "tecnologia": {
+          "type": "integer"
+        },
+        "vontade": {
+          "type": "integer"
+        }
+      }
+    },
+    "derivados": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pv_max": {
+          "type": "integer"
+        },
+        "pe_max": {
+          "type": "integer"
+        },
+        "san_max": {
+          "type": "integer"
+        },
+        "defesa": {
+          "type": "integer"
+        },
+        "pe_por_rodada": {
+          "type": "integer"
+        },
+        "dt_ritual": {
+          "type": "integer"
+        },
+        "carga": {
+          "type": "integer"
+        }
+      }
+    },
+    "recursos": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pv": {
+          "type": "integer",
+          "minimum": -999,
+          "maximum": 999,
+          "default": 0
+        },
+        "pe": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999,
+          "default": 0
+        },
+        "san": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999,
+          "default": 0
+        }
+      }
+    },
+    "combate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protecao": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99,
+          "default": 0
+        },
+        "resistencias": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "deslocamento": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99,
+          "default": 9
+        }
+      }
+    },
+    "proficiencias": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "armas_simples": {
+          "type": "boolean",
+          "default": false
+        },
+        "armas_taticas": {
+          "type": "boolean",
+          "default": false
+        },
+        "armas_pesadas": {
+          "type": "boolean",
+          "default": false
+        },
+        "protecoes_leves": {
+          "type": "boolean",
+          "default": false
+        },
+        "protecoes_pesadas": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "ataques": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "nome"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "nome": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "teste": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "dano": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "critico": {
+            "type": "string",
+            "maxLength": 20
+          },
+          "alcance": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "tipo": {
+            "type": "string",
+            "maxLength": 40
+          }
+        }
+      }
+    },
+    "inventario": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "nome"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "nome": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "categoria": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4,
+            "default": 0
+          },
+          "espacos": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20,
+            "default": 1
+          },
+          "quantidade": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99,
+            "default": 1
+          }
+        }
+      }
+    },
+    "rituais": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "nome",
+          "elemento",
+          "circulo"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "nome": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "elemento": {
+            "type": "string",
+            "enum": [
+              "sangue",
+              "morte",
+              "conhecimento",
+              "energia",
+              "medo"
+            ]
+          },
+          "circulo": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4,
+            "default": 1
+          },
+          "execucao": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "alcance": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "alvo": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "duracao": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "resistencia": {
+            "type": "string",
+            "maxLength": 80
+          }
+        }
+      }
+    },
+    "habilidades": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "nome"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "nome": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "fonte": {
+            "type": "string",
+            "enum": [
+              "classe",
+              "trilha",
+              "origem",
+              "paranormal",
+              "outra"
+            ]
+          },
+          "nota": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "descricao": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "aparencia": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "personalidade": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "historico": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "objetivo": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    }
+  }
+}

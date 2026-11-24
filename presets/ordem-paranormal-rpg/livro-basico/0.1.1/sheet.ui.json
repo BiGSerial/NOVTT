@@ -1,0 +1,808 @@
+{
+  "contract": "novtt.sheet-ui/1",
+  "default_access": "read_only",
+  "sections": [
+    {
+      "id": "identidade",
+      "label": "Identidade",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/identidade/nome",
+          "label": "Nome do agente",
+          "widget": "text",
+          "access": "editable"
+        },
+        {
+          "kind": "field",
+          "path": "/identidade/jogador",
+          "label": "Jogador",
+          "widget": "text",
+          "access": "editable"
+        },
+        {
+          "kind": "field",
+          "path": "/identidade/conceito",
+          "label": "Conceito",
+          "widget": "text",
+          "access": "editable"
+        }
+      ]
+    },
+    {
+      "id": "atributos",
+      "label": "Atributos",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/atributos/agi",
+          "label": "Agilidade (AGI)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/atributos/for",
+          "label": "Força (FOR)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/atributos/int",
+          "label": "Intelecto (INT)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/atributos/pre",
+          "label": "Presença (PRE)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/atributos/vig",
+          "label": "Vigor (VIG)",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "origem",
+      "label": "Origem",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/origem/origem",
+          "label": "Origem",
+          "widget": "select"
+        }
+      ]
+    },
+    {
+      "id": "classe",
+      "label": "Classe e trilha",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/classe/classe",
+          "label": "Classe",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/classe/pericia_ataque",
+          "label": "Perícia de ataque",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/classe/pericia_defesa",
+          "label": "Perícia de resistência",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/classe/trilha",
+          "label": "Trilha",
+          "widget": "select"
+        }
+      ]
+    },
+    {
+      "id": "pericias",
+      "label": "Perícias",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/pericias/acrobacia",
+          "label": "Acrobacia (AGI) +",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/adestramento",
+          "label": "Adestramento (PRE) *",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/artes",
+          "label": "Artes (PRE) *",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/atletismo",
+          "label": "Atletismo (FOR)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/atualidades",
+          "label": "Atualidades (INT)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/ciencias",
+          "label": "Ciências (INT) *",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/crime",
+          "label": "Crime (AGI) * +",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/diplomacia",
+          "label": "Diplomacia (PRE)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/enganacao",
+          "label": "Enganação (PRE)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/fortitude",
+          "label": "Fortitude (VIG)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/furtividade",
+          "label": "Furtividade (AGI) +",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/iniciativa",
+          "label": "Iniciativa (AGI)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/intimidacao",
+          "label": "Intimidação (PRE)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/intuicao",
+          "label": "Intuição (PRE)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/investigacao",
+          "label": "Investigação (INT)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/luta",
+          "label": "Luta (FOR)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/medicina",
+          "label": "Medicina (INT)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/ocultismo",
+          "label": "Ocultismo (INT) *",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/percepcao",
+          "label": "Percepção (PRE)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/pilotagem",
+          "label": "Pilotagem (AGI) *",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/pontaria",
+          "label": "Pontaria (AGI)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/profissao",
+          "label": "Profissão (INT) *",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/reflexos",
+          "label": "Reflexos (AGI)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/religiao",
+          "label": "Religião (PRE) *",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/sobrevivencia",
+          "label": "Sobrevivência (INT)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/tatica",
+          "label": "Tática (INT) *",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/tecnologia",
+          "label": "Tecnologia (INT) *",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/pericias/vontade",
+          "label": "Vontade (PRE)",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "bonus",
+      "label": "Bônus de perícia",
+      "access": "read_only",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/bonus/acrobacia",
+          "label": "Bônus de Acrobacia · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/adestramento",
+          "label": "Bônus de Adestramento · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/artes",
+          "label": "Bônus de Artes · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/atletismo",
+          "label": "Bônus de Atletismo · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/atualidades",
+          "label": "Bônus de Atualidades · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/ciencias",
+          "label": "Bônus de Ciências · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/crime",
+          "label": "Bônus de Crime · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/diplomacia",
+          "label": "Bônus de Diplomacia · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/enganacao",
+          "label": "Bônus de Enganação · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/fortitude",
+          "label": "Bônus de Fortitude · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/furtividade",
+          "label": "Bônus de Furtividade · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/iniciativa",
+          "label": "Bônus de Iniciativa · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/intimidacao",
+          "label": "Bônus de Intimidação · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/intuicao",
+          "label": "Bônus de Intuição · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/investigacao",
+          "label": "Bônus de Investigação · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/luta",
+          "label": "Bônus de Luta · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/medicina",
+          "label": "Bônus de Medicina · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/ocultismo",
+          "label": "Bônus de Ocultismo · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/percepcao",
+          "label": "Bônus de Percepção · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/pilotagem",
+          "label": "Bônus de Pilotagem · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/pontaria",
+          "label": "Bônus de Pontaria · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/profissao",
+          "label": "Bônus de Profissão · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/reflexos",
+          "label": "Bônus de Reflexos · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/religiao",
+          "label": "Bônus de Religião · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/sobrevivencia",
+          "label": "Bônus de Sobrevivência · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/tatica",
+          "label": "Bônus de Tática · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/tecnologia",
+          "label": "Bônus de Tecnologia · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/bonus/vontade",
+          "label": "Bônus de Vontade · a conferir",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "progresso",
+      "label": "NEX e patente",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/progresso/nex_nivel",
+          "label": "Etapa de NEX",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/progresso/nex",
+          "label": "NEX (%)",
+          "widget": "integer",
+          "access": "read_only"
+        },
+        {
+          "kind": "field",
+          "path": "/progresso/patente",
+          "label": "Patente",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/progresso/prestigio",
+          "label": "Pontos de prestígio",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "derivados",
+      "label": "Valores calculados",
+      "access": "read_only",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/derivados/pv_max",
+          "label": "PV máximo · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derivados/pe_max",
+          "label": "PE máximo · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derivados/san_max",
+          "label": "Sanidade máxima · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derivados/defesa",
+          "label": "Defesa · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derivados/pe_por_rodada",
+          "label": "Limite de PE por rodada · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derivados/dt_ritual",
+          "label": "DT de rituais · a conferir",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "recursos",
+      "label": "Recursos",
+      "access": "editable",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/recursos/pv",
+          "label": "PV atuais",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/recursos/pe",
+          "label": "PE atuais",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/recursos/san",
+          "label": "Sanidade atual",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "combate",
+      "label": "Combate",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/combate/protecao",
+          "label": "Proteção",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/combate/resistencias",
+          "label": "Resistências",
+          "widget": "text"
+        },
+        {
+          "kind": "field",
+          "path": "/combate/deslocamento",
+          "label": "Deslocamento (m)",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/proficiencias/armas_simples",
+          "label": "Armas simples",
+          "widget": "boolean"
+        },
+        {
+          "kind": "field",
+          "path": "/proficiencias/armas_taticas",
+          "label": "Armas táticas",
+          "widget": "boolean"
+        },
+        {
+          "kind": "field",
+          "path": "/proficiencias/armas_pesadas",
+          "label": "Armas pesadas",
+          "widget": "boolean"
+        },
+        {
+          "kind": "field",
+          "path": "/proficiencias/protecoes_leves",
+          "label": "Proteções leves",
+          "widget": "boolean"
+        },
+        {
+          "kind": "field",
+          "path": "/proficiencias/protecoes_pesadas",
+          "label": "Proteções pesadas",
+          "widget": "boolean"
+        },
+        {
+          "kind": "collection",
+          "path": "/ataques",
+          "label": "Ataques",
+          "max_items": 20,
+          "item_fields": [
+            {
+              "field": "nome",
+              "label": "Arma",
+              "widget": "text"
+            },
+            {
+              "field": "teste",
+              "label": "Teste",
+              "widget": "text"
+            },
+            {
+              "field": "dano",
+              "label": "Dano",
+              "widget": "text"
+            },
+            {
+              "field": "critico",
+              "label": "Crítico",
+              "widget": "text"
+            },
+            {
+              "field": "alcance",
+              "label": "Alcance",
+              "widget": "text"
+            },
+            {
+              "field": "tipo",
+              "label": "Tipo",
+              "widget": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inventario",
+      "label": "Inventário",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/inventario",
+          "label": "Itens",
+          "max_items": 40,
+          "item_fields": [
+            {
+              "field": "nome",
+              "label": "Item",
+              "widget": "text"
+            },
+            {
+              "field": "categoria",
+              "label": "Categoria (0–IV)",
+              "widget": "integer"
+            },
+            {
+              "field": "espacos",
+              "label": "Espaços",
+              "widget": "integer"
+            },
+            {
+              "field": "quantidade",
+              "label": "Quantidade",
+              "widget": "integer"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rituais",
+      "label": "Rituais",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/rituais",
+          "label": "Rituais conhecidos",
+          "max_items": 30,
+          "item_fields": [
+            {
+              "field": "nome",
+              "label": "Ritual",
+              "widget": "text"
+            },
+            {
+              "field": "elemento",
+              "label": "Elemento",
+              "widget": "select"
+            },
+            {
+              "field": "circulo",
+              "label": "Círculo",
+              "widget": "integer"
+            },
+            {
+              "field": "execucao",
+              "label": "Execução",
+              "widget": "text"
+            },
+            {
+              "field": "alcance",
+              "label": "Alcance",
+              "widget": "text"
+            },
+            {
+              "field": "alvo",
+              "label": "Alvo",
+              "widget": "text"
+            },
+            {
+              "field": "duracao",
+              "label": "Duração",
+              "widget": "text"
+            },
+            {
+              "field": "resistencia",
+              "label": "Resistência",
+              "widget": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "habilidades",
+      "label": "Habilidades e poderes",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/habilidades",
+          "label": "Habilidades",
+          "max_items": 40,
+          "item_fields": [
+            {
+              "field": "nome",
+              "label": "Nome",
+              "widget": "text"
+            },
+            {
+              "field": "fonte",
+              "label": "Fonte",
+              "widget": "select"
+            },
+            {
+              "field": "nota",
+              "label": "Anotação do jogador",
+              "widget": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "descricao",
+      "label": "Descrição",
+      "access": "editable",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/descricao/aparencia",
+          "label": "Aparência",
+          "widget": "textarea"
+        },
+        {
+          "kind": "field",
+          "path": "/descricao/personalidade",
+          "label": "Personalidade",
+          "widget": "textarea"
+        },
+        {
+          "kind": "field",
+          "path": "/descricao/historico",
+          "label": "Histórico",
+          "widget": "textarea"
+        },
+        {
+          "kind": "field",
+          "path": "/descricao/objetivo",
+          "label": "Objetivo",
+          "widget": "textarea"
+        }
+      ]
+    }
+  ]
+}

@@ -16,7 +16,7 @@ use Novtt\Engine\Validation\ValidationResult;
  */
 final class PresetCompatibility
 {
-    public const ENGINE_VERSION = '0.2.0';
+    public const ENGINE_VERSION = '0.3.0';
 
     private const ALLOWED_SCHEMA_KEYWORDS = [
         '$schema', 'title', 'description', 'type', 'properties', 'additionalProperties', 'required',
