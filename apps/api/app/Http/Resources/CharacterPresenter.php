@@ -40,6 +40,7 @@ final readonly class CharacterPresenter
             'player_user_id' => $character->player_user_id,
             'in_custody' => $character->custodian_user_id !== null,
             'preset_version_id' => $character->preset_version_id,
+            'portrait_image_id' => $character->portrait_image_id,
             ...$this->sheetView($character, (array) $character->sheet, $asMaster),
         ];
     }

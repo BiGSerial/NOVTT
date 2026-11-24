@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.6.0-clock-visibility
+  version: 1.6.1-character-portrait
   license:
     name: MIT
     identifier: MIT
@@ -2046,6 +2046,7 @@ components:
         player_user_id: { type: string, format: uuid }
         in_custody: { type: boolean }
         preset_version_id: { type: string, format: uuid }
+        portrait_image_id: { type: [string, 'null'], format: uuid, description: 'Set by the player (own character, any status) or the master via PUT /campaigns/{id}/portraits/character/{id}' }
         sheet:
           type: object
           description: |
