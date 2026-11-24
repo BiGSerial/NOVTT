@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.11.0-party
+  version: 1.12.0-map
   license:
     name: MIT
     identifier: MIT
@@ -474,6 +474,19 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [revision, places], properties: { revision: { type: integer, minimum: 0 }, places: { type: array, maxItems: 12, items: { $ref: '#/components/schemas/Place' } } } } } } }
       responses:
         '200': { description: Stored places, content: { application/json: { schema: { $ref: '#/components/schemas/Places' } } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /sessions/{sessionId}/map:
+    put:
+      operationId: setSessionMap
+      tags: [live]
+      summary: Master sets the scene map (image + pins, 0..1 of the image) and whether players see it
+      description: Only the master moves pins. Master event map.updated (full); table event map.view (players' view - nothing while hidden; character pins and revealed NPCs only). The image becomes readable by players while shown. Errors map.pin_invalid / map.revision_mismatch / image.unknown (409).
+      parameters: [{ name: sessionId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [revision, image_id, shown, pins], properties: { revision: { type: integer, minimum: 0 }, image_id: { type: [string, 'null'], format: uuid }, shown: { type: boolean }, pins: { type: array, maxItems: 60, items: { $ref: '#/components/schemas/MapPin' } } } } } } }
+      responses:
+        '200': { description: Stored map, content: { application/json: { schema: { $ref: '#/components/schemas/SessionMap' } } } }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
@@ -2459,6 +2472,7 @@ components:
         stage: { oneOf: [{ $ref: '#/components/schemas/Stage' }, { type: 'null' }], description: What the whole table sees now }
         atmosphere: { oneOf: [{ $ref: '#/components/schemas/Atmosphere' }, { type: 'null' }], description: Time of day and weather for the whole table; null until the master sets it }
         places: { oneOf: [{ $ref: '#/components/schemas/Places' }, { type: 'null' }], description: Who is near whom (table-visible); null when the master never set places }
+        map: { oneOf: [{ $ref: '#/components/schemas/SessionMap' }, { type: 'null' }], description: "Scene map: full for the master; players' view otherwise (empty while hidden)" }
         clocks: { type: array, items: { $ref: '#/components/schemas/PlayerClock' }, description: 'Players only: the clocks shown to the table or to this player (no visibility metadata). Masters read compass.clocks instead.' }
         last_seq: { type: integer }
         revision: { type: integer }
@@ -2485,6 +2499,22 @@ components:
               visibility: { enum: [master, table, players], default: master, description: 'master: console only; table: every player; players: only player_ids' }
               player_ids: { type: array, maxItems: 20, items: { type: string, format: uuid }, description: 'User ids when visibility = players; ids that are not active players of the campaign are dropped' }
         spotlight: { type: object, additionalProperties: { type: integer, minimum: 0 }, description: 'Moments in the spotlight per character id' }
+    MapPin:
+      type: object
+      required: [kind, id, x, y]
+      properties:
+        kind: { enum: [character, npc] }
+        id: { type: string, format: uuid }
+        x: { type: number, minimum: 0, maximum: 1 }
+        y: { type: number, minimum: 0, maximum: 1 }
+    SessionMap:
+      type: object
+      required: [revision, image_id, shown, pins]
+      properties:
+        revision: { type: integer }
+        image_id: { type: [string, 'null'], format: uuid }
+        shown: { type: boolean }
+        pins: { type: array, items: { $ref: '#/components/schemas/MapPin' } }
     Place:
       type: object
       required: [id, name, character_ids]

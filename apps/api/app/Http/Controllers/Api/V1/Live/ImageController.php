@@ -114,7 +114,7 @@ final class ImageController extends ApiController
     /**
      * A player sees: portraits of the campaign's characters, the portraits they uploaded
      * themselves, portraits of NPCs revealed in the open session, the staged scene image and
-     * images of clues revealed to the table or to them.
+     * images of clues revealed to the table or to them, and the scene map while it is shown.
      */
     private function playerMaySee(User $actor, CampaignImage $image): bool
     {
@@ -135,6 +135,10 @@ final class ImageController extends ApiController
             return $revealed !== [] && CampaignNpc::query()->where('campaign_id', $image->campaign_id)->whereIn('id', $revealed)->where('portrait_image_id', $id)->exists();
         }
         if ($session !== null && (($session->stage ?? [])['image_id'] ?? null) === $id) {
+            return true;
+        }
+        // The scene map while the master shows it (NT-15).
+        if ($session !== null && ($session->map['shown'] ?? false) && ($session->map['image_id'] ?? null) === $id) {
             return true;
         }
 

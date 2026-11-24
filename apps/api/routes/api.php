@@ -104,6 +104,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:novtt-api'])->group(f
     Route::get('campaigns/{campaignId}/sessions/current', [SessionController::class, 'current'])->whereUuid('campaignId');
     Route::post('campaigns/{campaignId}/sessions', [SessionController::class, 'start'])->whereUuid('campaignId');
     Route::put('sessions/{sessionId}/places', [PartyController::class, 'places'])->whereUuid('sessionId');
+    Route::put('sessions/{sessionId}/map', [PartyController::class, 'map'])->whereUuid('sessionId');
     Route::post('sessions/{sessionId}/item-offers', [PartyController::class, 'offer'])->whereUuid('sessionId');
     Route::post('item-offers/{offerId}/accept', [PartyController::class, 'accept'])->whereUuid('offerId');
     Route::post('item-offers/{offerId}/decline', [PartyController::class, 'decline'])->whereUuid('offerId');

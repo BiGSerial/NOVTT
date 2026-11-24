@@ -43,6 +43,7 @@ final class TableSnapshot
             'atmosphere' => $s->atmosphere,
             // Who is near whom: table-visible (players see who they can reach).
             'places' => $s->places,
+            'map' => $asMaster ? $s->map : \App\Http\Controllers\Api\V1\Live\PartyController::playerMap($s, $s->map),
             'last_seq' => $s->last_seq,
             'revision' => $s->revision,
             'started_at' => $s->started_at->format(DATE_RFC3339_EXTENDED),

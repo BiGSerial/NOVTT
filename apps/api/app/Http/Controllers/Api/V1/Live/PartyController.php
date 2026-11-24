@@ -75,6 +75,72 @@ final class PartyController extends ApiController
         return new JsonResponse($value);
     }
 
+    /**
+     * The scene map (NT-15): an image of the campaign with pins the master places (0..1 of the
+     * image). Players receive it only while shown, with character pins and revealed NPCs only.
+     */
+    public function map(Request $request, string $sessionId): JsonResponse
+    {
+        $actor = $this->actor($request);
+        [$session] = $this->access->session($actor, $sessionId);
+        $this->access->requireMaster($actor, $session->campaign_id);
+        $data = $this->input($request, [
+            'revision' => ['required', 'integer', 'min:0'],
+            'image_id' => ['present', 'nullable', 'uuid'],
+            'shown' => ['required', 'boolean'],
+            'pins' => ['present', 'array', 'max:60'],
+            'pins.*.kind' => ['required', 'in:character,npc'],
+            'pins.*.id' => ['required', 'uuid'],
+            'pins.*.x' => ['required', 'numeric', 'min:0', 'max:1'],
+            'pins.*.y' => ['required', 'numeric', 'min:0', 'max:1'],
+        ]);
+        if ($data['image_id'] !== null && !\App\Models\CampaignImage::query()->where(['id' => $data['image_id'], 'campaign_id' => $session->campaign_id])->exists()) {
+            throw ApiProblem::conflict('image.unknown');
+        }
+        $known = [
+            'character' => CampaignCharacter::query()->where('campaign_id', $session->campaign_id)->pluck('id')->map(static fn ($i): string => (string) $i)->all(),
+            'npc' => \App\Models\CampaignNpc::query()->where('campaign_id', $session->campaign_id)->pluck('id')->map(static fn ($i): string => (string) $i)->all(),
+        ];
+        $pins = [];
+        foreach ($data['pins'] as $pin) {
+            if (!in_array($pin['id'], $known[$pin['kind']], true) || isset($pins[$pin['id']])) {
+                throw ApiProblem::conflict('map.pin_invalid');
+            }
+            $pins[$pin['id']] = ['kind' => $pin['kind'], 'id' => $pin['id'], 'x' => round((float) $pin['x'], 4), 'y' => round((float) $pin['y'], 4)];
+        }
+        $value = DB::transaction(function () use ($sessionId, $data, $pins): array {
+            $session = $this->access->lockOpen($sessionId);
+            $current = (int) ($session->map['revision'] ?? 0);
+            if ($current !== (int) $data['revision']) {
+                throw ApiProblem::conflict('map.revision_mismatch', $current);
+            }
+            $value = ['revision' => $current + 1, 'image_id' => $data['image_id'], 'shown' => (bool) $data['shown'], 'pins' => array_values($pins)];
+            $session->update(['map' => $value]);
+            $this->stream->append($session, 'map.updated', $value, Audience::master());
+            $this->stream->append($session, 'map.view', self::playerMap($session, $value), Audience::table()); // players' view; the master keeps map.updated
+
+            return $value;
+        });
+
+        return new JsonResponse($value);
+    }
+
+    /**
+     * What players may see of the map: nothing while hidden; character pins and revealed NPCs.
+     *
+     * @param array<string, mixed>|null $map
+     * @return array<string, mixed>|null
+     */
+    public static function playerMap(GameSession $session, ?array $map): ?array
+    {
+        if ($map === null || !($map['shown'] ?? false)) {
+            return $map === null ? null : ['revision' => $map['revision'] ?? 0, 'image_id' => null, 'shown' => false, 'pins' => []];
+        }
+        $revealed = array_column((array) ($session->revealed_npcs ?? []), 'id');
+
+        return [...$map, 'pins' => array_values(array_filter((array) $map['pins'], static fn (array $p): bool => $p['kind'] === 'character' || in_array($p['id'], $revealed, true)))];
+    }
+
     public function offer(Request $request, string $sessionId): JsonResponse
     {
         $actor = $this->actor($request);

@@ -126,6 +126,14 @@ receiver) and emits `live.updated` for both. The master sees offers in the histo
 an accepted one. Events `item_offer.created` / `item_offer.resolved` reach the master, the giver
 and the receiver only.
 
+### NT-15 Scene map with pins (owner decision 2026-11-23)
+The master sets a map for the session: a campaign image, pins for characters and NPCs placed as
+fractions of the image, and whether players see it (`PUT /sessions/{id}/map`, own revision).
+Only the master moves pins. Players receive the map only while shown, with character pins and
+pins of NPCs already revealed (`map.view`); the full map (`map.updated`) is master-only. The
+image is readable by players while the map is shown. NOVTT stays a table aid, not a tactical
+grid: no movement rules, measurements or fog of war.
+
 ### Owner decisions 2026-11-23 (later phases)
 - Proximity: the master groups characters into named places; same place = near. Players see who
   is near, far members greyed as unreachable, and visible party conditions.

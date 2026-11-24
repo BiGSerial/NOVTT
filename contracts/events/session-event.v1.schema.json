@@ -20,10 +20,10 @@
         "whisper.received",
         "clue.saved", "clue.revealed",
         "npc.revealed",
-        "plot.updated", "stage.updated", "portrait.updated", "atmosphere.updated", "clocks.updated", "places.updated", "item_offer.created", "item_offer.resolved"
+        "plot.updated", "stage.updated", "portrait.updated", "atmosphere.updated", "clocks.updated", "places.updated", "item_offer.created", "item_offer.resolved", "map.updated", "map.view"
       ]
     },
     "occurred_at": { "type": "string", "format": "date-time" },
-    "payload": { "type": "object", "description": "Shape by type: roll.* → OfficialRoll / RollRequest (openapi.v1.yaml); whisper.received → Whisper; note.* → MasterNote; clue.* → Clue; live.updated → {subject, live}; compass.updated → {revision, compass}; initiative.updated → {revision, initiative}; session.status → {status, title}; npc.revealed → RevealedNpc; plot.updated → {revision, plot, compass} (master); stage.updated → {revision, stage} (table); atmosphere.updated → Atmosphere (table); places.updated → Places (table); item_offer.* → ItemOffer (master, giver, receiver); clocks.updated → {clocks: PlayerClock[]} (one player, only when that player's visible clocks changed); portrait.updated → {kind, id, portrait_image_id}; suggestion.* → RollSuggestion or {id, status, roll_request_id}." }
+    "payload": { "type": "object", "description": "Shape by type: roll.* → OfficialRoll / RollRequest (openapi.v1.yaml); whisper.received → Whisper; note.* → MasterNote; clue.* → Clue; live.updated → {subject, live}; compass.updated → {revision, compass}; initiative.updated → {revision, initiative}; session.status → {status, title}; npc.revealed → RevealedNpc; plot.updated → {revision, plot, compass} (master); stage.updated → {revision, stage} (table); atmosphere.updated → Atmosphere (table); places.updated → Places (table); item_offer.* → ItemOffer (master, giver, receiver); map.updated → SessionMap (master); map.view → SessionMap as players see it (table); clocks.updated → {clocks: PlayerClock[]} (one player, only when that player's visible clocks changed); portrait.updated → {kind, id, portrait_image_id}; suggestion.* → RollSuggestion or {id, status, roll_request_id}." }
   }
 }
