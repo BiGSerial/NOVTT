@@ -94,6 +94,11 @@ const labelSource = {
 /** The draft's value, or the preset default (attributes that start at 1 show 1, not a dash). */
 function valueAt(path: string): unknown {
   void tick.value
+  // A field held by a chosen option is written by the server: show what the preview computed.
+  if (holds.value.has(path)) {
+    const held = readPath(view.value?.sheet, path)
+    if (held !== undefined) return held
+  }
   const v = draft.value?.value(path)
   if (v !== undefined && v !== null && v !== '') return v
   const n = node(path)
