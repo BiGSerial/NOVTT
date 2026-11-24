@@ -46,7 +46,13 @@ final class PresetDemoTest extends TestCase
 
         // Seeding again changes nothing.
         $this->artisan('novtt:demo:seed')->assertSuccessful();
-        $this->assertSame(2, Campaign::query()->whereIn('name', array_column(PresetDemoSeeder::CAMPAIGNS, 0))->count());
+        $this->assertSame(count(PresetDemoSeeder::CAMPAIGNS), Campaign::query()->whereIn('name', array_column(PresetDemoSeeder::CAMPAIGNS, 0))->count());
+
+        // Ordem Paranormal: usable in the master's own library, never in the public catalogue.
+        $op = Campaign::query()->where('name', PresetDemoSeeder::CAMPAIGNS['presets/ordem-paranormal-rpg/livro-basico/0.1.1'][0])->sole();
+        $version = PresetVersion::query()->with('definition')->findOrFail($op->preset_version_id);
+        $this->assertSame('rights_review', $version->rights_status);
+        $this->assertNotNull($version->definition->owner_user_id);
     }
 
     public function test_the_draft_preview_carries_derived_values_creation_steps_and_choice_availability(): void

@@ -27,6 +27,8 @@ final readonly class PresetDemoSeeder
     public const CAMPAIGNS = [
         'presets/novtt-demo/demo-linhagens/1.0.0' => ['Linhagens da Névoa (demo)', 'Reserva de d10, prioridades e experiência. Crie seu personagem e envie ao mestre.'],
         'presets/novtt-demo/demo-heroico/1.0.0' => ['Heroico: a Estrada de Sal (demo)', 'd20 com modificadores e níveis por experiência ou marcos. Crie seu personagem e envie ao mestre.'],
+        // Third-party presets under rights review: imported into the master's own library only.
+        'presets/ordem-paranormal-rpg/livro-basico/0.1.1' => ['Ordem Paranormal (teste interno)', 'Conteúdo não oficial, publicado sob a Licença da Comunidade de Ordem Paranormal. Uso interno: publicação bloqueada até revisão jurídica.', false],
     ];
 
     public function __construct(private PresetImporter $importer, private AuditTrail $audit)
@@ -40,15 +42,17 @@ final readonly class PresetDemoSeeder
             throw new RuntimeException('Demo mode is disabled.');
         }
         $campaigns = [];
-        foreach (self::CAMPAIGNS as $directory => [$name, $description]) {
+        foreach (self::CAMPAIGNS as $directory => $entry) {
+            [$name, $description] = $entry;
+            $canonical = $entry[2] ?? true;
             [$raw, $missing] = PresetImporter::readDirectory($repositoryRoot . '/' . $directory);
             if ($raw === null) {
                 throw new RuntimeException("Demo preset {$directory} is missing {$missing}.");
             }
-            $campaigns[] = DB::transaction(function () use ($raw, $name, $description): Campaign {
+            $campaigns[] = DB::transaction(function () use ($raw, $name, $description, $canonical): Campaign {
                 $master = $this->user(DemoMode::MASTER_EMAIL, 'Mestre (demo)');
                 [$package, $objects] = $this->importer->parse($raw);
-                [$version] = $this->importer->import($master, $package, $objects, canonical: true);
+                [$version] = $this->importer->import($master, $package, $objects, canonical: $canonical);
                 $campaign = Campaign::query()->where('owner_user_id', $master->getKey())->where('name', $name)->first();
                 if ($campaign === null) {
                     $campaign = Campaign::query()->create([
