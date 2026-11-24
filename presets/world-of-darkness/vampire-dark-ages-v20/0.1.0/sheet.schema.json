@@ -1,0 +1,953 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "world-of-darkness vampire-dark-ages-v20 0.1.0 sheet",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "player": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "chronicle": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "concept": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "nature": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "demeanor": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "sire": {
+          "type": "string",
+          "maxLength": 120
+        }
+      }
+    },
+    "clan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clan": {
+          "type": "string",
+          "enum": [
+            "assamite",
+            "brujah",
+            "cappadocian",
+            "followers_of_set",
+            "gangrel",
+            "lasombra",
+            "malkavian",
+            "nosferatu",
+            "ravnos",
+            "salubri",
+            "toreador",
+            "tremere",
+            "tzimisce",
+            "ventrue"
+          ]
+        }
+      }
+    },
+    "priorities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "physical": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "tertiary"
+          ]
+        },
+        "social": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "tertiary"
+          ]
+        },
+        "mental": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "tertiary"
+          ]
+        },
+        "talents": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "tertiary"
+          ]
+        },
+        "skills": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "tertiary"
+          ]
+        },
+        "knowledges": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "tertiary"
+          ]
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "physical": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "strength": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6,
+              "default": 1
+            },
+            "dexterity": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6,
+              "default": 1
+            },
+            "stamina": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6,
+              "default": 1
+            }
+          }
+        },
+        "social": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "charisma": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6,
+              "default": 1
+            },
+            "manipulation": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6,
+              "default": 1
+            },
+            "appearance": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 1
+            }
+          }
+        },
+        "mental": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "perception": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6,
+              "default": 1
+            },
+            "intelligence": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6,
+              "default": 1
+            },
+            "wits": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6,
+              "default": 1
+            }
+          }
+        }
+      }
+    },
+    "abilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "talents": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "alertness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "athletics": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "awareness": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "brawl": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "empathy": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "expression": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "intimidation": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "leadership": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "legerdemain": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "subterfuge": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            }
+          }
+        },
+        "skills": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "animal_ken": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "archery": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "commerce": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "crafts": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "etiquette": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "melee": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "performance": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "ride": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "stealth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "survival": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            }
+          }
+        },
+        "knowledges": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "academics": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "enigmas": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "hearth_wisdom": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "investigation": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "law": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "medicine": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "occult": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "politics": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "seneschal": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            },
+            "theology": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 0
+            }
+          }
+        }
+      }
+    },
+    "disciplines": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "animalism": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "auspex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "celerity": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "chimerstry": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "dementation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "dominate": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "fortitude": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "mortis": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "obeah": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "obfuscate": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "obtenebration": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "potence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "presence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "protean": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "quietus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "serpentis": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "thaumaturgy": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "vicissitude": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        }
+      }
+    },
+    "backgrounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allies": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "contacts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "domain": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "herd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "influence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "mentor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "resources": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "retainers": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        },
+        "status": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 0
+        }
+      }
+    },
+    "virtues": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "conscience": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 1
+        },
+        "self_control": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 1
+        },
+        "courage": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 1
+        }
+      }
+    },
+    "morality": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "enum": [
+            "humanity",
+            "beast",
+            "heaven",
+            "kings",
+            "sin"
+          ]
+        },
+        "first_virtue": {
+          "type": "string",
+          "enum": [
+            "conscience",
+            "conviction"
+          ]
+        },
+        "second_virtue": {
+          "type": "string",
+          "enum": [
+            "self_control",
+            "instinct"
+          ]
+        },
+        "rating": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "default": 0
+        }
+      }
+    },
+    "willpower": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "permanent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "default": 0
+        }
+      }
+    },
+    "derived": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "generation": {
+          "type": "integer"
+        },
+        "blood_pool_max": {
+          "type": "integer"
+        },
+        "blood_per_turn": {
+          "type": "integer"
+        },
+        "trait_max": {
+          "type": "integer"
+        },
+        "morality_base": {
+          "type": "integer"
+        },
+        "initiative": {
+          "type": "integer"
+        },
+        "damage_total": {
+          "type": "integer"
+        },
+        "wound_penalty": {
+          "type": "integer"
+        },
+        "health_state": {
+          "type": "string"
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "blood": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50,
+          "default": 0
+        },
+        "willpower": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "default": 0
+        },
+        "bashing": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7,
+          "default": 0
+        },
+        "lethal": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7,
+          "default": 0
+        },
+        "aggravated": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7,
+          "default": 0
+        }
+      }
+    },
+    "specialties": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "ability",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "ability": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          }
+        }
+      }
+    },
+    "merits_flaws": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "kind"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "merit",
+              "flaw"
+            ]
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7,
+            "default": 1
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "discipline_paths": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "discipline": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "rating": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5,
+            "default": 1
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "rituals": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "default": 1
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "weapons": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "difficulty": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 10,
+            "default": 6
+          },
+          "damage": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "range": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "inventory": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99,
+            "default": 1
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "appearance": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "haven": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "history": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 3000
+        }
+      }
+    }
+  }
+}

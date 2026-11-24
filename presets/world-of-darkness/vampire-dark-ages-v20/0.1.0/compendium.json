@@ -1,0 +1,2320 @@
+{
+  "contract": "novtt.compendium/1",
+  "taxonomy": [
+    {
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Atributo",
+        "en": "Attribute"
+      }
+    },
+    {
+      "kind": "ability_group",
+      "labels": {
+        "pt-BR": "Grupo de Habilidades",
+        "en": "Ability category"
+      }
+    },
+    {
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Habilidade",
+        "en": "Ability"
+      },
+      "parent_kind": "ability_group"
+    },
+    {
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Clã",
+        "en": "Clan"
+      }
+    },
+    {
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Disciplina",
+        "en": "Discipline"
+      }
+    },
+    {
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Antecedente",
+        "en": "Background"
+      }
+    },
+    {
+      "kind": "virtue",
+      "labels": {
+        "pt-BR": "Virtude",
+        "en": "Virtue"
+      }
+    },
+    {
+      "kind": "road",
+      "labels": {
+        "pt-BR": "Estrada",
+        "en": "Road"
+      }
+    }
+  ],
+  "items": [
+    {
+      "canonical_id": "attribute.strength",
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Força",
+        "en": "Strength"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:test",
+        "roll:attribute"
+      ]
+    },
+    {
+      "canonical_id": "attribute.dexterity",
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Destreza",
+        "en": "Dexterity"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:test",
+        "roll:attribute"
+      ]
+    },
+    {
+      "canonical_id": "attribute.stamina",
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Vigor",
+        "en": "Stamina"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:test",
+        "roll:attribute"
+      ]
+    },
+    {
+      "canonical_id": "attribute.charisma",
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Carisma",
+        "en": "Charisma"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:test",
+        "roll:attribute"
+      ]
+    },
+    {
+      "canonical_id": "attribute.manipulation",
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Manipulação",
+        "en": "Manipulation"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:test",
+        "roll:attribute"
+      ]
+    },
+    {
+      "canonical_id": "attribute.appearance",
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Aparência",
+        "en": "Appearance"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:test",
+        "roll:attribute"
+      ]
+    },
+    {
+      "canonical_id": "attribute.perception",
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Percepção",
+        "en": "Perception"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:test",
+        "roll:attribute"
+      ]
+    },
+    {
+      "canonical_id": "attribute.intelligence",
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Inteligência",
+        "en": "Intelligence"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:test",
+        "roll:attribute"
+      ]
+    },
+    {
+      "canonical_id": "attribute.wits",
+      "kind": "attribute",
+      "labels": {
+        "pt-BR": "Raciocínio",
+        "en": "Wits"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:test",
+        "roll:attribute"
+      ]
+    },
+    {
+      "canonical_id": "ability_group.talents",
+      "kind": "ability_group",
+      "labels": {
+        "pt-BR": "Talentos",
+        "en": "Talents"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "ability_group.skills",
+      "kind": "ability_group",
+      "labels": {
+        "pt-BR": "Perícias",
+        "en": "Skills"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "ability_group.knowledges",
+      "kind": "ability_group",
+      "labels": {
+        "pt-BR": "Conhecimentos",
+        "en": "Knowledges"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "ability.alertness",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Prontidão",
+        "en": "Alertness"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.athletics",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Esportes",
+        "en": "Athletics"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.awareness",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Percepção do sobrenatural",
+        "en": "Awareness"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.brawl",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Briga",
+        "en": "Brawl"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.empathy",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Empatia",
+        "en": "Empathy"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.expression",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Expressão",
+        "en": "Expression"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.intimidation",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Intimidação",
+        "en": "Intimidation"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.leadership",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Liderança",
+        "en": "Leadership"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.legerdemain",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Prestidigitação",
+        "en": "Legerdemain"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.subterfuge",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Lábia",
+        "en": "Subterfuge"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.talents",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:talents_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.animal_ken",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Empatia com animais",
+        "en": "Animal Ken"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.archery",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Arquearia",
+        "en": "Archery"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.commerce",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Comércio",
+        "en": "Commerce"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.crafts",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Ofícios",
+        "en": "Crafts"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.etiquette",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Etiqueta",
+        "en": "Etiquette"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.melee",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Armas brancas",
+        "en": "Melee"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.performance",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Performance",
+        "en": "Performance"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.ride",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Cavalgar",
+        "en": "Ride"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.stealth",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Furtividade",
+        "en": "Stealth"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.survival",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Sobrevivência",
+        "en": "Survival"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.skills",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:skills_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.academics",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Acadêmicos",
+        "en": "Academics"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.enigmas",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Enigmas",
+        "en": "Enigmas"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.hearth_wisdom",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Sabedoria popular",
+        "en": "Hearth Wisdom"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.investigation",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Investigação",
+        "en": "Investigation"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.law",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Direito",
+        "en": "Law"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.medicine",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Medicina",
+        "en": "Medicine"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.occult",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Ocultismo",
+        "en": "Occult"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.politics",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Política",
+        "en": "Politics"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.seneschal",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Senescal",
+        "en": "Seneschal"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "ability.theology",
+      "kind": "ability",
+      "labels": {
+        "pt-BR": "Teologia",
+        "en": "Theology"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "parent_id": "ability_group.knowledges",
+      "mechanical_refs": [
+        "roll:test",
+        "cost:knowledges_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.assamite",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Assamita",
+        "en": "Assamite"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:assamite",
+        "cost:disc_celerity_xp",
+        "cost:disc_obfuscate_xp",
+        "cost:disc_quietus_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.brujah",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Brujah",
+        "en": "Brujah"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:brujah",
+        "cost:disc_celerity_xp",
+        "cost:disc_potence_xp",
+        "cost:disc_presence_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.cappadocian",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Capadócio",
+        "en": "Cappadocian"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:cappadocian",
+        "cost:disc_auspex_xp",
+        "cost:disc_fortitude_xp",
+        "cost:disc_mortis_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.followers_of_set",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Seguidores de Set",
+        "en": "Followers of Set"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:followers_of_set",
+        "cost:disc_obfuscate_xp",
+        "cost:disc_presence_xp",
+        "cost:disc_serpentis_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.gangrel",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Gangrel",
+        "en": "Gangrel"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:gangrel",
+        "cost:disc_animalism_xp",
+        "cost:disc_fortitude_xp",
+        "cost:disc_protean_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.lasombra",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Lasombra",
+        "en": "Lasombra"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:lasombra",
+        "cost:disc_dominate_xp",
+        "cost:disc_obtenebration_xp",
+        "cost:disc_potence_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.malkavian",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Malkaviano",
+        "en": "Malkavian"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:malkavian",
+        "cost:disc_auspex_xp",
+        "cost:disc_dementation_xp",
+        "cost:disc_obfuscate_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.nosferatu",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Nosferatu",
+        "en": "Nosferatu"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:nosferatu",
+        "cost:disc_animalism_xp",
+        "cost:disc_obfuscate_xp",
+        "cost:disc_potence_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.ravnos",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Ravnos",
+        "en": "Ravnos"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:ravnos",
+        "cost:disc_animalism_xp",
+        "cost:disc_chimerstry_xp",
+        "cost:disc_fortitude_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.salubri",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Salubri",
+        "en": "Salubri"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:salubri",
+        "cost:disc_auspex_xp",
+        "cost:disc_fortitude_xp",
+        "cost:disc_obeah_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.toreador",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Toreador",
+        "en": "Toreador"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:toreador",
+        "cost:disc_auspex_xp",
+        "cost:disc_celerity_xp",
+        "cost:disc_presence_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.tremere",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Tremere",
+        "en": "Tremere"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:tremere",
+        "cost:disc_auspex_xp",
+        "cost:disc_dominate_xp",
+        "cost:disc_thaumaturgy_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.tzimisce",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Tzimisce",
+        "en": "Tzimisce"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:tzimisce",
+        "cost:disc_animalism_xp",
+        "cost:disc_auspex_xp",
+        "cost:disc_vicissitude_xp"
+      ]
+    },
+    {
+      "canonical_id": "clan.ventrue",
+      "kind": "clan",
+      "labels": {
+        "pt-BR": "Ventrue",
+        "en": "Ventrue"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:clan:ventrue",
+        "cost:disc_dominate_xp",
+        "cost:disc_fortitude_xp",
+        "cost:disc_presence_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.animalism",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Animalismo",
+        "en": "Animalism"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_animalism_creation",
+        "cost:disc_animalism_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.auspex",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Auspícios",
+        "en": "Auspex"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_auspex_creation",
+        "cost:disc_auspex_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.celerity",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Rapidez",
+        "en": "Celerity"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_celerity_creation",
+        "cost:disc_celerity_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.chimerstry",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Quimerismo",
+        "en": "Chimerstry"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_chimerstry_creation",
+        "cost:disc_chimerstry_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.dementation",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Demência",
+        "en": "Dementation"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_dementation_creation",
+        "cost:disc_dementation_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.dominate",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Dominação",
+        "en": "Dominate"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_dominate_creation",
+        "cost:disc_dominate_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.fortitude",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Fortitude",
+        "en": "Fortitude"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_fortitude_creation",
+        "cost:disc_fortitude_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.mortis",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Mortis",
+        "en": "Mortis"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_mortis_creation",
+        "cost:disc_mortis_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.obeah",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Obeah",
+        "en": "Obeah"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_obeah_creation",
+        "cost:disc_obeah_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.obfuscate",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Ofuscação",
+        "en": "Obfuscate"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_obfuscate_creation",
+        "cost:disc_obfuscate_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.obtenebration",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Tenebrosidade",
+        "en": "Obtenebration"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_obtenebration_creation",
+        "cost:disc_obtenebration_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.potence",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Potência",
+        "en": "Potence"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_potence_creation",
+        "cost:disc_potence_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.presence",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Presença",
+        "en": "Presence"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_presence_creation",
+        "cost:disc_presence_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.protean",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Metamorfose",
+        "en": "Protean"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_protean_creation",
+        "cost:disc_protean_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.quietus",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Quietus",
+        "en": "Quietus"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_quietus_creation",
+        "cost:disc_quietus_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.serpentis",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Serpentis",
+        "en": "Serpentis"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_serpentis_creation",
+        "cost:disc_serpentis_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.thaumaturgy",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Taumaturgia",
+        "en": "Thaumaturgy"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_thaumaturgy_creation",
+        "cost:disc_thaumaturgy_xp"
+      ]
+    },
+    {
+      "canonical_id": "discipline.vicissitude",
+      "kind": "discipline",
+      "labels": {
+        "pt-BR": "Vicissitude",
+        "en": "Vicissitude"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "cost:disc_vicissitude_creation",
+        "cost:disc_vicissitude_xp"
+      ]
+    },
+    {
+      "canonical_id": "background.allies",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Aliados",
+        "en": "Allies"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "background.contacts",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Contatos",
+        "en": "Contacts"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "background.domain",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Domínio",
+        "en": "Domain"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "background.generation",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Geração",
+        "en": "Generation"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "derived:generation",
+        "derived:blood_pool_max"
+      ]
+    },
+    {
+      "canonical_id": "background.herd",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Rebanho",
+        "en": "Herd"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "background.influence",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Influência",
+        "en": "Influence"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "background.mentor",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Mentor",
+        "en": "Mentor"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "background.resources",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Recursos",
+        "en": "Resources"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "background.retainers",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Lacaios",
+        "en": "Retainers"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "background.status",
+      "kind": "background",
+      "labels": {
+        "pt-BR": "Status",
+        "en": "Status"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      }
+    },
+    {
+      "canonical_id": "virtue.conscience",
+      "kind": "virtue",
+      "labels": {
+        "pt-BR": "Consciência",
+        "en": "Conscience"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:virtue"
+      ]
+    },
+    {
+      "canonical_id": "virtue.conviction",
+      "kind": "virtue",
+      "labels": {
+        "pt-BR": "Convicção",
+        "en": "Conviction"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:virtue"
+      ]
+    },
+    {
+      "canonical_id": "virtue.self_control",
+      "kind": "virtue",
+      "labels": {
+        "pt-BR": "Autocontrole",
+        "en": "Self-Control"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:virtue"
+      ]
+    },
+    {
+      "canonical_id": "virtue.instinct",
+      "kind": "virtue",
+      "labels": {
+        "pt-BR": "Instinto",
+        "en": "Instinct"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:virtue"
+      ]
+    },
+    {
+      "canonical_id": "virtue.courage",
+      "kind": "virtue",
+      "labels": {
+        "pt-BR": "Coragem",
+        "en": "Courage"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "roll:virtue"
+      ]
+    },
+    {
+      "canonical_id": "road.humanity",
+      "kind": "road",
+      "labels": {
+        "pt-BR": "Estrada da Humanidade",
+        "en": "Road of Humanity"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:morality:humanity"
+      ]
+    },
+    {
+      "canonical_id": "road.beast",
+      "kind": "road",
+      "labels": {
+        "pt-BR": "Estrada da Besta",
+        "en": "Road of the Beast"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:morality:beast"
+      ]
+    },
+    {
+      "canonical_id": "road.heaven",
+      "kind": "road",
+      "labels": {
+        "pt-BR": "Estrada do Céu",
+        "en": "Road of Heaven"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:morality:heaven"
+      ]
+    },
+    {
+      "canonical_id": "road.kings",
+      "kind": "road",
+      "labels": {
+        "pt-BR": "Estrada dos Reis",
+        "en": "Road of Kings"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:morality:kings"
+      ]
+    },
+    {
+      "canonical_id": "road.sin",
+      "kind": "road",
+      "labels": {
+        "pt-BR": "Estrada do Pecado",
+        "en": "Road of Sin"
+      },
+      "rules_revision": "v20-dark-ages-pending-printing",
+      "locale": "pt-BR",
+      "summary": "",
+      "source": {
+        "source_id": "vda-v20-core",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "LicenseRef-WoD-proprietary",
+        "requires_attribution": false,
+        "review_status": "unverified",
+        "edition": "V20 Dark Ages"
+      },
+      "mechanical_refs": [
+        "choice:morality:sin"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "contract": "novtt.preset-manifest/2",
+  "family_id": "world-of-darkness",
+  "variant_id": "vampire-dark-ages-v20",
+  "version": "0.1.0",
+  "display_name": "Vampire: Dark Ages 20th Anniversary (uso interno, não oficial)",
+  "locale": "pt-BR",
+  "rules_revision": "v20-dark-ages-pending-printing",
+  "source_version": "V20 Dark Ages core (impressão e errata a confirmar)",
+  "errata_reference": null,
+  "license": {
+    "identifier": "LicenseRef-WoD-proprietary",
+    "source_url": "https://www.paradoxinteractive.com/games/world-of-darkness/community/dark-pack-agreement",
+    "rights_status": "rights_review",
+    "requires_attribution": false,
+    "consulted_at": "2026-11-23",
+    "policy_version": "Dark Pack Agreement (não cobre apps pagos; sem autorização escrita)"
+  },
+  "provenance": {
+    "source_authenticity": "official",
+    "authors": [
+      "Equipe NOVTT"
+    ],
+    "notes": "Mecânicas e nomes oficiais (via compêndio) para uso interno. Distribuição BLOQUEADA: o Dark Pack não cobre aplicativos pagos e não há autorização escrita da Paradox. Sem textos, artes ou descrições do livro. Nenhum documento-fonte no repositório: todos os valores foram lembrados pelo agente e estão 'a conferir' (ver SOURCE-REGISTER.md). Vampire: The Masquerade e World of Darkness são marcas da Paradox Interactive AB; conteúdo não oficial, sem afiliação."
+  },
+  "capabilities": {
+    "character_creation": true,
+    "character_progression": true,
+    "dice_resolution": true,
+    "resource_tracking": true,
+    "effects": false
+  },
+  "coverage": "progression",
+  "limitations": [
+    "Distribuição bloqueada: conteúdo proprietário (Paradox), sem autorização para app pago. Uso interno.",
+    "Todos os valores estão a conferir no livro (sem documento-fonte no repositório).",
+    "Qualidades e Defeitos, especializações, trilhas e rituais são registrados pelo jogador; sem custo ou efeito automático.",
+    "Penalidade de ferimento é calculada, mas não é aplicada automaticamente às paradas de dados.",
+    "Perder pontos de Estrada ou Força de Vontade permanente devolve a experiência paga por aquele ponto (limitação da engine).",
+    "Virtudes de cada Estrada (exceto Humanidade): o jogador escolhe; os pares oficiais não foram registrados.",
+    "Fraquezas de clã (exceto Aparência 0), linhagens, Caitiff, diablerie, absorção e combate: não modelados."
+  ],
+  "publication": {
+    "public": false
+  },
+  "engine": {
+    "min_version": "0.3.0"
+  },
+  "files": {
+    "sheet_schema": "sheet.schema.json",
+    "sheet_ui": "sheet.ui.json",
+    "rules": "rules.json",
+    "compendium": "compendium.json"
+  }
+}
