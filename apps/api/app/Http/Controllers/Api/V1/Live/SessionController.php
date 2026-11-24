@@ -10,6 +10,7 @@ use App\Domain\CampaignRole;
 use App\Http\Controllers\Api\V1\ApiController;
 use App\Http\Problems\ApiProblem;
 use App\Live\Audience;
+use App\Live\Clocks;
 use App\Live\Plot;
 use App\Live\SessionAccess;
 use App\Live\SessionStream;
@@ -42,7 +43,7 @@ final class SessionController extends ApiController
         $role = $this->access->memberRole($actor, $campaignId);
         $session = GameSession::query()->where('campaign_id', $campaignId)->whereIn('status', ['active', 'paused'])->first();
 
-        return new JsonResponse(['session' => $session === null ? null : TableSnapshot::session($session, $role === CampaignRole::Master)]);
+        return new JsonResponse(['session' => $session === null ? null : TableSnapshot::session($session, $role === CampaignRole::Master, $actor->getKey())]);
     }
 
     public function start(Request $request, string $campaignId, Idempotency $idempotency): JsonResponse
@@ -175,23 +176,37 @@ final class SessionController extends ApiController
             'compass.clocks.*.label' => ['required', 'string', 'max:80'],
             'compass.clocks.*.segments' => ['required', 'integer', 'min:2', 'max:12'],
             'compass.clocks.*.filled' => ['required', 'integer', 'min:0', 'max:12', 'lte:compass.clocks.*.segments'],
+            'compass.clocks.*.tone' => ['sometimes', 'string', 'in:'.implode(',', Clocks::TONES)],
+            'compass.clocks.*.visibility' => ['sometimes', 'string', 'in:'.implode(',', Clocks::VISIBILITY)],
+            'compass.clocks.*.player_ids' => ['sometimes', 'array', 'max:20'],
+            'compass.clocks.*.player_ids.*' => ['uuid'],
             'compass.spotlight' => ['present', 'array', 'max:20'],
             'compass.spotlight.*' => ['integer', 'min:0', 'max:999'],
         ]);
+        $players = $this->access->playerIds($session->campaign_id);
         $compass = [
             'scene' => $data['compass']['scene'], 'objective' => $data['compass']['objective'], 'next_clue' => $data['compass']['next_clue'],
-            'clocks' => array_map(static fn (array $c): array => ['id' => $c['id'], 'label' => $c['label'], 'segments' => (int) $c['segments'], 'filled' => (int) $c['filled']], $data['compass']['clocks']),
+            // Only active players of this campaign can be named on a clock.
+            'clocks' => array_map(static fn (array $c): array => Clocks::normalize($c, $players), $data['compass']['clocks']),
             'spotlight' => (object) $data['compass']['spotlight'],
         ];
 
-        $session = DB::transaction(function () use ($sessionId, $data, $compass): GameSession {
+        $session = DB::transaction(function () use ($sessionId, $data, $compass, $players): GameSession {
             $session = $this->access->lockOpen($sessionId);
             if ($session->revision !== $data['revision']) {
                 throw ApiProblem::conflict('session.revision_mismatch', $session->revision);
             }
+            $before = (array) (((array) ($session->compass ?? []))['clocks'] ?? []);
             $session->compass = $compass;
             $session->revision++;
             $this->stream->append($session, 'compass.updated', ['revision' => $session->revision, 'compass' => $compass], Audience::master());
+            // Each player hears only about the clocks they may see, and only when that view changed.
+            foreach ($players as $playerId) {
+                $mine = Clocks::visibleTo($compass['clocks'], $playerId);
+                if ($mine !== Clocks::visibleTo($before, $playerId)) {
+                    $this->stream->append($session, 'clocks.updated', ['clocks' => $mine], Audience::user($playerId));
+                }
+            }
 
             return $session;
         });

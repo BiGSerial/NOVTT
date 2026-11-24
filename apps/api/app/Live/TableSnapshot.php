@@ -28,7 +28,7 @@ final class TableSnapshot
     public const RECENT_ROLLS = 60;
 
     /** @return array<string, mixed> */
-    public static function session(GameSession $s, bool $asMaster): array
+    public static function session(GameSession $s, bool $asMaster, ?string $viewerId = null): array
     {
         $view = [
             'id' => $s->getKey(),
@@ -47,6 +47,8 @@ final class TableSnapshot
         if ($asMaster) {
             $view['compass'] = (object) ($s->compass ?? []);
             $view['plot'] = $s->plot ?? ['scenes' => [], 'current' => null];
+        } elseif ($viewerId !== null) {
+            $view['clocks'] = Clocks::visibleTo((array) (((array) ($s->compass ?? []))['clocks'] ?? []), $viewerId);
         }
 
         return $view;
@@ -95,7 +97,7 @@ final class TableSnapshot
             'contract' => 'novtt.table-snapshot/1',
             'role' => $asMaster ? 'master' : 'player',
             'me' => ['user_id' => $me, 'name' => $actor->name],
-            'session' => self::session($session, $asMaster),
+            'session' => self::session($session, $asMaster, $me),
             'members' => $members->map(static fn ($m): array => ['user_id' => $m->user_id, 'name' => $m->name, 'role' => is_string($m->role) ? $m->role : $m->role->value])->values(),
             'characters' => $characters->map(static fn (CampaignCharacter $c): array => [
                 'id' => $c->getKey(), 'name' => $c->name, 'player_user_id' => $c->player_user_id,

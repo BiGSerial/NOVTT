@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.5.0-atmosphere-fog
+  version: 1.6.0-clock-visibility
   license:
     name: MIT
     identifier: MIT
@@ -2251,6 +2251,7 @@ components:
         plot: { $ref: '#/components/schemas/Plot', description: Masters only }
         stage: { oneOf: [{ $ref: '#/components/schemas/Stage' }, { type: 'null' }], description: What the whole table sees now }
         atmosphere: { oneOf: [{ $ref: '#/components/schemas/Atmosphere' }, { type: 'null' }], description: Time of day and weather for the whole table; null until the master sets it }
+        clocks: { type: array, items: { $ref: '#/components/schemas/PlayerClock' }, description: 'Players only: the clocks shown to the table or to this player (no visibility metadata). Masters read compass.clocks instead.' }
         last_seq: { type: integer }
         revision: { type: integer }
         started_at: { type: string, format: date-time }
@@ -2272,7 +2273,19 @@ components:
               label: { type: string, maxLength: 80 }
               segments: { type: integer, minimum: 2, maximum: 12 }
               filled: { type: integer, minimum: 0, maximum: 12 }
+              tone: { enum: [threat, progress, mystery, neutral], default: threat, description: Colour and meaning on screen }
+              visibility: { enum: [master, table, players], default: master, description: 'master: console only; table: every player; players: only player_ids' }
+              player_ids: { type: array, maxItems: 20, items: { type: string, format: uuid }, description: 'User ids when visibility = players; ids that are not active players of the campaign are dropped' }
         spotlight: { type: object, additionalProperties: { type: integer, minimum: 0 }, description: 'Moments in the spotlight per character id' }
+    PlayerClock:
+      type: object
+      required: [id, label, segments, filled, tone]
+      properties:
+        id: { type: string, maxLength: 40 }
+        label: { type: string, maxLength: 80 }
+        segments: { type: integer, minimum: 2, maximum: 12 }
+        filled: { type: integer, minimum: 0, maximum: 12 }
+        tone: { enum: [threat, progress, mystery, neutral] }
     Initiative:
       type: object
       properties:

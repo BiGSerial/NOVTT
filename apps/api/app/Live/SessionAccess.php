@@ -31,6 +31,14 @@ final class SessionAccess
         return $role === null ? null : ($role instanceof CampaignRole ? $role : CampaignRole::from((string) $role));
     }
 
+    /** @return list<string> active player (non-master) user ids of a campaign */
+    public function playerIds(string $campaignId): array
+    {
+        return CampaignMember::query()
+            ->where(['campaign_id' => $campaignId, 'status' => MemberStatus::Active])->where('role', '!=', CampaignRole::Master->value)
+            ->pluck('user_id')->map(static fn ($id): string => (string) $id)->values()->all();
+    }
+
     public function memberRole(User $user, string $campaignId): CampaignRole
     {
         return $this->role($user, $campaignId) ?? throw ApiProblem::notFound();

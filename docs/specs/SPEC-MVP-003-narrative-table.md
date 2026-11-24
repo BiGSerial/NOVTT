@@ -95,6 +95,32 @@ clients advance the hour from `set_at` without further requests. Clients MUST ho
 motion (no particles or animated transitions) and SHOULD keep rendering cheap (bounded particles,
 paused when hidden). The atmosphere has no rules effect.
 
+### NT-11 Clocks: tone and visibility (owner request 2026-11-23)
+Each clock carries a `tone` (`threat`, `progress`, `mystery`, `neutral`; colour and meaning on
+screen) and a `visibility`: `master` (console only, the default and the value for clocks saved
+before this change), `table` (every player) or `players` (only the user ids in `player_ids`; ids
+that are not active players of the campaign are dropped by the server). The master creates and
+edits a clock in a dialog (name, segments, tone, who sees it). Players MUST receive only the clocks
+they may see, without the visibility list: the session snapshot carries them as `session.clocks`,
+and the user event `clocks.updated {clocks}` is sent to a player only when their visible set
+changed. Players never change clocks.
+
+### NT-12 Master control centre (owner request 2026-11-23)
+With nobody selected, the centre of the console shows the current scene's prep as a narration aid
+(what to read aloud, the scene's NPCs with their traits and lines, open decisions, clues still
+hidden), not an empty prompt. The side column is for refinement: notes, roll review and a single
+history of everything that happened in the session (player actions and rolls). Master actions
+that need more than one control open in a dialog instead of expanding inline under a panel.
+
+### Owner decisions 2026-11-23 (later phases)
+- Proximity: the master groups characters into named places; same place = near. Players see who
+  is near, far members greyed as unreachable, and visible party conditions.
+- Item exchange between nearby players: offered by the giver, accepted by the receiver, recorded
+  in the master's history; the master can undo.
+- Scene/atlas map with character pins: only the master moves pins.
+- Order: (1) player portrait, clocks, dialogs, control centre; (2) proximity, party status, item
+  exchange; (3) map with pins.
+
 ## Acceptance (end-to-end, demo data: 5 player characters, 10 NPCs, 5-scene roteiro)
 
 1. A request is private by default: the roller and the master see the same faces; another player
