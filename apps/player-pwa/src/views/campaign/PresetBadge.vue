@@ -12,8 +12,8 @@ const origin = computed(() => ({ original: 'Conteúdo original', official: 'Font
   <div class="preset-badge" :class="{ compact }">
     <p class="preset-name">
       <span class="preset-title">{{ preset.display_name }}</span>
-      <span class="chip">v{{ preset.version }}</span>
-      <span v-if="!preset.canonical" class="chip muted-chip">Biblioteca pessoal</span>
+      <span class="tag" title="Versão da ficha">ficha v{{ preset.version }}</span>
+      <span v-if="!preset.canonical" class="tag quiet" title="Preset privado do mestre, fora do catálogo público">biblioteca pessoal</span>
     </p>
     <p class="preset-meta small">
       <span v-if="preset.rules_revision">Revisão {{ preset.rules_revision }}</span>

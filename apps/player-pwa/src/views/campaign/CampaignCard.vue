@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { ApiError } from '../../api/client'
 import { t } from '../../i18n/messages'
 import { presets, setup, STATUS_LABEL, type CampaignCharacterView, type PresetVersionFull } from '../../live/campaign'
 import type { Campaign } from '../../live/types'
 import { go } from '../../live/user'
+import Portrait from '../../components/live/Portrait.vue'
 import PresetBadge from './PresetBadge.vue'
 
 /** One campaign: its preset, the viewer's characters (player) or the master's tools. */
@@ -20,6 +21,20 @@ const token = ref('')
 const copied = ref(false)
 let createKey: string | null = null
 const isMaster = props.campaign.role === 'master'
+const live = computed(() => props.campaign.last_session && props.campaign.last_session.status !== 'ended' ? props.campaign.last_session : null)
+const masters = computed(() => (props.campaign.masters ?? []).map(m => m.name).join(', '))
+/** "hoje", "ontem", "há 3 dias", "12 de nov." — a short relative date. */
+function when(iso: string): string {
+  const d = new Date(iso)
+  const days = Math.floor((Date.now() - d.getTime()) / 86_400_000)
+  if (days <= 0) return 'hoje'
+  if (days === 1) return 'ontem'
+  if (days < 14) return `há ${days} dias`
+  return d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' })
+}
+// Characters built on another version of the campaign's sheet need adapting.
+const versions = ref<Record<string, string>>({})
+const outdated = (c: CampaignCharacterView) => c.preset_version_id !== props.campaign.preset_version_id
 
 onMounted(async () => {
   try {
@@ -27,6 +42,9 @@ onMounted(async () => {
     preset.value = p
     characters.value = c.data
     loaded.value = true
+    for (const ch of c.data.filter(outdated)) {
+      presets.version(ch.preset_version_id).then(v => { versions.value = { ...versions.value, [ch.id]: v.version } }).catch(() => undefined)
+    }
   } catch { error.value = 'Não foi possível carregar os detalhes desta campanha.' }
 })
 
@@ -58,20 +76,41 @@ async function copy(): Promise<void> {
 </script>
 
 <template>
-  <li class="campaign-card preset-campaign">
-    <div class="campaign-main">
-      <p class="eyebrow">{{ isMaster ? 'Você mestra' : 'Você joga' }}</p>
-      <h2>{{ campaign.name }}</h2>
-      <p v-if="campaign.description" class="muted small">{{ campaign.description }}</p>
-      <PresetBadge v-if="preset" :preset="preset" compact />
-      <p v-else-if="!error" class="muted small" role="status">Carregando o preset…</p>
-    </div>
+  <li class="campaign-card camp" :class="{ 'is-live': live?.status === 'active' }">
+    <header class="camp-head">
+      <div class="camp-title">
+        <p class="camp-role"><span class="tag" :class="isMaster ? 'role-master' : 'role-player'">{{ isMaster ? 'Você mestra' : 'Você joga' }}</span></p>
+        <h2>{{ campaign.name }}</h2>
+      </div>
+      <a v-if="live" class="camp-live" :href="`#/mesa/${campaign.id}`">
+        <span class="live-dot" aria-hidden="true" />{{ live.status === 'active' ? 'Sessão ao vivo' : 'Sessão pausada' }}<small>{{ live.title }}</small>
+      </a>
+    </header>
 
-    <div v-if="!isMaster && loaded" class="my-characters">
-      <ul v-if="characters.length" class="character-chips" aria-label="Seus personagens">
+    <dl class="camp-facts">
+      <div><dt>Mestre</dt><dd>{{ isMaster && masters ? `${masters} (você)` : masters || '—' }}</dd></div>
+      <div><dt>Jogadores</dt><dd>{{ campaign.players_count ?? 0 }}</dd></div>
+      <div><dt>Última sessão</dt><dd>
+        <template v-if="campaign.last_session">{{ when(campaign.last_session.started_at) }} <small>· {{ campaign.last_session.title }}</small></template>
+        <template v-else>ainda não jogada</template>
+      </dd></div>
+    </dl>
+    <p v-if="campaign.description" class="camp-desc">{{ campaign.description }}</p>
+
+    <section class="camp-sheet" aria-label="Sistema e ficha da campanha">
+      <PresetBadge v-if="preset" :preset="preset" compact />
+      <p v-else-if="!error" class="muted small" role="status">Carregando o sistema…</p>
+    </section>
+
+    <section v-if="!isMaster && loaded" class="my-characters" aria-label="Seus personagens">
+      <ul v-if="characters.length" class="character-chips">
         <li v-for="c in characters" :key="c.id">
           <a class="character-chip" :href="`#/personagens/${c.id}`">
-            <span class="chip-name">{{ c.name }}</span>
+            <Portrait :name="c.name" :image-id="c.portrait_image_id ?? null" :size="40" :ring="false" />
+            <span class="chip-text">
+              <span class="chip-name">{{ c.name }}</span>
+              <small v-if="outdated(c)" class="chip-warn">⚠ Ficha v{{ versions[c.id] ?? '…' }}; a campanha usa v{{ preset?.version ?? '…' }}. Precisa ser adaptada.</small>
+            </span>
             <span class="status-pill" :class="c.status">{{ STATUS_LABEL[c.status] }}</span>
           </a>
         </li>
@@ -84,10 +123,10 @@ async function copy(): Promise<void> {
         <button type="button" class="ghost" @click="creating = false">Cancelar</button>
       </form>
       <button v-else-if="!characters.length" type="button" class="primary" @click="creating = true">Criar personagem</button>
-    </div>
+    </section>
 
-    <div class="card-actions">
-      <a class="button primary" :href="`#/mesa/${campaign.id}`">Abrir a mesa</a>
+    <footer class="card-actions">
+      <a class="button primary" :href="`#/mesa/${campaign.id}`">{{ live ? 'Entrar na mesa' : 'Abrir a mesa' }}</a>
       <template v-if="isMaster">
         <a class="button" :href="`#/campanha/${campaign.id}/personagens`">Personagens e propostas</a>
         <a class="button" :href="`#/roteiro/${campaign.id}`">Roteiro</a>
@@ -96,7 +135,7 @@ async function copy(): Promise<void> {
         <button type="button" class="ghost" :disabled="busy" @click="invite">Convidar jogadores</button>
       </template>
       <a v-else class="button" :href="`#/atlas/${campaign.id}`">O que sabemos</a>
-    </div>
+    </footer>
     <div v-if="token" class="invite-box" role="region" aria-label="Convite">
       <p class="small">Envie este código ao jogador (vale 72 h, até 10 usos). Ele entra em "Entrar com convite".</p>
       <code class="invite-token">{{ token }}</code>
