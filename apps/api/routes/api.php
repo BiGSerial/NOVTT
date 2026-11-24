@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Auth\PairingController;
 use App\Http\Controllers\Api\V1\CampaignCharacterController;
 use App\Http\Controllers\Api\V1\CampaignController;
 use App\Http\Controllers\Api\V1\LibraryController;
+use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\Live\ImageController;
 use App\Http\Controllers\Api\V1\Live\RollController;
 use App\Http\Controllers\Api\V1\Live\SessionController;
@@ -81,6 +82,10 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:novtt-api'])->group(f
     Route::post('change-requests/{changeRequestId}/finalize', [ReviewController::class, 'finalize'])->whereUuid('changeRequestId');
 
     Route::get('me', [AccountController::class, 'show']);
+    Route::get('me/preferences', [MeController::class, 'preferences']);
+    Route::put('me/preferences', [MeController::class, 'savePreferences']);
+    Route::get('me/characters', [MeController::class, 'characters']);
+    Route::get('me/companions', [MeController::class, 'companions']);
     Route::post('pairing/confirm', [PairingController::class, 'confirm'])->middleware('throttle:novtt-invitations');
     Route::get('devices', [PairingController::class, 'devices']);
     Route::delete('devices/{deviceId}', [PairingController::class, 'revoke']);

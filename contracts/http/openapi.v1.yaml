@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: NOVTT API
-  version: 1.9.0-sheet-versions
+  version: 1.10.0-me
   license:
     name: MIT
     identifier: MIT
@@ -464,10 +464,82 @@ paths:
               schema: { $ref: '#/components/schemas/CampaignCharacter' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
+  /me/preferences:
+    get:
+      operationId: getMyPreferences
+      tags: [accounts]
+      summary: The actor's preferences (dice sets with procedural textures), synced across devices
+      responses:
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '200': { description: Preferences, content: { application/json: { schema: { $ref: '#/components/schemas/Preferences' } } } }
+    put:
+      operationId: saveMyPreferences
+      tags: [accounts]
+      summary: Replace the actor's preferences
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Preferences' } } } }
+      responses:
+        '200': { description: Saved preferences (an unknown active set becomes null), content: { application/json: { schema: { $ref: '#/components/schemas/Preferences' } } } }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+  /me/characters:
+    get:
+      operationId: listMyCharacters
+      tags: [accounts]
+      summary: Every non-archived character the actor plays or holds, in every campaign, with its sheet version
+      responses:
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '200':
+          description: Characters
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name, status, campaign, outdated]
+                      properties:
+                        id: { type: string, format: uuid }
+                        name: { type: string }
+                        status: { enum: [draft, pending_approval, approved] }
+                        portrait_image_id: { type: [string, 'null'], format: uuid }
+                        campaign: { type: object, properties: { id: { type: string, format: uuid }, name: { type: string } } }
+                        sheet: { $ref: '#/components/schemas/SheetVersionLabel' }
+                        campaign_sheet: { $ref: '#/components/schemas/SheetVersionLabel' }
+                        outdated: { type: boolean, description: The character's sheet version differs from the campaign's }
+  /me/companions:
+    get:
+      operationId: listMyCompanions
+      tags: [accounts]
+      summary: People who share an active campaign with the actor, online first
+      description: Presence is coarse (online = active in the last 2 minutes; otherwise the day last seen) and only visible to fellow members. No e-mails.
+      responses:
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '200':
+          description: Companions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [user_id, name, online, campaigns]
+                      properties:
+                        user_id: { type: string, format: uuid }
+                        name: { type: string }
+                        online: { type: boolean }
+                        last_seen_on: { type: [string, 'null'], format: date }
+                        campaigns: { type: array, items: { type: object, properties: { id: { type: string, format: uuid }, name: { type: string }, role: { enum: [master, player] } } } }
   /campaigns/{campaignId}/preset-upgrades:
     get:
       operationId: listCampaignPresetUpgrades
-      tags: [Campaigns]
+      tags: [campaigns]
       summary: Newer versions of the campaign's preset the actor may move to
       parameters: [{ name: campaignId, in: path, required: true, schema: { type: string, format: uuid } }]
       responses:
@@ -478,7 +550,7 @@ paths:
   /campaigns/{campaignId}/preset-upgrade:
     post:
       operationId: upgradeCampaignPreset
-      tags: [Campaigns]
+      tags: [campaigns]
       summary: Master moves the campaign to another version of the same preset
       description: Characters keep their version until adapted (POST /campaign-characters/{id}/adaptation). Errors campaign.preset_upgrade_unavailable (422), campaign.revision_mismatch (409), campaign.master_only (403).
       parameters: [{ name: campaignId, in: path, required: true, schema: { type: string, format: uuid } }]
@@ -495,7 +567,7 @@ paths:
     parameters: [{ name: campaignCharacterId, in: path, required: true, schema: { type: string, format: uuid } }]
     get:
       operationId: previewCharacterAdaptation
-      tags: [Characters]
+      tags: [characters]
       summary: What adapting the character to the campaign's sheet version keeps and drops (owner or master)
       responses:
         '200': { description: Adaptation report, content: { application/json: { schema: { $ref: '#/components/schemas/AdaptationReport' } } } }
@@ -503,7 +575,7 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
     post:
       operationId: adaptCharacter
-      tags: [Characters]
+      tags: [characters]
       summary: Adapt the character to the campaign's sheet version
       description: Keeps valid values, drops the rest (reported), records the new revision, carries drafts over without operations on removed fields, withdraws active proposals; an approved character goes back to pending_approval. Errors character.revision_mismatch / character.already_current (409).
       requestBody:
@@ -2353,6 +2425,39 @@ components:
               visibility: { enum: [master, table, players], default: master, description: 'master: console only; table: every player; players: only player_ids' }
               player_ids: { type: array, maxItems: 20, items: { type: string, format: uuid }, description: 'User ids when visibility = players; ids that are not active players of the campaign are dropped' }
         spotlight: { type: object, additionalProperties: { type: integer, minimum: 0 }, description: 'Moments in the spotlight per character id' }
+    Preferences:
+      type: object
+      required: [dice_sets, active_dice_set]
+      properties:
+        dice_sets:
+          type: array
+          maxItems: 12
+          items:
+            type: object
+            required: [id, name, body, ink, finish]
+            properties:
+              id: { type: string, pattern: '^[a-z0-9-]{1,32}$' }
+              name: { type: string, minLength: 1, maxLength: 40 }
+              body: { type: string, pattern: '^#[0-9a-f]{6}$' }
+              ink: { type: string, pattern: '^#[0-9a-f]{6}$' }
+              finish: { enum: [matte, satin, gloss, metal] }
+              texture:
+                type: object
+                description: Procedural texture drawn by each client from these parameters (no images travel with rolls)
+                required: [pattern, accent]
+                properties:
+                  pattern: { enum: [none, marble, granite, nebula, wood, scales, speckle, veins] }
+                  accent: { type: string, pattern: '^#[0-9a-f]{6}$' }
+                  scale: { type: number, minimum: 0.5, maximum: 3 }
+        active_dice_set: { type: [string, 'null'] }
+        dice_sound: { type: boolean }
+    SheetVersionLabel:
+      type: [object, 'null']
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: string }
+        name: { type: string }
+        definition_id: { type: string, format: uuid }
     AdaptationReport:
       type: object
       required: [needed, from_version, to_version, kept, dropped, draft_operations_dropped, needs_approval]

@@ -23,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // First-party SPA session cookies for requests from SANCTUM_STATEFUL_DOMAINS (ADR 0009).
         $middleware->statefulApi();
         // Revoked paired devices lose their session (ADR 0011).
-        $middleware->api(append: [EnsurePairedDeviceActive::class]);
+        $middleware->api(append: [EnsurePairedDeviceActive::class, \App\Http\Middleware\TouchPresence::class]);
         // The API never redirects guests (there is no login page): <img> requests for campaign
         // images without a session get a 401 problem instead of a redirect error.
         $middleware->redirectGuestsTo(static fn (Request $request): ?string => $request->is('api/*') ? null : '/');
