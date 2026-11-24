@@ -1,7 +1,7 @@
 import type { Atmosphere } from './atmosphere'
 import { reactive } from 'vue'
 import type {
-  Clock, Clue, Compass, ItemOffer, Places, GameSession, Initiative, Plot, Stage, LiveState, MasterNote, OfficialRoll, RevealedNpc, RollRequest,
+  Clock, Clue, Compass, ItemOffer, Places, SessionMap, GameSession, Initiative, Plot, Stage, LiveState, MasterNote, OfficialRoll, RevealedNpc, RollRequest,
   SessionEvent, Suggestion, TableSnapshot, Whisper,
 } from './types'
 
@@ -156,6 +156,12 @@ export class TableState {
         this.hooks.onStage?.(stage)
         break
       }
+      case 'map.updated':
+        if (this.isMaster) s.session.map = p as SessionMap
+        break
+      case 'map.view':
+        if (!this.isMaster) s.session.map = p as SessionMap
+        break
       case 'places.updated':
         s.session.places = p as Places
         break

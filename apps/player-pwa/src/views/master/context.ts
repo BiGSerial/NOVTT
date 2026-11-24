@@ -7,7 +7,7 @@ import type { TableState } from '../../live/table'
 import type { useLiveTable } from '../../live/useLiveTable'
 import { useSheets } from '../../live/useSheets'
 import type {
-  Campaign, Clock, Compass, ItemOffer, Place, DiceChoice, Item, LiveState, OfficialRoll, Plot, PlotScene, ResourceTrack, RollRequest, Stage, Suggestion, TableSnapshot,
+  Campaign, Clock, Compass, ItemOffer, Place, SessionMap, DiceChoice, Item, LiveState, OfficialRoll, Plot, PlotScene, ResourceTrack, RollRequest, Stage, Suggestion, TableSnapshot,
 } from '../../live/types'
 
 export type SubjectKind = 'character' | 'npc'
@@ -281,6 +281,18 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
       return true
     } catch (e) { fail(e); return false }
   }
+  const map = computed(() => s.value.session.map ?? null)
+  /** Saves the scene map; on a revision race (another master window) retries once on the latest revision. */
+  async function saveMap(next: Omit<SessionMap, 'revision'>): Promise<void> {
+    const put = (revision: number) => party.setMap(s.value.session.id, next, revision)
+    try {
+      s.value.session.map = await put(map.value?.revision ?? 0)
+    } catch (e) {
+      if (e instanceof ApiError && e.code === 'map.revision_mismatch' && e.currentRevision !== undefined) {
+        try { s.value.session.map = await put(e.currentRevision) } catch (again) { fail(again) }
+      } else fail(e)
+    }
+  }
   const offers = computed(() => s.value.item_offers ?? [])
   async function undoOffer(o: ItemOffer): Promise<void> {
     try { await party.resolve(o.id, 'undo'); table.toast('Troca desfeita') } catch (e) { fail(e) }
@@ -361,7 +373,7 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
     table, campaign, t, s, sheets, busy, cast, byId, selection, focus, selected, select, selectMany, clearSelection,
     inScene, toggleInScene, paths, togglePath, suggestionId, fromSuggestion, pathLabels, playerName, fail, request, dismiss, cancel, grant, reveal, pendingFor,
     saveLive, adjustMany, conditionMany, compass, saveCompass, setClock, addClock, updateClock, removeClock, spotlight, spotlightLow,
-    places, savePlaces, offers, undoOffer, plot, currentScene, savePlot, goToScene, addScene, stage, showStage, showScene, atmosphere, setAtmosphere,
+    places, savePlaces, offers, undoOffer, map, saveMap, plot, currentScene, savePlot, goToScene, addScene, stage, showStage, showScene, atmosphere, setAtmosphere,
     initiative, initFrom, initMove, initRemove, nextTurn, endInitiative,
     players, whisper, revealClue, addClue, revealNpc, note, upload, setPortrait,
   }

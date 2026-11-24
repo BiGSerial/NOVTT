@@ -64,6 +64,8 @@ export interface GameSession {
   clocks?: Clock[]
   /** Who is near whom (null until the master sets places). */
   places?: Places | null
+  /** Scene map: full for the master, the players' view otherwise. */
+  map?: SessionMap | null
   last_seq: number
   revision: number
   started_at: string
@@ -121,6 +123,8 @@ export interface OfficialRoll {
 
 export interface Whisper { id: string; sender_user_id: string; recipient_user_id: string; kind: 'message' | 'clue'; body: string; created_at: string }
 export interface Clue { id: string; scene: string | null; title: string; body: string; revealed_to: 'table' | 'user' | null; revealed_user_id: string | null; revealed_at: string | null; image_id?: string | null }
+export interface MapPin { kind: 'character' | 'npc'; id: string; x: number; y: number }
+export interface SessionMap { revision: number; image_id: string | null; shown: boolean; pins: MapPin[] }
 export interface Place { id: string; name: string; character_ids: string[] }
 export interface Places { revision: number; places: Place[] }
 export interface ItemOffer { id: string; session_id?: string; from_character_id: string; to_character_id: string; item_id: string; item_label: string; qty: number; status: 'pending' | 'accepted' | 'declined' | 'undone'; created_at?: string | null }

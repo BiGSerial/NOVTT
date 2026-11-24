@@ -21,6 +21,7 @@ import type { useLiveTable } from '../live/useLiveTable'
 import { useSheets } from '../live/useSheets'
 import { near, placeOf, type Campaign, type Item, type ItemOffer, type OfficialRoll, type RollRequest } from '../live/types'
 import ActionDialog from '../components/ui/ActionDialog.vue'
+import SceneMap, { type MapSubject } from '../components/live/SceneMap.vue'
 
 /**
  * The player's phone (SPEC-MVP-003): the character up front (portrait, vitals, conditions), the
@@ -79,6 +80,10 @@ const isNear = (id: string) => !charId.value || near(places.value, charId.value,
 const mineIds = computed(() => new Set(mine.value.map(c => c.id)))
 const incoming = computed(() => (s.value.item_offers ?? []).filter(o => o.status === 'pending' && mineIds.value.has(o.to_character_id)))
 const outgoing = computed(() => (s.value.item_offers ?? []).filter(o => o.status === 'pending' && mineIds.value.has(o.from_character_id)))
+const mapSubjects = computed<MapSubject[]>(() => [
+  ...s.value.characters.map(c => ({ kind: 'character' as const, id: c.id, name: c.name, portrait: c.portrait_image_id ?? null, live: c.live })),
+  ...s.value.session.revealed_npcs.map(n => ({ kind: 'npc' as const, id: n.id, name: n.name, portrait: n.portrait_image_id ?? null })),
+])
 const charName = (id: string) => s.value.characters.find(c => c.id === id)?.name ?? '—'
 const giving = ref<Item | null>(null)
 const giveTo = ref('')
@@ -104,6 +109,8 @@ const stage = computed(() => s.value.session.stage ?? null)
 const sceneNew = ref(false)
 watch(() => stage.value?.shown_at, (v, o) => { if (v && v !== o && tab.value !== 'scene') sceneNew.value = true })
 watch(tab, v => { if (v === 'scene') sceneNew.value = false })
+// The map shown or moved also flags the scene tab.
+watch(() => `${s.value.session.map?.shown}:${s.value.session.map?.revision}`, (v, o) => { if (o !== undefined && v !== o && s.value.session.map?.shown && tab.value !== 'scene') sceneNew.value = true })
 // A clock shown or moved also flags the scene tab.
 watch(() => JSON.stringify(s.value.session.clocks ?? []), (v, o) => { if (o !== undefined && v !== o && tab.value !== 'scene') sceneNew.value = true })
 
@@ -256,6 +263,10 @@ const turn = computed(() => s.value.session.initiative?.entries?.[s.value.sessio
           </div>
         </article>
         <p v-else class="muted panel">Quando o mestre mostrar uma cena, ela aparece aqui.</p>
+        <section v-if="s.session.map?.shown && s.session.map.image_id" class="player-map" aria-label="Mapa da cena">
+          <h2 class="sheet-heading">Mapa</h2>
+          <SceneMap :image-id="s.session.map.image_id" :pins="s.session.map.pins" :subjects="mapSubjects" :highlight="charId" />
+        </section>
         <section v-if="s.session.clocks?.length" class="player-clocks" aria-label="Relógios">
           <h3 class="sheet-heading">Relógios</h3>
           <ClockDial v-for="c in s.session.clocks" :key="c.id" :label="c.label" :segments="c.segments" :filled="c.filled" :tone="c.tone" :size="64" />

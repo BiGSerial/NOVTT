@@ -6,6 +6,7 @@ import { oracle } from '../../live/oracle'
 import type { RoteiroContent } from '../../live/types'
 import { useMaster } from './context'
 import PlacesDialog from './PlacesDialog.vue'
+import MapDialog from './MapDialog.vue'
 
 /**
  * The centre of the console when nobody is selected (NT-12): the current scene's prep as a
@@ -52,6 +53,7 @@ const wants = computed(() => s.value.characters.map(c => ({
 })))
 const twist = ref('')
 const editingPlaces = ref(false)
+const editingMap = ref(false)
 const placeGroups = computed(() => {
   const places = m.places.value?.places ?? []
   const placed = new Set(places.flatMap(p => p.character_ids))
@@ -143,7 +145,8 @@ const rewards = computed(() => prep.value?.rewards?.filter(Boolean) ?? [])
         <ul class="cc-list place-groups">
           <li v-for="g in placeGroups" :key="g.name"><b>{{ g.name }}</b>: {{ g.people.map(p => p.name).join(', ') || 'ninguém' }}</li>
         </ul>
-        <button type="button" class="small-btn" @click="editingPlaces = true">Separar o grupo</button>
+        <div class="row"><button type="button" class="small-btn" @click="editingPlaces = true">Separar o grupo</button>
+          <button type="button" class="small-btn" @click="editingMap = true">🗺 Mapa da cena{{ m.map.value?.shown ? ' (na tela)' : '' }}</button></div>
         <template v-if="m.offers.value.length">
           <p class="cc-sub">Trocas de itens</p>
           <ul class="cc-clues">
@@ -167,6 +170,7 @@ const rewards = computed(() => prep.value?.rewards?.filter(Boolean) ?? [])
     </div>
 
     <PlacesDialog v-if="editingPlaces" @close="editingPlaces = false" />
+    <MapDialog v-if="editingMap" @close="editingMap = false" />
     <p v-if="loaded && !prep" class="cc-noprep muted small">
       Esta sessão não tem roteiro. <a :href="`#/roteiro/${m.campaign.id}`" target="_blank" rel="noopener">Monte um no Roteiro</a> para ver falas, desejos e segredos aqui.
     </p>
