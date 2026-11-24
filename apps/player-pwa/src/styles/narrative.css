@@ -642,3 +642,52 @@ input, select, textarea { font-family: var(--font-ui); }
 .paper-id { align-items: end; }
 @media (max-width: 480px) { .paper-id { grid-template-columns: 1fr; } }
 @media (max-width: 380px) { .paper-head { grid-template-columns: 1fr; justify-items: center; } }
+
+/* Master history (HistoryPanel.vue). */
+.history { display: grid; gap: 10px; }
+.history-tools { display: grid; gap: 8px; }
+.history-tools .seg-tabs { flex-wrap: wrap; }
+.history-search { min-height: 36px; font-size: 14px; }
+.history-icon { display: inline-block; width: 1.3em; text-align: center; }
+.history-detail { color: var(--muted); font: italic 14px/1.35 var(--font-story); overflow-wrap: anywhere; }
+.chronicle li.player::before { background: var(--accent); border-color: var(--accent); }
+.chronicle li.state::before { border-color: var(--lose); }
+.chronicle li.story::before { background: var(--surface-2); border-color: var(--text); }
+
+/* Master control centre (ControlCenter.vue): the scene's prep in the middle of the console. */
+.back-to-center { justify-self: start; width: auto; min-height: 32px; margin-bottom: 8px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); font: 700 13px var(--font-ui); cursor: pointer; }
+.back-to-center:hover { color: var(--accent); border-color: var(--accent); }
+.control-center { display: grid; gap: 16px; }
+.cc-head { display: grid; gap: 4px; }
+.cc-title { margin: 0; font-size: clamp(24px, 3vw, 34px); }
+.cc-goal { margin: 0; font: 17px var(--font-story); }
+.cc-goal span, .cc-line > span { margin-right: 8px; font: 700 11px var(--font-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.cc-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); align-items: start; }
+.cc-card { display: grid; gap: 8px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); }
+.cc-card h3 { margin: 0; font: 700 12px var(--font-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.cc-read { grid-column: 1 / -1; border-color: var(--ornament); }
+.cc-read blockquote { margin: 0; padding: 4px 0 4px 14px; border-left: 3px solid var(--accent); font: italic 19px/1.5 var(--font-story); white-space: pre-wrap; }
+.cc-actions { display: flex; gap: 8px; align-items: center; }
+.cc-npcs, .cc-wants, .cc-clues, .cc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.cc-npc { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; }
+.cc-npc-name { margin: 0; font: 700 17px var(--font-display); }
+.cc-line { margin: 2px 0; font: 15px/1.4 var(--font-story); }
+.cc-line.secret > span { color: var(--lose); }
+.cc-sub { margin: 6px 0 0; font: 700 11px var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.cc-clues li { font-size: 14px; }
+.cc-list li { padding-left: 14px; position: relative; font: 15px var(--font-story); }
+.cc-list li::before { content: '◆'; position: absolute; left: 0; color: var(--accent); font-size: 9px; top: 5px; }
+.cc-person { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; text-align: left; padding: 6px 8px; border-radius: 12px; border: 1px solid transparent; background: transparent; color: var(--text); cursor: pointer; }
+.cc-person:hover, .cc-person:focus-visible { border-color: var(--line-strong); background: var(--surface); }
+.cc-person-text { display: grid; min-width: 0; }
+.cc-person-text small { color: var(--muted); font: 14px/1.3 var(--font-story); }
+.cc-person-text small.cc-conds { color: color-mix(in srgb, var(--lose) 65%, var(--text)); font: 700 12px var(--font-ui); }
+.cc-flags { display: flex; gap: 4px; }
+.cc-noprep { text-align: center; }
+.cond-grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 130px), 1fr)); }
+.cond-tile { min-height: 44px; align-content: center; }
+.cond-tile.on { border-color: color-mix(in srgb, var(--lose) 70%, transparent); background: color-mix(in srgb, var(--lose) 16%, var(--surface)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--lose) 25%, transparent); }
+.roll-options { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+.roll-options .grow, .roll-options .check { grid-column: 1 / -1; }
+.roll-options select, .roll-options input:not([type=checkbox]) { width: 100%; }
+.give-btn { margin-top: 8px; width: auto; }

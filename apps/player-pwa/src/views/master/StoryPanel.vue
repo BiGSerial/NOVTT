@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import NotesPanel from '../../components/live/NotesPanel.vue'
+import HistoryPanel from './HistoryPanel.vue'
 import Portrait from '../../components/live/Portrait.vue'
-import { faceCounts, outcomeText } from '../../live/dice'
 import { oracle } from '../../live/oracle'
-import type { Clue, OfficialRoll } from '../../live/types'
+import type { Clue } from '../../live/types'
 import { useMaster } from './context'
 
 /**
@@ -29,16 +29,6 @@ async function addClue(): Promise<void> {
 }
 const clueState = (c: Clue) => (c.revealed_to === 'table' ? 'Revelada à mesa' : c.revealed_to === 'user' ? `Só ${m.playerName(c.revealed_user_id)}` : 'Ainda guardada')
 
-// ---------- Chronicle ----------
-type Line = { id: string; at: string; kind: 'roll' | 'clue' | 'npc'; roll?: OfficialRoll; text: string }
-const chronicle = computed<Line[]>(() => {
-  const lines: Line[] = [
-    ...s.value.rolls.map(r => ({ id: r.id, at: r.created_at, kind: 'roll' as const, roll: r, text: `${r.subject.name} · ${r.label}` })),
-    ...s.value.clues.filter(c => c.revealed_at).map(c => ({ id: `c${c.id}`, at: c.revealed_at!, kind: 'clue' as const, text: `${c.revealed_to === 'table' ? 'Pista revelada' : `Pista para ${m.playerName(c.revealed_user_id)}`}: ${c.title}` })),
-  ]
-  return lines.sort((a, b) => b.at.localeCompare(a.at)).slice(0, 80)
-})
-const time = (iso: string) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
 // ---------- Whispers ----------
 const to = ref<string>(m.players.value[0]?.user_id ?? '')
@@ -73,7 +63,7 @@ function roll(kind: string): void {
   <aside class="story" aria-label="História">
     <div class="story-tabs" role="tablist">
       <button type="button" role="tab" :aria-selected="tab === 'plot'" :class="{ on: tab === 'plot' }" @click="tab = 'plot'">Trama</button>
-      <button type="button" role="tab" :aria-selected="tab === 'chronicle'" :class="{ on: tab === 'chronicle' }" @click="tab = 'chronicle'">Crônica</button>
+      <button type="button" role="tab" :aria-selected="tab === 'chronicle'" :class="{ on: tab === 'chronicle' }" @click="tab = 'chronicle'">Histórico</button>
       <button type="button" role="tab" :aria-selected="tab === 'whispers'" :class="{ on: tab === 'whispers' }" @click="tab = 'whispers'">Sussurros<span v-if="unreadTotal" class="badge">{{ unreadTotal }}</span></button>
       <button type="button" role="tab" :aria-selected="tab === 'notes'" :class="{ on: tab === 'notes' }" @click="tab = 'notes'">Notas</button>
       <button type="button" role="tab" :aria-selected="tab === 'oracle'" :class="{ on: tab === 'oracle' }" @click="tab = 'oracle'">Oráculo</button>
@@ -118,21 +108,8 @@ function roll(kind: string): void {
         </ol>
       </section>
 
-      <!-- Crônica -->
-      <ol v-else-if="tab === 'chronicle'" class="chronicle">
-        <li v-for="l in chronicle" :key="l.id" :class="[l.kind, l.roll ? { win: l.roll.succeeded === true, lose: l.roll.succeeded === false } : {}]">
-          <time :datetime="l.at">{{ time(l.at) }}</time>
-          <div>
-            <p>{{ l.text }}<span v-if="l.roll?.secret && !l.roll.revealed" class="pill secret">entre vocês</span></p>
-            <p v-if="l.roll" class="chron-faces"><span v-for="(f, i) in l.roll.results" :key="i" class="face" :class="{ counts: faceCounts(l.roll, f) && l.roll.dice.reading !== 'sum' }">{{ f }}</span><b>{{ outcomeText(l.roll) }}</b></p>
-            <p v-if="l.roll" class="chron-actions">
-              <button type="button" class="link" @click="m.table.enqueue(l.roll)">Ver de novo</button>
-              <button v-if="l.roll.secret && !l.roll.revealed" type="button" class="link" @click="m.reveal(l.roll)">Revelar à mesa</button>
-            </p>
-          </div>
-        </li>
-        <li v-if="!chronicle.length" class="muted">A crônica da sessão aparece aqui: rolagens, pistas e revelações.</li>
-      </ol>
+      <!-- Histórico -->
+      <HistoryPanel v-else-if="tab === 'chronicle'" />
 
       <!-- Sussurros -->
       <section v-else-if="tab === 'whispers'" class="whisper-box">

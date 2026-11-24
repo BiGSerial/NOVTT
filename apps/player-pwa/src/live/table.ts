@@ -28,6 +28,8 @@ export class TableState {
   private readonly seen = new Set<number>()
   private catchingUp: Promise<void> | null = null
   private catchUpAgain = false
+  /** Events applied since the snapshot, in order (the master's history merges them). Capped. */
+  readonly events = reactive<SessionEvent[]>([])
 
   constructor(snapshot: TableSnapshot, private readonly fetchAfter: Fetcher, private readonly hooks: TableHooks = {}) {
     this.s = reactive(structuredClone(snapshot)) as TableSnapshot
@@ -80,6 +82,8 @@ export class TableState {
 
   private apply(e: SessionEvent): void {
     this.seen.add(e.seq)
+    this.events.push(e)
+    if (this.events.length > 2000) this.events.splice(0, this.events.length - 2000)
     this.lastSeq = Math.max(this.lastSeq, e.seq)
     const p = e.payload as never
     const s = this.s

@@ -98,7 +98,7 @@ async function reveal(): Promise<void> {
     <div class="inspector-grid">
       <section class="inspector-side">
         <h3 class="sheet-heading">Estado</h3>
-        <Vitals :live="entry.live" editable big :busy="m.busy.value" @resources="r => m.saveLive(entry.kind, entry.id, { resources: r })" @conditions="c => m.saveLive(entry.kind, entry.id, { conditions: c })" />
+        <Vitals :live="entry.live" :name="entry.name" editable big :busy="m.busy.value" @resources="r => m.saveLive(entry.kind, entry.id, { resources: r })" @conditions="c => m.saveLive(entry.kind, entry.id, { conditions: c })" />
         <h3 class="sheet-heading">Mochila</h3>
         <Inventory :items="entry.live?.items ?? []" editable :busy="m.busy.value" @save="items => m.saveLive(entry.kind, entry.id, { items })" />
       </section>

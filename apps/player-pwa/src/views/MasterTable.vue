@@ -10,6 +10,7 @@ import { loadTheme, saveTheme, THEMES, type ThemeId } from '../live/theme'
 import type { useLiveTable } from '../live/useLiveTable'
 import type { Campaign } from '../live/types'
 import CastRail from './master/CastRail.vue'
+import ControlCenter from './master/ControlCenter.vue'
 import InitiativeStrip from './master/InitiativeStrip.vue'
 import Inspector from './master/Inspector.vue'
 import PartyBoard from './master/PartyBoard.vue'
@@ -102,13 +103,10 @@ const origin = location.origin
     <div class="console">
       <CastRail />
       <main class="workbench" aria-label="Mesa">
+        <button v-if="m.selection.value.length" type="button" class="back-to-center" @click="m.clearSelection()">◀ Central do mestre</button>
         <PartyBoard v-if="many" />
         <Inspector v-else-if="m.focus.value" :key="m.focus.value.id" :entry="m.focus.value" />
-        <div v-else class="empty-bench">
-          <p class="char-name">Escolha alguém do elenco</p>
-          <p class="muted">Clique em um retrato para abrir a ficha. Segure <kbd>Ctrl</kbd> para juntar vários e agir no grupo todo.</p>
-          <div class="row"><button type="button" class="primary" @click="m.selectMany(s.characters.map(c => ({ kind: 'character', id: c.id })))">Selecionar o grupo</button></div>
-        </div>
+        <ControlCenter v-else />
       </main>
       <StoryPanel />
     </div>

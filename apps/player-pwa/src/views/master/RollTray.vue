@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ActionDialog from '../../components/ui/ActionDialog.vue'
 import { computed, reactive, watch } from 'vue'
 import { describeDice } from '../../live/dice'
 import type { SheetField } from '../../live/sheet'
@@ -85,9 +86,10 @@ async function send(): Promise<void> {
         <button v-for="p in PRESETS" :key="p.id" type="button" :class="{ on: f.preset === p.id }" :aria-pressed="f.preset === p.id" @click="preset(p.id)">{{ p.name }}</button>
       </div>
       <label class="mini">{{ f.reading === 'successes' ? 'Precisa de' : 'Alvo' }} <input v-model.number="f.target" type="number" min="-50" max="500" /></label>
-      <button type="button" class="link" :aria-expanded="f.advanced" @click="f.advanced = !f.advanced">{{ f.advanced ? 'menos opções' : 'mais opções' }}</button>
+      <button type="button" class="link" aria-haspopup="dialog" @click="f.advanced = true">mais opções</button>
     </div>
-    <div v-if="f.advanced" class="tray-row wrap">
+    <ActionDialog v-if="f.advanced" title="Opções da rolagem" @close="f.advanced = false" @submit="f.advanced = false">
+      <div class="roll-options">
       <label class="mini">Dado <select v-model.number="f.faces"><option v-for="n in FACES" :key="n" :value="n">d{{ n }}</option></select></label>
       <label class="mini">Quantidade <select v-model="f.count_mode"><option value="pool">da combinação</option><option value="fixed">fixa</option></select></label>
       <label v-if="f.count_mode === 'fixed'" class="mini">Nº <input v-model.number="f.count" type="number" min="1" :max="f.faces === 100 ? 6 : 12" /></label>
@@ -97,6 +99,8 @@ async function send(): Promise<void> {
       <label class="mini grow">Rótulo <input v-model="f.label" maxlength="120" :placeholder="comboLabel || 'Ex.: Escalar a ponte'" /></label>
       <label v-if="!onlyNpcs && f.count_mode === 'pool'" class="check"><input v-model="f.choice" type="checkbox" /> Jogador escolhe quantos dados</label>
     </div>
+      <template #actions><span class="grow" /><button type="submit" class="primary">Pronto</button></template>
+    </ActionDialog>
     <div class="tray-send">
       <div class="seg-tabs vis" role="radiogroup" aria-label="Quem vê">
         <button type="button" role="radio" :aria-checked="!f.toTable" :class="{ on: !f.toTable }" @click="f.toTable = false">🔒 {{ onlyNpcs ? 'Só eu' : 'Entre nós' }}</button>

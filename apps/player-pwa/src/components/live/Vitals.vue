@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { LiveState, ResourceTrack } from '../../live/types'
+import ActionDialog from '../ui/ActionDialog.vue'
 
 /**
  * Resource tracks as bars with quick steps, plus conditions. Editable for the master: −3 / −1 /
  * +1 / +3 and condition chips, each saved with the known revision (conflicts surface).
  */
-const props = defineProps<{ live: LiveState | null; editable?: boolean; busy?: boolean; big?: boolean }>()
+const props = defineProps<{ live: LiveState | null; editable?: boolean; busy?: boolean; big?: boolean; name?: string }>()
 const emit = defineEmits<{ resources: [r: ResourceTrack[]]; conditions: [c: string[]] }>()
 const COMMON = ['Ferido', 'Caído', 'Assustado', 'Cego', 'Envenenado', 'Exausto', 'Escondido', 'Inspirado', 'Preso', 'Em chamas']
 const custom = ref('')
@@ -41,9 +42,23 @@ const tone = (t: ResourceTrack) => (t.current <= 0 ? 'down' : t.current <= t.max
     </div>
     <div class="conditions" :aria-label="editable ? 'Condições (toque para ligar ou desligar)' : 'Condições'">
       <template v-if="editable">
-        <button v-for="c in [...new Set([...(live?.conditions ?? []), ...(showAll ? COMMON : [])])]" :key="c" type="button" class="chip cond" :class="{ on: live?.conditions?.includes(c) }" :aria-pressed="live?.conditions?.includes(c) ?? false" :disabled="busy" @click="toggle(c)">{{ c }}</button>
-        <button type="button" class="chip ghosty" :aria-expanded="showAll" @click="showAll = !showAll">{{ showAll ? 'fechar' : '+ condição' }}</button>
-        <form v-if="showAll" class="chip-add" @submit.prevent="add"><input v-model="custom" maxlength="40" placeholder="Outra…" aria-label="Nova condição" /></form>
+        <button v-for="c in live?.conditions ?? []" :key="c" type="button" class="chip cond on" aria-pressed="true" :title="`Tirar ${c}`" :disabled="busy" @click="toggle(c)">{{ c }} ×</button>
+        <button type="button" class="chip ghosty" aria-haspopup="dialog" @click="showAll = true">+ condição</button>
+        <ActionDialog v-if="showAll" :title="name ? `Condições de ${name}` : 'Condições'" @close="showAll = false" @submit="add">
+          <p class="muted small">Toque para ligar ou desligar. Os jogadores veem as condições do grupo.</p>
+          <div class="cond-grid">
+            <button
+              v-for="c in [...new Set([...COMMON, ...(live?.conditions ?? [])])]" :key="c" type="button" class="choice-tile cond-tile" :class="{ on: live?.conditions?.includes(c) }"
+              :aria-pressed="live?.conditions?.includes(c) ?? false" :disabled="busy" @click="toggle(c)"
+            ><b>{{ c }}</b></button>
+          </div>
+          <label>Outra condição <input v-model="custom" maxlength="40" placeholder="Ex.: Amaldiçoado" /></label>
+          <template #actions>
+            <span class="grow" />
+            <button type="submit" class="ghost" :disabled="!custom.trim() || busy">Adicionar</button>
+            <button type="button" class="primary" @click="showAll = false">Pronto</button>
+          </template>
+        </ActionDialog>
       </template>
       <template v-else>
         <span v-for="c in live?.conditions ?? []" :key="c" class="chip cond on">{{ c }}</span>
