@@ -506,6 +506,8 @@ def common_rows(book):
         ("Archetypes (Nature/Demeanor) list and Willpower regain", "free text", "—", "missing"),
         ("Diablerie / generation change in play", "not wired", "—", "missing"),
         ("Soak, damage and combat maneuvers", "not wired (roll `attribute` covers Stamina)", "—", "missing"),
+        ("Engine: a cost rule that does not apply to some increments", f"modelled by pricing them at {NOT_PAYABLE} (above any balance) so the next rule pays; an unaffordable dot reports that price", "—", "missing capability (`applies_when`)"),
+        ("Engine: losing a trait in play (degeneration, permanent Willpower) without a refund", "lowering a rating refunds the XP that paid it", "—", "missing capability"),
     ]
 
 

@@ -43,6 +43,8 @@ No rulebook prose, art or descriptions: compendium entries carry names and mecha
 | Archetypes (Nature/Demeanor) list and Willpower regain | free text | — | missing |
 | Diablerie / generation change in play | not wired | — | missing |
 | Soak, damage and combat maneuvers | not wired (roll `attribute` covers Stamina) | — | missing |
+| Engine: a cost rule that does not apply to some increments | modelled by pricing them at 1000 (above any balance) so the next rule pays; an unaffordable dot reports that price | — | missing capability (`applies_when`) |
+| Engine: losing a trait in play (degeneration, permanent Willpower) without a refund | lowering a rating refunds the XP that paid it | — | missing capability |
 | Clans V20 core: 13 + Caitiff | Assamite, Brujah, Followers of Set, Gangrel, Giovanni, Lasombra, Malkavian, Nosferatu, Ravnos, Toreador, Tremere, Tzimisce, Ventrue, Caitiff | high | pending |
 | Caitiff: no clan Disciplines; any Discipline at creation; XP current×6 | creation table admits any Discipline; XP multiplier 6 | medium | pending |
 | Disciplines (17 clan Disciplines) | Animalism, Auspex, Celerity, Chimerstry, Dementation, Dominate, Fortitude, Necromancy, Obfuscate, Obtenebration, Potence, Presence, Protean, Quietus, Serpentis, Thaumaturgy, Vicissitude | high | pending |

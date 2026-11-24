@@ -43,6 +43,8 @@ No rulebook prose, art or descriptions: compendium entries carry names and mecha
 | Archetypes (Nature/Demeanor) list and Willpower regain | free text | — | missing |
 | Diablerie / generation change in play | not wired | — | missing |
 | Soak, damage and combat maneuvers | not wired (roll `attribute` covers Stamina) | — | missing |
+| Engine: a cost rule that does not apply to some increments | modelled by pricing them at 1000 (above any balance) so the next rule pays; an unaffordable dot reports that price | — | missing capability (`applies_when`) |
+| Engine: losing a trait in play (degeneration, permanent Willpower) without a refund | lowering a rating refunds the XP that paid it | — | missing capability |
 | Clans V20 Dark Ages core | Assamite, Brujah, Cappadocian, Followers of Set, Gangrel, Lasombra, Malkavian, Nosferatu, Ravnos, Salubri, Toreador, Tremere, Tzimisce, Ventrue | medium-high (Salubri in the core list: medium) | pending |
 | Cappadocian Mortis; Salubri Obeah | clan Disciplines as listed | medium | pending |
 | Disciplines | Animalism, Auspex, Celerity, Chimerstry, Dementation, Dominate, Fortitude, Mortis, Obeah, Obfuscate, Obtenebration, Potence, Presence, Protean, Quietus, Serpentis, Thaumaturgy, Vicissitude | medium-high | pending |
