@@ -146,3 +146,5 @@
 
 .review-sheet { display: grid; gap: 12px; }
 @media (min-width: 640px) { .review-sheet { grid-template-columns: auto minmax(0, 1fr); align-items: start; } .review-sheet .portrait-picker { margin-top: 18px; } }
+.stat-row.locked { opacity: .85; border-style: dashed; }
+.stat-locked { margin: 0; font: 600 13px var(--font-ui); color: var(--muted); }

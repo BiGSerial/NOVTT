@@ -69,6 +69,16 @@ const fieldLabels = computed(() => {
   return map
 })
 const choices = computed(() => rules.value.creation?.choices ?? [])
+// Fields held by the chosen options (server-computed): path → "Clã: X (reason)".
+const lockedBy = computed(() => {
+  const out = new Map<string, string>()
+  for (const c of view.value?.choices ?? []) {
+    const decl = choices.value.find(x => x.id === c.id)
+    const option = decl?.options.find(o => o.value === c.value)
+    for (const f of c.fixes ?? []) out.set(f.path, `${decl?.label ?? c.id}: ${option?.label ?? String(c.value)}${f.label ? ` (${f.label})` : ''}`)
+  }
+  return out
+})
 const choicePaths = computed(() => new Set(choices.value.map(c => c.path)))
 const derivedPaths = computed(() => new Set((rules.value.derived ?? []).map(d => d.path)))
 const optionEntry = (id?: string) => (id ? compendium.value.get(id) : undefined)
@@ -422,6 +432,7 @@ onBeforeUnmount(() => clearTimeout(autosave))
                   :linked="(linkedDerived.get(f.path) ?? []).map(l => ({ label: l.label, value: derivedValue(l.path) }))"
                   :can-raise="!pending && canRaise(f.path)"
                   :errors="errorsFor(f.path)"
+                  :locked="lockedBy.get(f.path) ?? null"
                   @set="v => setValue(f.path, v)"
                 />
               </div>

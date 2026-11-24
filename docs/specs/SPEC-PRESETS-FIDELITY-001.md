@@ -1,0 +1,33 @@
+# SPEC-PRESETS-FIDELITY-001: faithful presets for Ordem Paranormal, Vampire V20 / Dark Ages, D&D 5e
+
+Status: ACCEPTED (owner directive 2026-11-23). Supersedes the "blocked" wording of
+SPEC-PRESET-ENGINE-001 §Open items 1 and 4 for **development**; publication gates are unchanged.
+
+## Owner directive (summary)
+- Do not block preset implementation on licensing or on data that still needs checking.
+- The engine stays universal; presets execute each game's particularities faithfully.
+- No invented rules to fill gaps, no silent approximations of official rules. Data without a
+  validated source is marked **pending** (`mechanics_verified: false`, source "pending"), with
+  tests and interfaces ready to receive it.
+- Separate mechanics, nomenclature, compendium, licence and publication authorisation. Publication
+  controls are **per package**; they never block the platform.
+- Presets are free; monetisation is in NOVTT services, subject to each licence.
+- Every preset and its sources are versioned (SOURCE-REGISTER per package).
+
+## Packages
+| Package | Family | Distributed compendium | Publication |
+|---|---|---|---|
+| `ordem-paranormal-rpg` livro básico (+ `sobrevivendo-ao-horror`, off by default) | Ordem Paranormal | general terminology allowed by the Community Licence v1.0; no official descriptions or art; authorial summaries only after editorial + legal review; no AI-generated text in commercial content | `blocked_pending_legal_review` |
+| `vampire-v20`, `vampire-dark-ages` | World of Darkness | engine + structure; names/taxonomies via compendium; proprietary content not distributed without applicable authorisation (Dark Pack does not cover paid apps automatically) | blocked for distribution, internal use allowed |
+| `dnd-5e-2014` (SRD 5.1), `dnd-5e-2024` (SRD 5.2.1) | D&D 5e | SRD content only, exact CC BY 4.0 attribution; any subclass is representable, only SRD ones are filled | allowed with attribution |
+
+## Engine capabilities added for fidelity
+- `creation.choices[].options[].fixes`: while an option is selected a field holds a value and is
+  locked (e.g. a clan that sets Appearance to 0). The engine writes it when the option is chosen,
+  refunds points spent on it, rejects other values (`choice.fixed_value`) and reports the holds in
+  the choice availability so clients lock the control and say why.
+- Roll strategy `keep`: N dice, keep the K highest or lowest, both from formulas (Ordem
+  Paranormal: a d20 per attribute point keeping the best; at 0, two keeping the worst).
+
+## Pending (needs sources or legal review)
+Tracked per package in its `SOURCE-REGISTER.md`.

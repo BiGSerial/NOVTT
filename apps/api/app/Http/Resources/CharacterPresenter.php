@@ -90,9 +90,10 @@ final readonly class CharacterPresenter
                 }, $progress['steps']),
                 'issues' => $this->changes->filterFor(new ValidationResult($progress['issues']), $character, $viewer)->toArray()['issues'],
             ];
-            $out['choices'] = array_values(array_filter(
-                $mechanics->choiceAvailability($raw, $grants),
-                static fn (array $choice): bool => $readable($choice['path']),
+            $out['choices'] = array_values(array_map(
+                // Held fields follow the same read rules as the choice itself.
+                static fn (array $choice): array => ['fixes' => array_values(array_filter($choice['fixes'] ?? [], static fn (array $f): bool => $readable($f['path'])))] + $choice,
+                array_filter($mechanics->choiceAvailability($raw, $grants), static fn (array $choice): bool => $readable($choice['path'])),
             ));
         }
 
