@@ -149,7 +149,8 @@ export interface SessionEvent {
 
 /** Sheet fields as the preset lays them out (sheet.ui.json). */
 export interface SheetUiField { kind: 'field'; path: string; label: string; widget: string; access?: string }
-export interface SheetUiSection { id: string; label: string; access?: string; elements: Array<SheetUiField | { kind: string; path: string; label: string }> }
+export interface SheetUiCollection { kind: 'collection'; path: string; label: string; item_fields?: { field: string; label: string; widget: string }[] }
+export interface SheetUiSection { id: string; label: string; access?: string; tab?: string; elements: Array<SheetUiField | SheetUiCollection | { kind: string; path: string; label: string }> }
 export interface SheetUi { sections: SheetUiSection[] }
 
 export interface RoteiroContent {

@@ -9,7 +9,7 @@ export interface ItemFieldUi { field: string; label: string; widget: Widget; acc
 export interface FieldElement { kind: 'field'; path: string; label: string; widget: Widget; access?: FieldAccess; description?: string }
 export interface CollectionElement { kind: 'collection'; path: string; label: string; access?: FieldAccess; max_items?: number; item_fields: ItemFieldUi[] }
 export type Element = FieldElement | CollectionElement
-export interface Section { id: string; label: string; access?: FieldAccess; elements: Element[] }
+export interface Section { id: string; label: string; access?: FieldAccess; tab?: string; elements: Element[] }
 export interface SheetUi { contract: 'novtt.sheet-ui/1'; default_access: FieldAccess; sections: Section[] }
 
 export type Operation =

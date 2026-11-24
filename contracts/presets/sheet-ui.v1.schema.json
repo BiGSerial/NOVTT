@@ -75,6 +75,12 @@
           "items": {
             "$ref": "#/$defs/element"
           }
+        },
+        "tab": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40,
+          "description": "Optional tab label that groups this section in sheet views (e.g. \"Combate\"). Sections without one are grouped by the client (ratings, computed values, items, details)."
         }
       }
     },

@@ -1,7 +1,29 @@
-import type { SheetUi } from './types'
+import type { SheetUi, SheetUiCollection } from './types'
 
 export interface SheetField { path: string; label: string; widget: string; value: unknown }
-export interface SheetSection { id: string; label: string; numeric: boolean; fields: SheetField[] }
+export interface SheetSection {
+  id: string; label: string; numeric: boolean; fields: SheetField[]
+  /** Every field is a rating (dots): attributes, skills. */
+  rated?: boolean
+  /** The section is read-only for everyone (computed values). */
+  readOnly?: boolean
+  /** Tab declared by the preset (sheet-ui `tab`), if any. */
+  tab?: string
+  /** Lists in this section (attacks, items, rituals): column labels and the rows the viewer may read. */
+  collections?: { path: string; label: string; columns: { field: string; label: string }[]; rows: Record<string, unknown>[] }[]
+}
+
+export type SheetTab = 'ficha' | 'valores' | 'itens' | 'detalhes'
+/** Which tab a section belongs to: the preset's own `tab`, else ratings / computed values / lists / the rest. */
+export const LONG_SECTION = 8
+export function tabOf(section: SheetSection): string {
+  if (section.tab) return section.tab
+  if (section.collections?.length && !section.fields.length) return 'Itens'
+  if (section.numeric && section.readOnly) return 'Valores'
+  // A long list of ratings (skills, disciplines) gets its own tab, named after it.
+  if (section.numeric) return section.fields.length > LONG_SECTION ? section.label : 'Ficha'
+  return 'Detalhes'
+}
 
 /** Reads a JSON pointer from a sheet document (no exceptions: missing → undefined). */
 export function readPointer(doc: unknown, pointer: string): unknown {
@@ -52,9 +74,21 @@ export function sheetSections(ui: SheetUi, sheet: Record<string, unknown>, schem
         return { path: e.path, label: e.label, widget, value }
       })
       .filter(f => f.value !== undefined && f.value !== '')
+    const collections = section.elements
+      .filter((e): e is SheetUiCollection => e.kind === 'collection')
+      .map(e => {
+        const columns = (e.item_fields ?? []).map(f => ({ field: f.field, label: f.label }))
+        const raw = readPointer(sheet, e.path)
+        const rows = (Array.isArray(raw) ? raw : []).filter((r): r is Record<string, unknown> => typeof r === 'object' && r !== null)
+          .map(r => Object.fromEntries(columns.map(c => [c.field, optionLabels?.[`${e.path}/*/${c.field}`]?.[String(r[c.field])] ?? r[c.field]])))
+        return { path: e.path, label: e.label, columns, rows }
+      })
+      .filter(c => c.rows.length > 0)
     const numeric = fields.length > 0 && fields.every(f => f.widget === 'dot_rating' || f.widget === 'integer')
-    return { id: section.id, label: section.label, numeric, fields }
-  }).filter(s => s.fields.length > 0)
+    const rated = fields.length > 0 && fields.every(f => f.widget === 'dot_rating')
+    const readOnly = ((section as { access?: string }).access ?? defaultAccess) === 'read_only'
+    return { id: section.id, label: section.label, numeric, fields, rated, readOnly, tab: (section as { tab?: string }).tab, collections }
+  }).filter(s => s.fields.length > 0 || s.collections.length > 0)
 }
 
 /** Deep copy of plain JSON data, including Vue reactive proxies (structuredClone rejects those). */

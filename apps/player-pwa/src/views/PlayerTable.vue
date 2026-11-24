@@ -16,7 +16,7 @@ import SceneArt from '../components/live/SceneArt.vue'
 import StatBoard from '../components/live/StatBoard.vue'
 import Vitals from '../components/live/Vitals.vue'
 import { imageUrl, rolls, table as tableApi } from '../live/api'
-import { readPointer } from '../live/sheet'
+import { LONG_SECTION, readPointer, tabOf } from '../live/sheet'
 import type { useLiveTable } from '../live/useLiveTable'
 import { useSheets } from '../live/useSheets'
 import type { Campaign, OfficialRoll, RollRequest } from '../live/types'
@@ -45,8 +45,30 @@ watch(charId, id => { const c = mine.value.find(x => x.id === id); if (c) void s
 const text = (p: string) => { const v = sheet.value ? readPointer(sheet.value.raw, p) : undefined; return typeof v === 'string' ? v : '' }
 const concept = computed(() => character.value?.concept || text('/identity/concept'))
 // Identity prose from the preset's own identity section (name and concept are in the header).
-const identity = computed(() => (sheet.value?.sections.find(x => x.id === 'identity')?.fields ?? [])
-  .filter(f => !/\/(name|concept)$/.test(f.path) && typeof f.value === 'string' && f.value.trim()))
+const IDENTITY = ['identity', 'identidade']
+const identity = computed(() => (sheet.value?.sections.find(x => IDENTITY.includes(x.id))?.fields ?? [])
+  .filter(f => !/\/(name|nome|concept|conceito|player|jogador)$/.test(f.path) && typeof f.value === 'string' && f.value.trim()))
+// The sheet in tabs (the preset's own `tab`, else Ficha / Valores / Itens / Detalhes): a long
+// sheet no longer scrolls forever on a phone. "Itens" always exists (the backpack is live).
+const sheetSectionsShown = computed(() => (sheet.value?.sections ?? []).filter(x => !IDENTITY.includes(x.id) && x.id !== 'gear'))
+const sheetTabs = computed(() => {
+  const order = ['Ficha']
+  for (const sec of sheetSectionsShown.value) { const t = tabOf(sec); if (!order.includes(t)) order.push(t) }
+  if (!order.includes('Itens')) order.push('Itens')
+  if (identity.value.length && !order.includes('Detalhes')) order.push('Detalhes')
+  return order
+})
+const sheetTab = ref('Ficha')
+watch(sheetTabs, list => { if (!list.includes(sheetTab.value)) sheetTab.value = list[0] ?? 'Ficha' })
+// Short blocks first (except the lead ratings on Ficha): PV/Defesa before 28 skill bonuses.
+const tabSections = computed(() => {
+  const list = sheetSectionsShown.value.filter(x => tabOf(x) === sheetTab.value)
+  const lead = sheetTab.value === 'Ficha' ? list.find(x => x.numeric && !x.readOnly) : undefined
+  return [...(lead ? [lead] : []), ...list.filter(x => x !== lead).sort((a, b) => (a.fields.length > LONG_SECTION ? 1 : 0) - (b.fields.length > LONG_SECTION ? 1 : 0))]
+})
+const tabHasRatings = computed(() => tabSections.value.some(x => x.numeric && !x.readOnly))
+// Medallions only for the attributes on Ficha; a skills tab shows rows.
+const tabLead = computed(() => sheetTab.value === 'Ficha' && tabHasRatings.value)
 
 const myRequests = computed(() => s.value.requests.filter(r => r.roller_user_id === me.value))
 const master = computed(() => s.value.members.find(x => x.role === 'master'))
@@ -161,14 +183,17 @@ const turn = computed(() => s.value.session.initiative?.entries?.[s.value.sessio
             <span v-for="c in character.live?.conditions ?? []" :key="c" class="paper-stamp">{{ c }}</span>
             <span v-if="!character.live?.conditions?.length" class="paper-none">nenhuma</span>
           </section>
-          <p class="paper-hint">Toque em um atributo e uma perícia para sugerir uma rolagem ao mestre.</p>
-          <StatBoard class="paper-stats" :sections="sheet.sections" :selected="picked" selectable :hide="['identity', 'gear']" @toggle="toggle" />
-          <section class="paper-box">
+          <div v-if="sheetTabs.length > 1" class="seg-tabs sheet-tabs" role="tablist" aria-label="Partes da ficha">
+            <button v-for="tb in sheetTabs" :key="tb" type="button" role="tab" :aria-selected="sheetTab === tb" :class="{ on: sheetTab === tb }" @click="sheetTab = tb">{{ tb }}</button>
+          </div>
+          <p v-if="tabHasRatings" class="paper-hint">Toque em um atributo e uma perícia para sugerir uma rolagem ao mestre.</p>
+          <StatBoard v-if="tabSections.length" class="paper-stats" :sections="tabSections" :selected="picked" :selectable="tabHasRatings" :lead="tabLead" @toggle="toggle" />
+          <section v-if="sheetTab === 'Itens'" class="paper-box">
             <h3 class="paper-title">Mochila</h3>
             <Inventory :items="character.live?.items ?? []" />
             <p v-if="text('/gear/items')" class="paper-note">{{ text('/gear/items') }}</p>
           </section>
-          <section v-if="identity.length" class="paper-box">
+          <section v-if="sheetTab === 'Detalhes' && identity.length" class="paper-box">
             <h3 class="paper-title">Quem é</h3>
             <dl class="paper-lines">
               <div v-for="f in identity" :key="f.path"><dt>{{ f.label }}</dt><dd>{{ f.value }}</dd></div>
