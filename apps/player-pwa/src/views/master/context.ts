@@ -68,6 +68,16 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
   const paths = ref<string[]>([])
   const suggestionId = ref<string | null>(null)
   const togglePath = (p: string) => { paths.value = paths.value.includes(p) ? paths.value.filter(x => x !== p) : [...paths.value, p] }
+  /** "Força + Luta" from the open sheet's labels; the path's last segment until it loads. */
+  function pathLabels(id: string, list: string[]): string {
+    const fields = fieldLabels(id)
+    return list.map(p => fields.get(p) ?? p.split('/').pop() ?? p).join(' + ')
+  }
+  function fieldLabels(id: string): Map<string, string> {
+    const out = new Map<string, string>()
+    sheets.byId.get(id)?.sections.forEach(sec => sec.fields.forEach(f => out.set(f.path, f.label)))
+    return out
+  }
   function fromSuggestion(sg: Suggestion): void {
     select('character', sg.campaign_character_id)
     paths.value = [...sg.paths]
@@ -287,7 +297,7 @@ export function createMasterContext(table: ReturnType<typeof useLiveTable>, camp
 
   return {
     table, campaign, t, s, sheets, busy, cast, byId, selection, focus, selected, select, selectMany, clearSelection,
-    inScene, toggleInScene, paths, togglePath, suggestionId, fromSuggestion, playerName, fail, request, dismiss, cancel, grant, reveal, pendingFor,
+    inScene, toggleInScene, paths, togglePath, suggestionId, fromSuggestion, pathLabels, playerName, fail, request, dismiss, cancel, grant, reveal, pendingFor,
     saveLive, adjustMany, conditionMany, compass, saveCompass, setClock, addClock, removeClock, spotlight, spotlightLow,
     plot, currentScene, savePlot, goToScene, addScene, stage, showStage, showScene, atmosphere, setAtmosphere,
     initiative, initFrom, initMove, initRemove, nextTurn, endInitiative,

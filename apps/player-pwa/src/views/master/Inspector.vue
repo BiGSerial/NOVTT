@@ -16,6 +16,9 @@ const props = defineProps<{ entry: CastEntry }>()
 const m = useMaster()
 const sheet = computed(() => m.sheets.byId.get(props.entry.id))
 const requests = computed(() => m.pendingFor(props.entry.id))
+// What the player asked for: a banner on the sheet, and the asked fields lit on the board.
+const asks = computed(() => m.s.value.suggestions.filter(sg => sg.campaign_character_id === props.entry.id))
+const asked = computed(() => [...new Set(asks.value.flatMap(sg => sg.paths))])
 const file = ref<HTMLInputElement | null>(null)
 const whisperText = ref('')
 const revealing = ref(false)
@@ -70,6 +73,19 @@ async function reveal(): Promise<void> {
       </div>
     </header>
 
+    <section v-for="sg in asks" :key="sg.id" class="ask-banner" :class="{ active: m.suggestionId.value === sg.id }" aria-live="polite">
+      <span class="ask-hand" aria-hidden="true">✋</span>
+      <p>
+        <strong>{{ entry.sub || 'O jogador' }} pede</strong> {{ m.pathLabels(entry.id, sg.paths) }}
+        <span v-if="sg.note" class="ask-note">“{{ sg.note }}”</span>
+      </p>
+      <div class="ask-actions">
+        <button v-if="m.suggestionId.value !== sg.id" type="button" class="small-btn" @click="m.fromSuggestion(sg)">Preparar rolagem</button>
+        <span v-else class="muted small">Ajuste a rolagem abaixo e peça.</span>
+        <button type="button" class="link danger" @click="m.dismiss(sg)">Dispensar</button>
+      </div>
+    </section>
+
     <div v-if="requests.length" class="pending-strip">
       <div v-for="r in requests" :key="r.id" class="pending-row">
         <span class="pending-dot" aria-hidden="true" />
@@ -87,7 +103,7 @@ async function reveal(): Promise<void> {
         <Inventory :items="entry.live?.items ?? []" editable :busy="m.busy.value" @save="items => m.saveLive(entry.kind, entry.id, { items })" />
       </section>
       <section class="inspector-sheet">
-        <StatBoard v-if="sheet" :sections="sheet.sections" :selected="m.paths.value" selectable :hide="['identity']" @toggle="m.togglePath" />
+        <StatBoard v-if="sheet" :sections="sheet.sections" :selected="m.paths.value" :asked="asked" selectable :hide="['identity']" @toggle="m.togglePath" />
         <p v-else class="muted" role="status">Abrindo a ficha…</p>
       </section>
     </div>
