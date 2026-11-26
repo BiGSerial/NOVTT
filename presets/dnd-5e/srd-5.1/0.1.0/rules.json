@@ -1,0 +1,1248 @@
+{
+  "contract": "novtt.rules/2",
+  "budgets": [
+    {
+      "id": "point_buy",
+      "kind": "initial",
+      "label": "Pontos de compra de atributos",
+      "initial_amount": 27
+    },
+    {
+      "id": "origin_asi",
+      "kind": "initial",
+      "label": "Aumentos raciais à escolha (Meio-Elfo)",
+      "amount": {"op": "lookup", "key": {"ref": "/origin/race"}, "table": {"half_elf": 2}, "default": {"const": 0}}
+    },
+    {
+      "id": "skill_picks",
+      "kind": "initial",
+      "label": "Perícias a escolher",
+      "amount": {"op": "add", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": 2, "bard": 3, "cleric": 2, "druid": 2, "fighter": 2, "monk": 2, "paladin": 2, "ranger": 3, "rogue": 4, "sorcerer": 2, "warlock": 2, "wizard": 2}, "default": {"const": 0}}, {"op": "add", "args": [{"op": "lookup", "key": {"ref": "/origin/race"}, "table": {"half_elf": 2}, "default": {"const": 0}}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/subclass"}, {"const": "college_of_lore"}]}, {"const": 3}, {"const": 0}]}]}]}
+    },
+    {
+      "id": "expertise",
+      "kind": "other",
+      "label": "Especializações a escolher",
+      "amount": {"op": "add", "args": [{"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [3, 2], [10, 4]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "rogue"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 2], [6, 4]]}, {"const": 0}]}]}
+    },
+    {
+      "id": "asi",
+      "kind": "other",
+      "label": "Aumentos de atributo por nível",
+      "amount": {"op": "add", "args": [{"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "barbarian"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "cleric"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "druid"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "fighter"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [6, 4], [8, 6], [12, 8], [14, 10], [16, 12], [19, 14]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "paladin"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "ranger"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "rogue"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [10, 6], [12, 8], [16, 10], [19, 12]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "sorcerer"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "warlock"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "wizard"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [4, 2], [8, 4], [12, 6], [16, 8], [19, 10]]}, {"const": 0}]}]}
+    },
+    {
+      "id": "xp",
+      "kind": "experience",
+      "label": "Experiência (não é gasta)",
+      "initial_amount": 0
+    },
+    {
+      "id": "milestones",
+      "kind": "other",
+      "label": "Marcos concedidos pelo mestre (um nível cada)",
+      "initial_amount": 0
+    }
+  ],
+  "costs": [
+    {
+      "id": "point_buy",
+      "phase": "creation",
+      "budget": "point_buy",
+      "targets": ["/abilities/base/*"],
+      "model": {"type": "formula", "formula": {"op": "lookup", "key": {"var": "new"}, "table": {"14": 2, "15": 2}, "default": {"const": 1}}}
+    },
+    {
+      "id": "origin_asi",
+      "phase": "creation",
+      "budget": "origin_asi",
+      "targets": ["/abilities/origin/*"],
+      "model": {"type": "fixed_per_dot", "amount": 1}
+    },
+    {
+      "id": "skill_picks_creation",
+      "phase": "creation",
+      "budget": "skill_picks",
+      "targets": ["/skills/*"],
+      "model": {"type": "fixed_per_dot", "amount": 1}
+    },
+    {
+      "id": "skill_picks_advancement",
+      "phase": "advancement",
+      "budget": "skill_picks",
+      "targets": ["/skills/*"],
+      "model": {"type": "fixed_per_dot", "amount": 1}
+    },
+    {
+      "id": "expertise_creation",
+      "phase": "creation",
+      "budget": "expertise",
+      "targets": ["/expertise/*"],
+      "model": {"type": "fixed_per_dot", "amount": 1}
+    },
+    {
+      "id": "expertise_advancement",
+      "phase": "advancement",
+      "budget": "expertise",
+      "targets": ["/expertise/*"],
+      "model": {"type": "fixed_per_dot", "amount": 1}
+    },
+    {
+      "id": "asi_creation",
+      "phase": "creation",
+      "budget": "asi",
+      "targets": ["/abilities/improvement/*"],
+      "model": {"type": "fixed_per_dot", "amount": 1}
+    },
+    {
+      "id": "asi_advancement",
+      "phase": "advancement",
+      "budget": "asi",
+      "targets": ["/abilities/improvement/*"],
+      "model": {"type": "fixed_per_dot", "amount": 1}
+    }
+  ],
+  "phase_limits": [
+    {
+      "id": "point_buy_max",
+      "phase": "creation",
+      "targets": ["/abilities/base/*"],
+      "max": 15
+    },
+    {
+      "id": "origin_asi_max",
+      "phase": "creation",
+      "targets": ["/abilities/origin/*"],
+      "max": 2
+    }
+  ],
+  "dependencies": [],
+  "derived": [
+    {
+      "id": "pb",
+      "path": "/progress/proficiency_bonus",
+      "label": "Bônus de proficiência",
+      "formula": {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 2], [5, 3], [9, 4], [13, 5], [17, 6]]}
+    },
+    {
+      "id": "xp",
+      "path": "/progress/xp",
+      "label": "Pontos de experiência (concedidos pelo mestre)",
+      "formula": {"budget": "xp", "of": "granted"}
+    },
+    {
+      "id": "score_str",
+      "path": "/abilities/score/str",
+      "label": "Força (valor)",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "lookup", "key": {"ref": "/character/ability_method"}, "table": {"point_buy": true}, "default": {"const": false}}, {"ref": "/abilities/base/str"}, {"ref": "/abilities/assigned/str"}]}, {"ref": "/abilities/origin/str"}, {"ref": "/abilities/improvement/str"}, {"ref": "/abilities/adjust/str"}]}
+    },
+    {
+      "id": "score_dex",
+      "path": "/abilities/score/dex",
+      "label": "Destreza (valor)",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "lookup", "key": {"ref": "/character/ability_method"}, "table": {"point_buy": true}, "default": {"const": false}}, {"ref": "/abilities/base/dex"}, {"ref": "/abilities/assigned/dex"}]}, {"ref": "/abilities/origin/dex"}, {"ref": "/abilities/improvement/dex"}, {"ref": "/abilities/adjust/dex"}]}
+    },
+    {
+      "id": "score_con",
+      "path": "/abilities/score/con",
+      "label": "Constituição (valor)",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "lookup", "key": {"ref": "/character/ability_method"}, "table": {"point_buy": true}, "default": {"const": false}}, {"ref": "/abilities/base/con"}, {"ref": "/abilities/assigned/con"}]}, {"ref": "/abilities/origin/con"}, {"ref": "/abilities/improvement/con"}, {"ref": "/abilities/adjust/con"}]}
+    },
+    {
+      "id": "score_int",
+      "path": "/abilities/score/int",
+      "label": "Inteligência (valor)",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "lookup", "key": {"ref": "/character/ability_method"}, "table": {"point_buy": true}, "default": {"const": false}}, {"ref": "/abilities/base/int"}, {"ref": "/abilities/assigned/int"}]}, {"ref": "/abilities/origin/int"}, {"ref": "/abilities/improvement/int"}, {"ref": "/abilities/adjust/int"}]}
+    },
+    {
+      "id": "score_wis",
+      "path": "/abilities/score/wis",
+      "label": "Sabedoria (valor)",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "lookup", "key": {"ref": "/character/ability_method"}, "table": {"point_buy": true}, "default": {"const": false}}, {"ref": "/abilities/base/wis"}, {"ref": "/abilities/assigned/wis"}]}, {"ref": "/abilities/origin/wis"}, {"ref": "/abilities/improvement/wis"}, {"ref": "/abilities/adjust/wis"}]}
+    },
+    {
+      "id": "score_cha",
+      "path": "/abilities/score/cha",
+      "label": "Carisma (valor)",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "lookup", "key": {"ref": "/character/ability_method"}, "table": {"point_buy": true}, "default": {"const": false}}, {"ref": "/abilities/base/cha"}, {"ref": "/abilities/assigned/cha"}]}, {"ref": "/abilities/origin/cha"}, {"ref": "/abilities/improvement/cha"}, {"ref": "/abilities/adjust/cha"}]}
+    },
+    {
+      "id": "mod_str",
+      "path": "/abilities/mod/str",
+      "label": "Modificador de Força",
+      "formula": {"op": "floor", "args": [{"op": "divide", "args": [{"op": "subtract", "args": [{"derived": "score_str"}, {"const": 10}]}, {"const": 2}]}]}
+    },
+    {
+      "id": "mod_dex",
+      "path": "/abilities/mod/dex",
+      "label": "Modificador de Destreza",
+      "formula": {"op": "floor", "args": [{"op": "divide", "args": [{"op": "subtract", "args": [{"derived": "score_dex"}, {"const": 10}]}, {"const": 2}]}]}
+    },
+    {
+      "id": "mod_con",
+      "path": "/abilities/mod/con",
+      "label": "Modificador de Constituição",
+      "formula": {"op": "floor", "args": [{"op": "divide", "args": [{"op": "subtract", "args": [{"derived": "score_con"}, {"const": 10}]}, {"const": 2}]}]}
+    },
+    {
+      "id": "mod_int",
+      "path": "/abilities/mod/int",
+      "label": "Modificador de Inteligência",
+      "formula": {"op": "floor", "args": [{"op": "divide", "args": [{"op": "subtract", "args": [{"derived": "score_int"}, {"const": 10}]}, {"const": 2}]}]}
+    },
+    {
+      "id": "mod_wis",
+      "path": "/abilities/mod/wis",
+      "label": "Modificador de Sabedoria",
+      "formula": {"op": "floor", "args": [{"op": "divide", "args": [{"op": "subtract", "args": [{"derived": "score_wis"}, {"const": 10}]}, {"const": 2}]}]}
+    },
+    {
+      "id": "mod_cha",
+      "path": "/abilities/mod/cha",
+      "label": "Modificador de Carisma",
+      "formula": {"op": "floor", "args": [{"op": "divide", "args": [{"op": "subtract", "args": [{"derived": "score_cha"}, {"const": 10}]}, {"const": 2}]}]}
+    },
+    {
+      "id": "check_str",
+      "path": "/checks/str",
+      "label": "Teste de Força",
+      "formula": {"derived": "mod_str"}
+    },
+    {
+      "id": "check_dex",
+      "path": "/checks/dex",
+      "label": "Teste de Destreza",
+      "formula": {"derived": "mod_dex"}
+    },
+    {
+      "id": "check_con",
+      "path": "/checks/con",
+      "label": "Teste de Constituição",
+      "formula": {"derived": "mod_con"}
+    },
+    {
+      "id": "check_int",
+      "path": "/checks/int",
+      "label": "Teste de Inteligência",
+      "formula": {"derived": "mod_int"}
+    },
+    {
+      "id": "check_wis",
+      "path": "/checks/wis",
+      "label": "Teste de Sabedoria",
+      "formula": {"derived": "mod_wis"}
+    },
+    {
+      "id": "check_cha",
+      "path": "/checks/cha",
+      "label": "Teste de Carisma",
+      "formula": {"derived": "mod_cha"}
+    },
+    {
+      "id": "save_str",
+      "path": "/saves/str",
+      "label": "Salvaguarda de Força",
+      "formula": {"op": "add", "args": [{"derived": "mod_str"}, {"op": "if", "args": [{"ref": "/saving_throws/str"}, {"derived": "pb"}, {"const": 0}]}]}
+    },
+    {
+      "id": "save_dex",
+      "path": "/saves/dex",
+      "label": "Salvaguarda de Destreza",
+      "formula": {"op": "add", "args": [{"derived": "mod_dex"}, {"op": "if", "args": [{"ref": "/saving_throws/dex"}, {"derived": "pb"}, {"const": 0}]}]}
+    },
+    {
+      "id": "save_con",
+      "path": "/saves/con",
+      "label": "Salvaguarda de Constituição",
+      "formula": {"op": "add", "args": [{"derived": "mod_con"}, {"op": "if", "args": [{"ref": "/saving_throws/con"}, {"derived": "pb"}, {"const": 0}]}]}
+    },
+    {
+      "id": "save_int",
+      "path": "/saves/int",
+      "label": "Salvaguarda de Inteligência",
+      "formula": {"op": "add", "args": [{"derived": "mod_int"}, {"op": "if", "args": [{"ref": "/saving_throws/int"}, {"derived": "pb"}, {"const": 0}]}]}
+    },
+    {
+      "id": "save_wis",
+      "path": "/saves/wis",
+      "label": "Salvaguarda de Sabedoria",
+      "formula": {"op": "add", "args": [{"derived": "mod_wis"}, {"op": "if", "args": [{"ref": "/saving_throws/wis"}, {"derived": "pb"}, {"const": 0}]}]}
+    },
+    {
+      "id": "save_cha",
+      "path": "/saves/cha",
+      "label": "Salvaguarda de Carisma",
+      "formula": {"op": "add", "args": [{"derived": "mod_cha"}, {"op": "if", "args": [{"ref": "/saving_throws/cha"}, {"derived": "pb"}, {"const": 0}]}]}
+    },
+    {
+      "id": "skill_acrobatics",
+      "path": "/skill_bonus/acrobatics",
+      "label": "Acrobacia (DEX)",
+      "formula": {"op": "add", "args": [{"derived": "mod_dex"}, {"op": "multiply", "args": [{"ref": "/skills/acrobatics"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/acrobatics"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_animal_handling",
+      "path": "/skill_bonus/animal_handling",
+      "label": "Adestrar Animais (WIS)",
+      "formula": {"op": "add", "args": [{"derived": "mod_wis"}, {"op": "multiply", "args": [{"ref": "/skills/animal_handling"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/animal_handling"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_arcana",
+      "path": "/skill_bonus/arcana",
+      "label": "Arcanismo (INT)",
+      "formula": {"op": "add", "args": [{"derived": "mod_int"}, {"op": "multiply", "args": [{"ref": "/skills/arcana"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/arcana"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_athletics",
+      "path": "/skill_bonus/athletics",
+      "label": "Atletismo (STR)",
+      "formula": {"op": "add", "args": [{"derived": "mod_str"}, {"op": "multiply", "args": [{"ref": "/skills/athletics"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/athletics"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_deception",
+      "path": "/skill_bonus/deception",
+      "label": "Enganação (CHA)",
+      "formula": {"op": "add", "args": [{"derived": "mod_cha"}, {"op": "multiply", "args": [{"ref": "/skills/deception"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/deception"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_history",
+      "path": "/skill_bonus/history",
+      "label": "História (INT)",
+      "formula": {"op": "add", "args": [{"derived": "mod_int"}, {"op": "multiply", "args": [{"ref": "/skills/history"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/history"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_insight",
+      "path": "/skill_bonus/insight",
+      "label": "Intuição (WIS)",
+      "formula": {"op": "add", "args": [{"derived": "mod_wis"}, {"op": "multiply", "args": [{"ref": "/skills/insight"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/insight"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_intimidation",
+      "path": "/skill_bonus/intimidation",
+      "label": "Intimidação (CHA)",
+      "formula": {"op": "add", "args": [{"derived": "mod_cha"}, {"op": "multiply", "args": [{"ref": "/skills/intimidation"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/intimidation"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_investigation",
+      "path": "/skill_bonus/investigation",
+      "label": "Investigação (INT)",
+      "formula": {"op": "add", "args": [{"derived": "mod_int"}, {"op": "multiply", "args": [{"ref": "/skills/investigation"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/investigation"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_medicine",
+      "path": "/skill_bonus/medicine",
+      "label": "Medicina (WIS)",
+      "formula": {"op": "add", "args": [{"derived": "mod_wis"}, {"op": "multiply", "args": [{"ref": "/skills/medicine"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/medicine"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_nature",
+      "path": "/skill_bonus/nature",
+      "label": "Natureza (INT)",
+      "formula": {"op": "add", "args": [{"derived": "mod_int"}, {"op": "multiply", "args": [{"ref": "/skills/nature"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/nature"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_perception",
+      "path": "/skill_bonus/perception",
+      "label": "Percepção (WIS)",
+      "formula": {"op": "add", "args": [{"derived": "mod_wis"}, {"op": "multiply", "args": [{"ref": "/skills/perception"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/perception"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_performance",
+      "path": "/skill_bonus/performance",
+      "label": "Atuação (CHA)",
+      "formula": {"op": "add", "args": [{"derived": "mod_cha"}, {"op": "multiply", "args": [{"ref": "/skills/performance"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/performance"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_persuasion",
+      "path": "/skill_bonus/persuasion",
+      "label": "Persuasão (CHA)",
+      "formula": {"op": "add", "args": [{"derived": "mod_cha"}, {"op": "multiply", "args": [{"ref": "/skills/persuasion"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/persuasion"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_religion",
+      "path": "/skill_bonus/religion",
+      "label": "Religião (INT)",
+      "formula": {"op": "add", "args": [{"derived": "mod_int"}, {"op": "multiply", "args": [{"ref": "/skills/religion"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/religion"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_sleight_of_hand",
+      "path": "/skill_bonus/sleight_of_hand",
+      "label": "Prestidigitação (DEX)",
+      "formula": {"op": "add", "args": [{"derived": "mod_dex"}, {"op": "multiply", "args": [{"ref": "/skills/sleight_of_hand"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/sleight_of_hand"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_stealth",
+      "path": "/skill_bonus/stealth",
+      "label": "Furtividade (DEX)",
+      "formula": {"op": "add", "args": [{"derived": "mod_dex"}, {"op": "multiply", "args": [{"ref": "/skills/stealth"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/stealth"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "skill_survival",
+      "path": "/skill_bonus/survival",
+      "label": "Sobrevivência (WIS)",
+      "formula": {"op": "add", "args": [{"derived": "mod_wis"}, {"op": "multiply", "args": [{"ref": "/skills/survival"}, {"derived": "pb"}]}, {"op": "multiply", "args": [{"ref": "/expertise/survival"}, {"derived": "pb"}]}]}
+    },
+    {
+      "id": "passive_perception",
+      "path": "/senses/passive_perception",
+      "label": "Percepção passiva",
+      "formula": {"op": "add", "args": [{"const": 10}, {"derived": "skill_perception"}]}
+    },
+    {
+      "id": "darkvision",
+      "path": "/senses/darkvision",
+      "label": "Visão no escuro (pés)",
+      "formula": {"op": "lookup", "key": {"ref": "/origin/race"}, "table": {"dwarf": 60, "elf": 60, "halfling": 0, "human": 0, "dragonborn": 0, "gnome": 60, "half_elf": 60, "half_orc": 60, "tiefling": 60}, "default": {"const": 0}}
+    },
+    {
+      "id": "initiative",
+      "path": "/combat/initiative",
+      "label": "Iniciativa",
+      "formula": {"derived": "check_dex"}
+    },
+    {
+      "id": "armor_class",
+      "path": "/combat/armor_class",
+      "label": "Classe de Armadura",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/combat/armor"}, {"const": "none"}]}, {"op": "max", "args": [{"op": "add", "args": [{"const": 10}, {"derived": "mod_dex"}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "barbarian"}]}, {"op": "add", "args": [{"const": 10}, {"derived": "mod_dex"}, {"derived": "mod_con"}]}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "not", "args": [{"ref": "/combat/shield"}]}]}, {"op": "add", "args": [{"const": 10}, {"derived": "mod_dex"}, {"derived": "mod_wis"}]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/subclass"}, {"const": "draconic_bloodline"}]}, {"op": "add", "args": [{"const": 13}, {"derived": "mod_dex"}]}, {"const": 0}]}]}, {"op": "add", "args": [{"op": "lookup", "key": {"ref": "/combat/armor"}, "table": {"padded": 11, "leather": 11, "studded_leather": 12, "hide": 12, "chain_shirt": 13, "scale_mail": 14, "breastplate": 14, "half_plate": 15, "ring_mail": 14, "chain_mail": 16, "splint": 17, "plate": 18}, "default": {"const": 10}}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"op": "lookup", "key": {"ref": "/combat/armor"}, "table": {"padded": "light", "leather": "light", "studded_leather": "light", "hide": "medium", "chain_shirt": "medium", "scale_mail": "medium", "breastplate": "medium", "half_plate": "medium", "ring_mail": "heavy", "chain_mail": "heavy", "splint": "heavy", "plate": "heavy"}, "default": {"const": "none"}}, {"const": "light"}]}, {"derived": "mod_dex"}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"op": "lookup", "key": {"ref": "/combat/armor"}, "table": {"padded": "light", "leather": "light", "studded_leather": "light", "hide": "medium", "chain_shirt": "medium", "scale_mail": "medium", "breastplate": "medium", "half_plate": "medium", "ring_mail": "heavy", "chain_mail": "heavy", "splint": "heavy", "plate": "heavy"}, "default": {"const": "none"}}, {"const": "medium"}]}, {"op": "min", "args": [{"derived": "mod_dex"}, {"const": 2}]}, {"const": 0}]}]}]}]}, {"op": "if", "args": [{"ref": "/combat/shield"}, {"const": 2}, {"const": 0}]}, {"ref": "/combat/ac_bonus"}]}
+    },
+    {
+      "id": "speed",
+      "path": "/combat/speed",
+      "label": "Deslocamento (pés)",
+      "formula": {"op": "add", "args": [{"op": "lookup", "key": {"ref": "/origin/race"}, "table": {"dwarf": 25, "elf": 30, "halfling": 25, "human": 30, "dragonborn": 30, "gnome": 25, "half_elf": 30, "half_orc": 30, "tiefling": 30}, "default": {"const": 30}}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "barbarian"}]}, {"op": "compare", "cmp": "ne", "args": [{"op": "lookup", "key": {"ref": "/combat/armor"}, "table": {"padded": "light", "leather": "light", "studded_leather": "light", "hide": "medium", "chain_shirt": "medium", "scale_mail": "medium", "breastplate": "medium", "half_plate": "medium", "ring_mail": "heavy", "chain_mail": "heavy", "splint": "heavy", "plate": "heavy"}, "default": {"const": "none"}}, {"const": "heavy"}]}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [5, 10]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/combat/armor"}, {"const": "none"}]}, {"op": "not", "args": [{"ref": "/combat/shield"}]}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [2, 10], [6, 15], [10, 20], [14, 25], [18, 30]]}, {"const": 0}]}]}
+    },
+    {
+      "id": "hit_die",
+      "path": "/combat/hit_die",
+      "label": "Dado de Vida (faces)",
+      "formula": {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": 12, "bard": 8, "cleric": 8, "druid": 8, "fighter": 10, "monk": 8, "paladin": 10, "ranger": 10, "rogue": 8, "sorcerer": 6, "warlock": 8, "wizard": 6}, "default": {"const": 0}}
+    },
+    {
+      "id": "hp_max",
+      "path": "/combat/hp_max",
+      "label": "Pontos de Vida máximos",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "compare", "cmp": "ne", "args": [{"ref": "/character/class"}, {"const": ""}]}, {"op": "add", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": 12, "bard": 8, "cleric": 8, "druid": 8, "fighter": 10, "monk": 8, "paladin": 10, "ranger": 10, "rogue": 8, "sorcerer": 6, "warlock": 8, "wizard": 6}, "default": {"const": 0}}, {"derived": "mod_con"}, {"op": "multiply", "args": [{"op": "subtract", "args": [{"ref": "/progress/level"}, {"const": 1}]}, {"op": "add", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": 7, "bard": 5, "cleric": 5, "druid": 5, "fighter": 6, "monk": 5, "paladin": 6, "ranger": 6, "rogue": 5, "sorcerer": 4, "warlock": 5, "wizard": 4}, "default": {"const": 0}}, {"derived": "mod_con"}]}]}]}, {"const": 0}]}, {"ref": "/combat/hp_adjust"}]}
+    },
+    {
+      "id": "attack_melee",
+      "path": "/combat/attack/melee",
+      "label": "Ataque corpo a corpo (FOR + proficiência)",
+      "formula": {"op": "add", "args": [{"derived": "mod_str"}, {"derived": "pb"}]}
+    },
+    {
+      "id": "attack_ranged",
+      "path": "/combat/attack/ranged",
+      "label": "Ataque à distância (DES + proficiência)",
+      "formula": {"op": "add", "args": [{"derived": "mod_dex"}, {"derived": "pb"}]}
+    },
+    {
+      "id": "attack_finesse",
+      "path": "/combat/attack/finesse",
+      "label": "Ataque com acuidade (FOR ou DES + proficiência)",
+      "formula": {"op": "add", "args": [{"op": "max", "args": [{"derived": "mod_str"}, {"derived": "mod_dex"}]}, {"derived": "pb"}]}
+    },
+    {
+      "id": "attack_spell",
+      "path": "/combat/attack/spell",
+      "label": "Ataque mágico",
+      "formula": {"derived": "spell_attack"}
+    },
+    {
+      "id": "caster_type",
+      "path": "/computed/caster_type",
+      "label": "interno",
+      "formula": {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": "full", "cleric": "full", "druid": "full", "paladin": "half", "ranger": "half", "sorcerer": "full", "warlock": "pact", "wizard": "full"}, "default": {"const": "none"}}
+    },
+    {
+      "id": "spell_ability",
+      "path": "/spellcasting/ability",
+      "label": "Atributo de conjuração",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"paladin": 2, "ranger": 2}, "default": {"const": 1}}]}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": "cha", "cleric": "wis", "druid": "wis", "paladin": "cha", "ranger": "wis", "sorcerer": "cha", "warlock": "cha", "wizard": "int"}, "default": {"const": ""}}, {"const": ""}]}
+    },
+    {
+      "id": "spell_mod",
+      "path": "/spellcasting/modifier",
+      "label": "Modificador de conjuração",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"paladin": 2, "ranger": 2}, "default": {"const": 1}}]}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": "cha", "cleric": "wis", "druid": "wis", "paladin": "cha", "ranger": "wis", "sorcerer": "cha", "warlock": "cha", "wizard": "int"}, "default": {"const": ""}}, {"const": ""}]}, {"const": "int"}]}, {"derived": "mod_int"}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"paladin": 2, "ranger": 2}, "default": {"const": 1}}]}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": "cha", "cleric": "wis", "druid": "wis", "paladin": "cha", "ranger": "wis", "sorcerer": "cha", "warlock": "cha", "wizard": "int"}, "default": {"const": ""}}, {"const": ""}]}, {"const": "wis"}]}, {"derived": "mod_wis"}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"paladin": 2, "ranger": 2}, "default": {"const": 1}}]}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": "cha", "cleric": "wis", "druid": "wis", "paladin": "cha", "ranger": "wis", "sorcerer": "cha", "warlock": "cha", "wizard": "int"}, "default": {"const": ""}}, {"const": ""}]}, {"const": "cha"}]}, {"derived": "mod_cha"}, {"const": 0}]}]}]}
+    },
+    {
+      "id": "spell_save_dc",
+      "path": "/spellcasting/save_dc",
+      "label": "CD de magia (0 = sem conjuração)",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "ne", "args": [{"derived": "spell_ability"}, {"const": ""}]}, {"op": "add", "args": [{"const": 8}, {"derived": "pb"}, {"derived": "spell_mod"}]}, {"const": 0}]}
+    },
+    {
+      "id": "spell_attack",
+      "path": "/spellcasting/attack_bonus",
+      "label": "Bônus de ataque mágico",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "ne", "args": [{"derived": "spell_ability"}, {"const": ""}]}, {"op": "add", "args": [{"derived": "pb"}, {"derived": "spell_mod"}]}, {"const": 0}]}
+    },
+    {
+      "id": "cantrips_known",
+      "path": "/spellcasting/cantrips_known",
+      "label": "Truques conhecidos",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 2], [4, 3], [10, 4]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "cleric"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 3], [4, 4], [10, 5]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "druid"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 2], [4, 3], [10, 4]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "sorcerer"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 4], [4, 5], [10, 6]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "warlock"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 2], [4, 3], [10, 4]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "wizard"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 3], [4, 4], [10, 5]]}, {"const": 0}]}]}
+    },
+    {
+      "id": "spells_prepared",
+      "path": "/spellcasting/prepared",
+      "label": "Magias conhecidas ou preparadas",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9], [7, 10], [8, 11], [9, 12], [10, 14], [11, 15], [13, 16], [14, 18], [15, 19], [17, 20], [18, 22]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "cleric"}]}, {"op": "max", "args": [{"const": 1}, {"op": "add", "args": [{"derived": "spell_mod"}, {"ref": "/progress/level"}]}]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "druid"}]}, {"op": "max", "args": [{"const": 1}, {"op": "add", "args": [{"derived": "spell_mod"}, {"ref": "/progress/level"}]}]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "paladin"}]}, {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}, {"op": "max", "args": [{"const": 1}, {"op": "add", "args": [{"derived": "spell_mod"}, {"op": "floor", "args": [{"op": "divide", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}]}]}, {"const": 0}]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "ranger"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [2, 2], [3, 3], [5, 4], [7, 5], [9, 6], [11, 7], [13, 8], [15, 9], [17, 10], [19, 11]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "sorcerer"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 12], [13, 13], [15, 14], [17, 15]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "warlock"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [11, 11], [13, 12], [15, 13], [17, 14], [19, 15]]}, {"const": 0}]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "wizard"}]}, {"op": "max", "args": [{"const": 1}, {"op": "add", "args": [{"derived": "spell_mod"}, {"ref": "/progress/level"}]}]}, {"const": 0}]}]}
+    },
+    {
+      "id": "slot_1",
+      "path": "/spellcasting/slots/l1",
+      "label": "Espaços de magia de 1º círculo",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "full"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 2], [2, 3], [3, 4]]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "half"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [2, 2], [3, 3], [5, 4]]}, {"const": 0}]}]}
+    },
+    {
+      "id": "slot_2",
+      "path": "/spellcasting/slots/l2",
+      "label": "Espaços de magia de 2º círculo",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "full"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [3, 2], [4, 3]]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "half"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [5, 2], [7, 3]]}, {"const": 0}]}]}
+    },
+    {
+      "id": "slot_3",
+      "path": "/spellcasting/slots/l3",
+      "label": "Espaços de magia de 3º círculo",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "full"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [5, 2], [6, 3]]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "half"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [9, 2], [11, 3]]}, {"const": 0}]}]}
+    },
+    {
+      "id": "slot_4",
+      "path": "/spellcasting/slots/l4",
+      "label": "Espaços de magia de 4º círculo",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "full"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [7, 1], [8, 2], [9, 3]]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "half"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [13, 1], [15, 2], [17, 3]]}, {"const": 0}]}]}
+    },
+    {
+      "id": "slot_5",
+      "path": "/spellcasting/slots/l5",
+      "label": "Espaços de magia de 5º círculo",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "full"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [9, 1], [10, 2], [18, 3]]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "half"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [17, 1], [19, 2]]}, {"const": 0}]}]}
+    },
+    {
+      "id": "slot_6",
+      "path": "/spellcasting/slots/l6",
+      "label": "Espaços de magia de 6º círculo",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "full"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [11, 1], [19, 2]]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "half"}]}, {"const": 0}, {"const": 0}]}]}
+    },
+    {
+      "id": "slot_7",
+      "path": "/spellcasting/slots/l7",
+      "label": "Espaços de magia de 7º círculo",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "full"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [13, 1], [20, 2]]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "half"}]}, {"const": 0}, {"const": 0}]}]}
+    },
+    {
+      "id": "slot_8",
+      "path": "/spellcasting/slots/l8",
+      "label": "Espaços de magia de 8º círculo",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "full"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [15, 1]]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "half"}]}, {"const": 0}, {"const": 0}]}]}
+    },
+    {
+      "id": "slot_9",
+      "path": "/spellcasting/slots/l9",
+      "label": "Espaços de magia de 9º círculo",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "full"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 0], [17, 1]]}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"derived": "caster_type"}, {"const": "half"}]}, {"const": 0}, {"const": 0}]}]}
+    },
+    {
+      "id": "pact_slots",
+      "path": "/spellcasting/pact_slots",
+      "label": "Espaços de Magia de Pacto",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "warlock"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 1], [2, 2], [11, 3], [17, 4]]}, {"const": 0}]}
+    },
+    {
+      "id": "pact_slot_level",
+      "path": "/spellcasting/pact_slot_level",
+      "label": "Círculo dos espaços de Pacto",
+      "formula": {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "warlock"}]}, {"op": "lookup", "key": {"ref": "/progress/level"}, "steps": [[1, 1], [3, 2], [5, 3], [7, 4], [9, 5]]}, {"const": 0}]}
+    },
+    {
+      "id": "carried",
+      "path": "/load/carried",
+      "label": "Peso carregado (lb)",
+      "formula": {"op": "sum", "collection": "/inventory", "value": {"op": "multiply", "args": [{"item": "quantity"}, {"item": "weight"}]}}
+    },
+    {
+      "id": "capacity",
+      "path": "/load/capacity",
+      "label": "Capacidade de carga (lb)",
+      "formula": {"op": "multiply", "args": [{"derived": "score_str"}, {"const": 15}]}
+    },
+    {
+      "id": "class_notes",
+      "path": "/proficiencies/class_notes",
+      "label": "Proficiências específicas da classe",
+      "formula": {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": "Bestas de mão, espadas longas, rapieiras, espadas curtas; três instrumentos musicais", "druid": "Clavas, adagas, dardos, azagaias, maças, bordões, cimitarras, foices, fundas, lanças; kit de herbalismo; sem metal", "monk": "Espadas curtas; um tipo de ferramenta de artesão ou instrumento musical", "rogue": "Bestas de mão, espadas longas, rapieiras, espadas curtas; ferramentas de ladrão", "sorcerer": "Adagas, dardos, fundas, bordões, bestas leves", "wizard": "Adagas, dardos, fundas, bordões, bestas leves"}, "default": {"const": ""}}
+    },
+    {
+      "id": "off_list_a",
+      "path": "/computed/off_list_a",
+      "label": "interno",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/acrobatics"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "fighter": true, "monk": true, "rogue": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/animal_handling"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": true, "bard": true, "druid": true, "fighter": true, "ranger": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/arcana"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "druid": true, "sorcerer": true, "warlock": true, "wizard": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/athletics"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": true, "bard": true, "fighter": true, "monk": true, "paladin": true, "ranger": true, "rogue": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/deception"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "rogue": true, "sorcerer": true, "warlock": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/history"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "cleric": true, "fighter": true, "monk": true, "warlock": true, "wizard": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}]}
+    },
+    {
+      "id": "off_list_b",
+      "path": "/computed/off_list_b",
+      "label": "interno",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/insight"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "cleric": true, "druid": true, "fighter": true, "monk": true, "paladin": true, "ranger": true, "rogue": true, "sorcerer": true, "wizard": true}, "default": {"const": false}}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/background"}, {"const": "acolyte"}]}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/intimidation"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": true, "bard": true, "fighter": true, "paladin": true, "rogue": true, "sorcerer": true, "warlock": true}, "default": {"const": false}}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "half_orc"}]}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/investigation"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "ranger": true, "rogue": true, "warlock": true, "wizard": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/medicine"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "cleric": true, "druid": true, "paladin": true, "wizard": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/nature"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": true, "bard": true, "druid": true, "ranger": true, "warlock": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/perception"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": true, "bard": true, "druid": true, "fighter": true, "ranger": true, "rogue": true}, "default": {"const": false}}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "elf"}]}]}]}]}, {"const": 1}, {"const": 0}]}]}
+    },
+    {
+      "id": "off_list_c",
+      "path": "/computed/off_list_c",
+      "label": "interno",
+      "formula": {"op": "add", "args": [{"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/performance"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "rogue": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/persuasion"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "cleric": true, "paladin": true, "rogue": true, "sorcerer": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/religion"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "cleric": true, "druid": true, "monk": true, "paladin": true, "sorcerer": true, "warlock": true, "wizard": true}, "default": {"const": false}}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/background"}, {"const": "acolyte"}]}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/sleight_of_hand"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "rogue": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/stealth"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"bard": true, "monk": true, "ranger": true, "rogue": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/skills/survival"}, {"const": 1}]}, {"op": "not", "args": [{"op": "or", "args": [{"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": true, "bard": true, "druid": true, "fighter": true, "ranger": true}, "default": {"const": false}}, {"const": false}]}]}]}, {"const": 1}, {"const": 0}]}]}
+    },
+    {
+      "id": "size",
+      "path": "/origin/size",
+      "label": "Tamanho",
+      "formula": {"op": "lookup", "key": {"ref": "/origin/race"}, "table": {"dwarf": "Médio", "elf": "Médio", "halfling": "Pequeno", "human": "Médio", "dragonborn": "Médio", "gnome": "Pequeno", "half_elf": "Médio", "half_orc": "Médio", "tiefling": "Médio"}, "default": {"const": ""}}
+    }
+  ],
+  "effects": [
+    {
+      "id": "jack_of_all_trades_acrobatics",
+      "target": "skill_acrobatics",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/acrobatics"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_animal_handling",
+      "target": "skill_animal_handling",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/animal_handling"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_arcana",
+      "target": "skill_arcana",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/arcana"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_athletics",
+      "target": "skill_athletics",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/athletics"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_deception",
+      "target": "skill_deception",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/deception"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_history",
+      "target": "skill_history",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/history"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_insight",
+      "target": "skill_insight",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/insight"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_intimidation",
+      "target": "skill_intimidation",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/intimidation"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_investigation",
+      "target": "skill_investigation",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/investigation"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_medicine",
+      "target": "skill_medicine",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/medicine"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_nature",
+      "target": "skill_nature",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/nature"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_perception",
+      "target": "skill_perception",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/perception"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_performance",
+      "target": "skill_performance",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/performance"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_persuasion",
+      "target": "skill_persuasion",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/persuasion"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_religion",
+      "target": "skill_religion",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/religion"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_sleight_of_hand",
+      "target": "skill_sleight_of_hand",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/sleight_of_hand"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_stealth",
+      "target": "skill_stealth",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/stealth"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_survival",
+      "target": "skill_survival",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}, {"op": "compare", "cmp": "eq", "args": [{"ref": "/skills/survival"}, {"const": 0}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_check_str",
+      "target": "check_str",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_check_dex",
+      "target": "check_dex",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_check_con",
+      "target": "check_con",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_check_int",
+      "target": "check_int",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_check_wis",
+      "target": "check_wis",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "jack_of_all_trades_check_cha",
+      "target": "check_cha",
+      "label": "Versatilidade (metade da proficiência)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]},
+      "value": {"op": "floor", "args": [{"op": "divide", "args": [{"derived": "pb"}, {"const": 2}]}]}
+    },
+    {
+      "id": "monk_save_proficiency_str",
+      "target": "save_str",
+      "label": "Proficiência em salvaguarda (Monge 14º)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 14}]}, {"op": "not", "args": [{"ref": "/saving_throws/str"}]}]},
+      "value": {"derived": "pb"}
+    },
+    {
+      "id": "monk_save_proficiency_dex",
+      "target": "save_dex",
+      "label": "Proficiência em salvaguarda (Monge 14º)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 14}]}, {"op": "not", "args": [{"ref": "/saving_throws/dex"}]}]},
+      "value": {"derived": "pb"}
+    },
+    {
+      "id": "monk_save_proficiency_con",
+      "target": "save_con",
+      "label": "Proficiência em salvaguarda (Monge 14º)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 14}]}, {"op": "not", "args": [{"ref": "/saving_throws/con"}]}]},
+      "value": {"derived": "pb"}
+    },
+    {
+      "id": "monk_save_proficiency_int",
+      "target": "save_int",
+      "label": "Proficiência em salvaguarda (Monge 14º)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 14}]}, {"op": "not", "args": [{"ref": "/saving_throws/int"}]}]},
+      "value": {"derived": "pb"}
+    },
+    {
+      "id": "monk_save_proficiency_wis",
+      "target": "save_wis",
+      "label": "Proficiência em salvaguarda (Monge 14º)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 14}]}, {"op": "not", "args": [{"ref": "/saving_throws/wis"}]}]},
+      "value": {"derived": "pb"}
+    },
+    {
+      "id": "monk_save_proficiency_cha",
+      "target": "save_cha",
+      "label": "Proficiência em salvaguarda (Monge 14º)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 14}]}, {"op": "not", "args": [{"ref": "/saving_throws/cha"}]}]},
+      "value": {"derived": "pb"}
+    },
+    {
+      "id": "paladin_aura_str",
+      "target": "save_str",
+      "label": "Aura de Proteção (CAR, mínimo +1)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "paladin"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 6}]}]},
+      "value": {"op": "max", "args": [{"const": 1}, {"derived": "mod_cha"}]}
+    },
+    {
+      "id": "paladin_aura_dex",
+      "target": "save_dex",
+      "label": "Aura de Proteção (CAR, mínimo +1)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "paladin"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 6}]}]},
+      "value": {"op": "max", "args": [{"const": 1}, {"derived": "mod_cha"}]}
+    },
+    {
+      "id": "paladin_aura_con",
+      "target": "save_con",
+      "label": "Aura de Proteção (CAR, mínimo +1)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "paladin"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 6}]}]},
+      "value": {"op": "max", "args": [{"const": 1}, {"derived": "mod_cha"}]}
+    },
+    {
+      "id": "paladin_aura_int",
+      "target": "save_int",
+      "label": "Aura de Proteção (CAR, mínimo +1)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "paladin"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 6}]}]},
+      "value": {"op": "max", "args": [{"const": 1}, {"derived": "mod_cha"}]}
+    },
+    {
+      "id": "paladin_aura_wis",
+      "target": "save_wis",
+      "label": "Aura de Proteção (CAR, mínimo +1)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "paladin"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 6}]}]},
+      "value": {"op": "max", "args": [{"const": 1}, {"derived": "mod_cha"}]}
+    },
+    {
+      "id": "paladin_aura_cha",
+      "target": "save_cha",
+      "label": "Aura de Proteção (CAR, mínimo +1)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "paladin"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 6}]}]},
+      "value": {"op": "max", "args": [{"const": 1}, {"derived": "mod_cha"}]}
+    },
+    {
+      "id": "rogue_save_proficiency_wis",
+      "target": "save_wis",
+      "label": "Proficiência em salvaguarda (Ladino 15º)",
+      "when": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "rogue"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 15}]}, {"op": "not", "args": [{"ref": "/saving_throws/wis"}]}]},
+      "value": {"derived": "pb"}
+    },
+    {
+      "id": "draconic_bloodline_hp",
+      "target": "hp_max",
+      "label": "Resiliência Dracônica (+1 PV por nível)",
+      "when": {"op": "compare", "cmp": "eq", "args": [{"ref": "/character/subclass"}, {"const": "draconic_bloodline"}]},
+      "value": {"ref": "/progress/level"}
+    },
+    {
+      "id": "hill_dwarf_hp",
+      "target": "hp_max",
+      "label": "Robustez Anã (+1 PV por nível)",
+      "when": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/subrace"}, {"const": "hill_dwarf"}]},
+      "value": {"ref": "/progress/level"}
+    }
+  ],
+  "constraints": [
+    {
+      "id": "score_cap_str",
+      "label": "Força: aumentos não passam de 20",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"op": "subtract", "args": [{"derived": "score_str"}, {"ref": "/abilities/adjust/str"}]}, {"const": 20}]},
+      "paths": ["/abilities/base/str", "/abilities/origin/str", "/abilities/improvement/str"]
+    },
+    {
+      "id": "score_cap_dex",
+      "label": "Destreza: aumentos não passam de 20",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"op": "subtract", "args": [{"derived": "score_dex"}, {"ref": "/abilities/adjust/dex"}]}, {"const": 20}]},
+      "paths": ["/abilities/base/dex", "/abilities/origin/dex", "/abilities/improvement/dex"]
+    },
+    {
+      "id": "score_cap_con",
+      "label": "Constituição: aumentos não passam de 20",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"op": "subtract", "args": [{"derived": "score_con"}, {"ref": "/abilities/adjust/con"}]}, {"const": 20}]},
+      "paths": ["/abilities/base/con", "/abilities/origin/con", "/abilities/improvement/con"]
+    },
+    {
+      "id": "score_cap_int",
+      "label": "Inteligência: aumentos não passam de 20",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"op": "subtract", "args": [{"derived": "score_int"}, {"ref": "/abilities/adjust/int"}]}, {"const": 20}]},
+      "paths": ["/abilities/base/int", "/abilities/origin/int", "/abilities/improvement/int"]
+    },
+    {
+      "id": "score_cap_wis",
+      "label": "Sabedoria: aumentos não passam de 20",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"op": "subtract", "args": [{"derived": "score_wis"}, {"ref": "/abilities/adjust/wis"}]}, {"const": 20}]},
+      "paths": ["/abilities/base/wis", "/abilities/origin/wis", "/abilities/improvement/wis"]
+    },
+    {
+      "id": "score_cap_cha",
+      "label": "Carisma: aumentos não passam de 20",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"op": "subtract", "args": [{"derived": "score_cha"}, {"ref": "/abilities/adjust/cha"}]}, {"const": 20}]},
+      "paths": ["/abilities/base/cha", "/abilities/origin/cha", "/abilities/improvement/cha"]
+    },
+    {
+      "id": "skills_off_class_list",
+      "label": "Perícias fora da lista da classe excedem as escolhas livres",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"op": "add", "args": [{"derived": "off_list_a"}, {"derived": "off_list_b"}, {"derived": "off_list_c"}]}, {"op": "add", "args": [{"op": "lookup", "key": {"ref": "/origin/race"}, "table": {"half_elf": 2}, "default": {"const": 0}}, {"op": "if", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/subclass"}, {"const": "college_of_lore"}]}, {"const": 3}, {"const": 0}]}]}]},
+      "paths": ["/skills/acrobatics", "/skills/animal_handling", "/skills/arcana", "/skills/athletics", "/skills/deception", "/skills/history", "/skills/insight", "/skills/intimidation", "/skills/investigation", "/skills/medicine", "/skills/nature", "/skills/perception", "/skills/performance", "/skills/persuasion", "/skills/religion", "/skills/sleight_of_hand", "/skills/stealth", "/skills/survival"]
+    },
+    {
+      "id": "expertise_needs_proficiency_acrobatics",
+      "label": "Acrobacia: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/acrobatics"}, {"ref": "/skills/acrobatics"}]},
+      "paths": ["/expertise/acrobatics"]
+    },
+    {
+      "id": "expertise_needs_proficiency_animal_handling",
+      "label": "Adestrar Animais: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/animal_handling"}, {"ref": "/skills/animal_handling"}]},
+      "paths": ["/expertise/animal_handling"]
+    },
+    {
+      "id": "expertise_needs_proficiency_arcana",
+      "label": "Arcanismo: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/arcana"}, {"ref": "/skills/arcana"}]},
+      "paths": ["/expertise/arcana"]
+    },
+    {
+      "id": "expertise_needs_proficiency_athletics",
+      "label": "Atletismo: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/athletics"}, {"ref": "/skills/athletics"}]},
+      "paths": ["/expertise/athletics"]
+    },
+    {
+      "id": "expertise_needs_proficiency_deception",
+      "label": "Enganação: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/deception"}, {"ref": "/skills/deception"}]},
+      "paths": ["/expertise/deception"]
+    },
+    {
+      "id": "expertise_needs_proficiency_history",
+      "label": "História: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/history"}, {"ref": "/skills/history"}]},
+      "paths": ["/expertise/history"]
+    },
+    {
+      "id": "expertise_needs_proficiency_insight",
+      "label": "Intuição: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/insight"}, {"ref": "/skills/insight"}]},
+      "paths": ["/expertise/insight"]
+    },
+    {
+      "id": "expertise_needs_proficiency_intimidation",
+      "label": "Intimidação: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/intimidation"}, {"ref": "/skills/intimidation"}]},
+      "paths": ["/expertise/intimidation"]
+    },
+    {
+      "id": "expertise_needs_proficiency_investigation",
+      "label": "Investigação: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/investigation"}, {"ref": "/skills/investigation"}]},
+      "paths": ["/expertise/investigation"]
+    },
+    {
+      "id": "expertise_needs_proficiency_medicine",
+      "label": "Medicina: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/medicine"}, {"ref": "/skills/medicine"}]},
+      "paths": ["/expertise/medicine"]
+    },
+    {
+      "id": "expertise_needs_proficiency_nature",
+      "label": "Natureza: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/nature"}, {"ref": "/skills/nature"}]},
+      "paths": ["/expertise/nature"]
+    },
+    {
+      "id": "expertise_needs_proficiency_perception",
+      "label": "Percepção: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/perception"}, {"ref": "/skills/perception"}]},
+      "paths": ["/expertise/perception"]
+    },
+    {
+      "id": "expertise_needs_proficiency_performance",
+      "label": "Atuação: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/performance"}, {"ref": "/skills/performance"}]},
+      "paths": ["/expertise/performance"]
+    },
+    {
+      "id": "expertise_needs_proficiency_persuasion",
+      "label": "Persuasão: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/persuasion"}, {"ref": "/skills/persuasion"}]},
+      "paths": ["/expertise/persuasion"]
+    },
+    {
+      "id": "expertise_needs_proficiency_religion",
+      "label": "Religião: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/religion"}, {"ref": "/skills/religion"}]},
+      "paths": ["/expertise/religion"]
+    },
+    {
+      "id": "expertise_needs_proficiency_sleight_of_hand",
+      "label": "Prestidigitação: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/sleight_of_hand"}, {"ref": "/skills/sleight_of_hand"}]},
+      "paths": ["/expertise/sleight_of_hand"]
+    },
+    {
+      "id": "expertise_needs_proficiency_stealth",
+      "label": "Furtividade: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/stealth"}, {"ref": "/skills/stealth"}]},
+      "paths": ["/expertise/stealth"]
+    },
+    {
+      "id": "expertise_needs_proficiency_survival",
+      "label": "Sobrevivência: especialização exige proficiência",
+      "assert": {"op": "compare", "cmp": "le", "args": [{"ref": "/expertise/survival"}, {"ref": "/skills/survival"}]},
+      "paths": ["/expertise/survival"]
+    },
+    {
+      "id": "subclass_due",
+      "label": "Escolha a subclasse no nível indicado pela classe",
+      "assert": {"op": "or", "args": [{"op": "compare", "cmp": "lt", "args": [{"ref": "/progress/level"}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": 3, "bard": 3, "cleric": 1, "druid": 2, "fighter": 3, "monk": 3, "paladin": 3, "ranger": 3, "rogue": 3, "sorcerer": 1, "warlock": 1, "wizard": 2}, "default": {"const": 99}}]}, {"op": "compare", "cmp": "ne", "args": [{"ref": "/character/subclass"}, {"const": ""}]}]},
+      "paths": ["/character/subclass", "/progress/level"]
+    },
+    {
+      "id": "half_elf_increases",
+      "phase": "creation",
+      "label": "Meio-Elfo: dois outros atributos à escolha aumentam em 1",
+      "assert": {"op": "or", "args": [{"op": "compare", "cmp": "ne", "args": [{"ref": "/origin/race"}, {"const": "half_elf"}]}, {"op": "and", "args": [{"op": "compare", "cmp": "le", "args": [{"ref": "/abilities/origin/str"}, {"const": 1}]}, {"op": "compare", "cmp": "le", "args": [{"ref": "/abilities/origin/dex"}, {"const": 1}]}, {"op": "compare", "cmp": "le", "args": [{"ref": "/abilities/origin/con"}, {"const": 1}]}, {"op": "compare", "cmp": "le", "args": [{"ref": "/abilities/origin/int"}, {"const": 1}]}, {"op": "compare", "cmp": "le", "args": [{"ref": "/abilities/origin/wis"}, {"const": 1}]}]}]},
+      "paths": ["/abilities/origin/str", "/abilities/origin/dex", "/abilities/origin/con", "/abilities/origin/int", "/abilities/origin/wis"]
+    }
+  ],
+  "creation": {
+    "steps": [
+      {"id": "identity", "label": "Identidade", "paths": ["/identity/*"], "required": ["/identity/name"]},
+      {"id": "class", "label": "Classe e nível", "paths": ["/character/class", "/character/subclass", "/progress/level"], "required": ["/character/class"], "complete_when": {"op": "or", "args": [{"op": "compare", "cmp": "lt", "args": [{"ref": "/progress/level"}, {"op": "lookup", "key": {"ref": "/character/class"}, "table": {"barbarian": 3, "bard": 3, "cleric": 1, "druid": 2, "fighter": 3, "monk": 3, "paladin": 3, "ranger": 3, "rogue": 3, "sorcerer": 1, "warlock": 1, "wizard": 2}, "default": {"const": 99}}]}, {"op": "compare", "cmp": "ne", "args": [{"ref": "/character/subclass"}, {"const": ""}]}]}},
+      {"id": "origin", "label": "Raça e antecedente", "paths": ["/origin/*"], "required": ["/origin/race", "/origin/background"], "complete_when": {"op": "and", "args": [{"op": "or", "args": [{"op": "not", "args": [{"op": "lookup", "key": {"ref": "/origin/race"}, "table": {"dwarf": true, "elf": true, "halfling": true, "gnome": true}, "default": {"const": false}}]}, {"op": "compare", "cmp": "ne", "args": [{"ref": "/origin/subrace"}, {"const": ""}]}]}, {"op": "or", "args": [{"op": "not", "args": [{"op": "lookup", "key": {"ref": "/origin/race"}, "table": {"dragonborn": true}, "default": {"const": false}}]}, {"op": "compare", "cmp": "ne", "args": [{"ref": "/origin/draconic_ancestry"}, {"const": ""}]}]}]}},
+      {"id": "abilities", "label": "Atributos", "paths": ["/abilities/base/*", "/abilities/origin/*", "/abilities/improvement/*", "/character/ability_method"], "required": ["/character/ability_method"], "complete_when": {"op": "and", "args": [{"op": "or", "args": [{"op": "not", "args": [{"op": "lookup", "key": {"ref": "/character/ability_method"}, "table": {"point_buy": true}, "default": {"const": false}}]}, {"op": "compare", "cmp": "eq", "args": [{"budget": "point_buy", "of": "balance"}, {"const": 0}]}]}, {"op": "compare", "cmp": "eq", "args": [{"budget": "origin_asi", "of": "balance"}, {"const": 0}]}]}},
+      {"id": "skills", "label": "Perícias", "paths": ["/skills/*", "/expertise/*"], "complete_when": {"op": "and", "args": [{"op": "compare", "cmp": "le", "args": [{"budget": "skill_picks", "of": "balance"}, {"const": 0}]}, {"op": "compare", "cmp": "eq", "args": [{"budget": "expertise", "of": "balance"}, {"const": 0}]}]}},
+      {"id": "equipment", "label": "Equipamento", "paths": ["/inventory", "/attacks", "/combat/armor", "/combat/shield", "/currency/*"], "complete_when": {"const": true}},
+      {"id": "review", "label": "Revisão", "paths": ["/description/*", "/resources/*", "/spells", "/features", "/feats"], "complete_when": {"const": true}}
+    ],
+    "choices": [
+      {"id": "class", "path": "/character/class", "label": "Classe", "options": [{"value": "barbarian", "label": "Bárbaro", "compendium_id": "class.barbarian", "fixes": [{"path": "/saving_throws/str", "value": {"const": true}, "label": "salvaguarda da classe Bárbaro", "mode": "exact"}, {"path": "/saving_throws/con", "value": {"const": true}, "label": "salvaguarda da classe Bárbaro", "mode": "exact"}, {"path": "/proficiencies/armor_light", "value": {"const": true}, "label": "treinamento da classe Bárbaro", "mode": "exact"}, {"path": "/proficiencies/armor_medium", "value": {"const": true}, "label": "treinamento da classe Bárbaro", "mode": "exact"}, {"path": "/proficiencies/shields", "value": {"const": true}, "label": "treinamento da classe Bárbaro", "mode": "exact"}, {"path": "/proficiencies/weapons_simple", "value": {"const": true}, "label": "treinamento da classe Bárbaro", "mode": "exact"}, {"path": "/proficiencies/weapons_martial", "value": {"const": true}, "label": "treinamento da classe Bárbaro", "mode": "exact"}]}, {"value": "bard", "label": "Bardo", "compendium_id": "class.bard", "fixes": [{"path": "/saving_throws/dex", "value": {"const": true}, "label": "salvaguarda da classe Bardo", "mode": "exact"}, {"path": "/saving_throws/cha", "value": {"const": true}, "label": "salvaguarda da classe Bardo", "mode": "exact"}, {"path": "/proficiencies/armor_light", "value": {"const": true}, "label": "treinamento da classe Bardo", "mode": "exact"}, {"path": "/proficiencies/weapons_simple", "value": {"const": true}, "label": "treinamento da classe Bardo", "mode": "exact"}]}, {"value": "cleric", "label": "Clérigo", "compendium_id": "class.cleric", "fixes": [{"path": "/saving_throws/wis", "value": {"const": true}, "label": "salvaguarda da classe Clérigo", "mode": "exact"}, {"path": "/saving_throws/cha", "value": {"const": true}, "label": "salvaguarda da classe Clérigo", "mode": "exact"}, {"path": "/proficiencies/armor_light", "value": {"const": true}, "label": "treinamento da classe Clérigo", "mode": "exact"}, {"path": "/proficiencies/armor_medium", "value": {"const": true}, "label": "treinamento da classe Clérigo", "mode": "exact"}, {"path": "/proficiencies/shields", "value": {"const": true}, "label": "treinamento da classe Clérigo", "mode": "exact"}, {"path": "/proficiencies/weapons_simple", "value": {"const": true}, "label": "treinamento da classe Clérigo", "mode": "exact"}]}, {"value": "druid", "label": "Druida", "compendium_id": "class.druid", "fixes": [{"path": "/saving_throws/int", "value": {"const": true}, "label": "salvaguarda da classe Druida", "mode": "exact"}, {"path": "/saving_throws/wis", "value": {"const": true}, "label": "salvaguarda da classe Druida", "mode": "exact"}, {"path": "/proficiencies/armor_light", "value": {"const": true}, "label": "treinamento da classe Druida", "mode": "exact"}, {"path": "/proficiencies/armor_medium", "value": {"const": true}, "label": "treinamento da classe Druida", "mode": "exact"}, {"path": "/proficiencies/shields", "value": {"const": true}, "label": "treinamento da classe Druida", "mode": "exact"}]}, {"value": "fighter", "label": "Guerreiro", "compendium_id": "class.fighter", "fixes": [{"path": "/saving_throws/str", "value": {"const": true}, "label": "salvaguarda da classe Guerreiro", "mode": "exact"}, {"path": "/saving_throws/con", "value": {"const": true}, "label": "salvaguarda da classe Guerreiro", "mode": "exact"}, {"path": "/proficiencies/armor_light", "value": {"const": true}, "label": "treinamento da classe Guerreiro", "mode": "exact"}, {"path": "/proficiencies/armor_medium", "value": {"const": true}, "label": "treinamento da classe Guerreiro", "mode": "exact"}, {"path": "/proficiencies/armor_heavy", "value": {"const": true}, "label": "treinamento da classe Guerreiro", "mode": "exact"}, {"path": "/proficiencies/shields", "value": {"const": true}, "label": "treinamento da classe Guerreiro", "mode": "exact"}, {"path": "/proficiencies/weapons_simple", "value": {"const": true}, "label": "treinamento da classe Guerreiro", "mode": "exact"}, {"path": "/proficiencies/weapons_martial", "value": {"const": true}, "label": "treinamento da classe Guerreiro", "mode": "exact"}]}, {"value": "monk", "label": "Monge", "compendium_id": "class.monk", "fixes": [{"path": "/saving_throws/str", "value": {"const": true}, "label": "salvaguarda da classe Monge", "mode": "exact"}, {"path": "/saving_throws/dex", "value": {"const": true}, "label": "salvaguarda da classe Monge", "mode": "exact"}, {"path": "/proficiencies/weapons_simple", "value": {"const": true}, "label": "treinamento da classe Monge", "mode": "exact"}]}, {"value": "paladin", "label": "Paladino", "compendium_id": "class.paladin", "fixes": [{"path": "/saving_throws/wis", "value": {"const": true}, "label": "salvaguarda da classe Paladino", "mode": "exact"}, {"path": "/saving_throws/cha", "value": {"const": true}, "label": "salvaguarda da classe Paladino", "mode": "exact"}, {"path": "/proficiencies/armor_light", "value": {"const": true}, "label": "treinamento da classe Paladino", "mode": "exact"}, {"path": "/proficiencies/armor_medium", "value": {"const": true}, "label": "treinamento da classe Paladino", "mode": "exact"}, {"path": "/proficiencies/armor_heavy", "value": {"const": true}, "label": "treinamento da classe Paladino", "mode": "exact"}, {"path": "/proficiencies/shields", "value": {"const": true}, "label": "treinamento da classe Paladino", "mode": "exact"}, {"path": "/proficiencies/weapons_simple", "value": {"const": true}, "label": "treinamento da classe Paladino", "mode": "exact"}, {"path": "/proficiencies/weapons_martial", "value": {"const": true}, "label": "treinamento da classe Paladino", "mode": "exact"}]}, {"value": "ranger", "label": "Patrulheiro", "compendium_id": "class.ranger", "fixes": [{"path": "/saving_throws/str", "value": {"const": true}, "label": "salvaguarda da classe Patrulheiro", "mode": "exact"}, {"path": "/saving_throws/dex", "value": {"const": true}, "label": "salvaguarda da classe Patrulheiro", "mode": "exact"}, {"path": "/proficiencies/armor_light", "value": {"const": true}, "label": "treinamento da classe Patrulheiro", "mode": "exact"}, {"path": "/proficiencies/armor_medium", "value": {"const": true}, "label": "treinamento da classe Patrulheiro", "mode": "exact"}, {"path": "/proficiencies/shields", "value": {"const": true}, "label": "treinamento da classe Patrulheiro", "mode": "exact"}, {"path": "/proficiencies/weapons_simple", "value": {"const": true}, "label": "treinamento da classe Patrulheiro", "mode": "exact"}, {"path": "/proficiencies/weapons_martial", "value": {"const": true}, "label": "treinamento da classe Patrulheiro", "mode": "exact"}]}, {"value": "rogue", "label": "Ladino", "compendium_id": "class.rogue", "fixes": [{"path": "/saving_throws/dex", "value": {"const": true}, "label": "salvaguarda da classe Ladino", "mode": "exact"}, {"path": "/saving_throws/int", "value": {"const": true}, "label": "salvaguarda da classe Ladino", "mode": "exact"}, {"path": "/proficiencies/armor_light", "value": {"const": true}, "label": "treinamento da classe Ladino", "mode": "exact"}, {"path": "/proficiencies/weapons_simple", "value": {"const": true}, "label": "treinamento da classe Ladino", "mode": "exact"}]}, {"value": "sorcerer", "label": "Feiticeiro", "compendium_id": "class.sorcerer", "fixes": [{"path": "/saving_throws/con", "value": {"const": true}, "label": "salvaguarda da classe Feiticeiro", "mode": "exact"}, {"path": "/saving_throws/cha", "value": {"const": true}, "label": "salvaguarda da classe Feiticeiro", "mode": "exact"}]}, {"value": "warlock", "label": "Bruxo", "compendium_id": "class.warlock", "fixes": [{"path": "/saving_throws/wis", "value": {"const": true}, "label": "salvaguarda da classe Bruxo", "mode": "exact"}, {"path": "/saving_throws/cha", "value": {"const": true}, "label": "salvaguarda da classe Bruxo", "mode": "exact"}, {"path": "/proficiencies/armor_light", "value": {"const": true}, "label": "treinamento da classe Bruxo", "mode": "exact"}, {"path": "/proficiencies/weapons_simple", "value": {"const": true}, "label": "treinamento da classe Bruxo", "mode": "exact"}]}, {"value": "wizard", "label": "Mago", "compendium_id": "class.wizard", "fixes": [{"path": "/saving_throws/int", "value": {"const": true}, "label": "salvaguarda da classe Mago", "mode": "exact"}, {"path": "/saving_throws/wis", "value": {"const": true}, "label": "salvaguarda da classe Mago", "mode": "exact"}]}]},
+      {"id": "subclass", "path": "/character/subclass", "label": "Subclasse", "options": [{"value": "path_of_the_berserker", "label": "Caminho do Berserker", "compendium_id": "subclass.path_of_the_berserker", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "barbarian"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 3}]}]}}, {"value": "college_of_lore", "label": "Colégio do Conhecimento", "compendium_id": "subclass.college_of_lore", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "bard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 3}]}]}}, {"value": "life_domain", "label": "Domínio da Vida", "compendium_id": "subclass.life_domain", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "cleric"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 1}]}]}, "fixes": [{"path": "/proficiencies/armor_heavy", "value": {"const": true}, "label": "treinamento de Domínio da Vida", "mode": "exact"}]}, {"value": "circle_of_the_land", "label": "Círculo da Terra", "compendium_id": "subclass.circle_of_the_land", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "druid"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}}, {"value": "champion", "label": "Campeão", "compendium_id": "subclass.champion", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "fighter"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 3}]}]}}, {"value": "way_of_the_open_hand", "label": "Caminho da Mão Aberta", "compendium_id": "subclass.way_of_the_open_hand", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "monk"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 3}]}]}}, {"value": "oath_of_devotion", "label": "Juramento de Devoção", "compendium_id": "subclass.oath_of_devotion", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "paladin"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 3}]}]}}, {"value": "hunter", "label": "Caçador", "compendium_id": "subclass.hunter", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "ranger"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 3}]}]}}, {"value": "thief", "label": "Ladrão", "compendium_id": "subclass.thief", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "rogue"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 3}]}]}}, {"value": "draconic_bloodline", "label": "Linhagem Dracônica", "compendium_id": "subclass.draconic_bloodline", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "sorcerer"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 1}]}]}}, {"value": "the_fiend", "label": "O Ínfero", "compendium_id": "subclass.the_fiend", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "warlock"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 1}]}]}}, {"value": "school_of_evocation", "label": "Escola de Evocação", "compendium_id": "subclass.school_of_evocation", "requires": {"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/class"}, {"const": "wizard"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 2}]}]}}]},
+      {"id": "ability_method", "path": "/character/ability_method", "label": "Geração de atributos", "options": [{"value": "point_buy", "label": "Compra de pontos (27) — tabela do SRD 5.2.1, pendente"}, {"value": "gm_assigned", "label": "Valores definidos pelo mestre"}]},
+      {"id": "race", "path": "/origin/race", "label": "Raça", "options": [{"value": "dwarf", "label": "Anão", "compendium_id": "race.dwarf", "fixes": [{"path": "/abilities/origin/con", "value": {"const": 2}, "label": "aumento de Anão", "mode": "exact"}]}, {"value": "elf", "label": "Elfo", "compendium_id": "race.elf", "fixes": [{"path": "/abilities/origin/dex", "value": {"const": 2}, "label": "aumento de Elfo", "mode": "exact"}, {"path": "/skills/perception", "value": {"const": 1}, "label": "perícia de Elfo", "mode": "at_least"}]}, {"value": "halfling", "label": "Halfling", "compendium_id": "race.halfling", "fixes": [{"path": "/abilities/origin/dex", "value": {"const": 2}, "label": "aumento de Halfling", "mode": "exact"}]}, {"value": "human", "label": "Humano", "compendium_id": "race.human", "fixes": [{"path": "/abilities/origin/str", "value": {"const": 1}, "label": "aumento de Humano", "mode": "exact"}, {"path": "/abilities/origin/dex", "value": {"const": 1}, "label": "aumento de Humano", "mode": "exact"}, {"path": "/abilities/origin/con", "value": {"const": 1}, "label": "aumento de Humano", "mode": "exact"}, {"path": "/abilities/origin/int", "value": {"const": 1}, "label": "aumento de Humano", "mode": "exact"}, {"path": "/abilities/origin/wis", "value": {"const": 1}, "label": "aumento de Humano", "mode": "exact"}, {"path": "/abilities/origin/cha", "value": {"const": 1}, "label": "aumento de Humano", "mode": "exact"}]}, {"value": "dragonborn", "label": "Draconato", "compendium_id": "race.dragonborn", "fixes": [{"path": "/abilities/origin/str", "value": {"const": 2}, "label": "aumento de Draconato", "mode": "exact"}, {"path": "/abilities/origin/cha", "value": {"const": 1}, "label": "aumento de Draconato", "mode": "exact"}]}, {"value": "gnome", "label": "Gnomo", "compendium_id": "race.gnome", "fixes": [{"path": "/abilities/origin/int", "value": {"const": 2}, "label": "aumento de Gnomo", "mode": "exact"}]}, {"value": "half_elf", "label": "Meio-Elfo", "compendium_id": "race.half_elf", "fixes": [{"path": "/abilities/origin/cha", "value": {"const": 2}, "label": "aumento de Meio-Elfo", "mode": "exact"}]}, {"value": "half_orc", "label": "Meio-Orc", "compendium_id": "race.half_orc", "fixes": [{"path": "/abilities/origin/str", "value": {"const": 2}, "label": "aumento de Meio-Orc", "mode": "exact"}, {"path": "/abilities/origin/con", "value": {"const": 1}, "label": "aumento de Meio-Orc", "mode": "exact"}, {"path": "/skills/intimidation", "value": {"const": 1}, "label": "perícia de Meio-Orc", "mode": "at_least"}]}, {"value": "tiefling", "label": "Tiefling", "compendium_id": "race.tiefling", "fixes": [{"path": "/abilities/origin/int", "value": {"const": 1}, "label": "aumento de Tiefling", "mode": "exact"}, {"path": "/abilities/origin/cha", "value": {"const": 2}, "label": "aumento de Tiefling", "mode": "exact"}]}]},
+      {"id": "subrace", "path": "/origin/subrace", "label": "Sub-raça", "options": [{"value": "hill_dwarf", "label": "Anão da Colina", "compendium_id": "subrace.hill_dwarf", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dwarf"}]}, "fixes": [{"path": "/abilities/origin/wis", "value": {"const": 1}, "label": "aumento de Anão da Colina", "mode": "exact"}]}, {"value": "high_elf", "label": "Alto Elfo", "compendium_id": "subrace.high_elf", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "elf"}]}, "fixes": [{"path": "/abilities/origin/int", "value": {"const": 1}, "label": "aumento de Alto Elfo", "mode": "exact"}]}, {"value": "lightfoot", "label": "Pés-Leves", "compendium_id": "subrace.lightfoot", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "halfling"}]}, "fixes": [{"path": "/abilities/origin/cha", "value": {"const": 1}, "label": "aumento de Pés-Leves", "mode": "exact"}]}, {"value": "rock_gnome", "label": "Gnomo das Rochas", "compendium_id": "subrace.rock_gnome", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "gnome"}]}, "fixes": [{"path": "/abilities/origin/con", "value": {"const": 1}, "label": "aumento de Gnomo das Rochas", "mode": "exact"}]}]},
+      {"id": "draconic_ancestry", "path": "/origin/draconic_ancestry", "label": "Ancestralidade dracônica", "options": [{"value": "black", "label": "Dragão Negro (ácido)", "compendium_id": "draconic_ancestry.black", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}, {"value": "blue", "label": "Dragão Azul (elétrico)", "compendium_id": "draconic_ancestry.blue", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}, {"value": "brass", "label": "Dragão Latão (fogo)", "compendium_id": "draconic_ancestry.brass", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}, {"value": "bronze", "label": "Dragão Bronze (elétrico)", "compendium_id": "draconic_ancestry.bronze", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}, {"value": "copper", "label": "Dragão Cobre (ácido)", "compendium_id": "draconic_ancestry.copper", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}, {"value": "gold", "label": "Dragão Ouro (fogo)", "compendium_id": "draconic_ancestry.gold", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}, {"value": "green", "label": "Dragão Verde (veneno)", "compendium_id": "draconic_ancestry.green", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}, {"value": "red", "label": "Dragão Vermelho (fogo)", "compendium_id": "draconic_ancestry.red", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}, {"value": "silver", "label": "Dragão Prata (frio)", "compendium_id": "draconic_ancestry.silver", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}, {"value": "white", "label": "Dragão Branco (frio)", "compendium_id": "draconic_ancestry.white", "requires": {"op": "compare", "cmp": "eq", "args": [{"ref": "/origin/race"}, {"const": "dragonborn"}]}}]},
+      {"id": "background", "path": "/origin/background", "label": "Antecedente", "options": [{"value": "acolyte", "label": "Acólito", "compendium_id": "background.acolyte", "fixes": [{"path": "/skills/insight", "value": {"const": 1}, "label": "perícia do antecedente Acólito", "mode": "at_least"}, {"path": "/skills/religion", "value": {"const": 1}, "label": "perícia do antecedente Acólito", "mode": "at_least"}]}]},
+      {"id": "armor", "path": "/combat/armor", "label": "Armadura vestida", "options": [{"value": "none", "label": "Sem armadura"}, {"value": "padded", "label": "Acolchoada", "compendium_id": "armor.padded"}, {"value": "leather", "label": "Couro", "compendium_id": "armor.leather"}, {"value": "studded_leather", "label": "Couro batido", "compendium_id": "armor.studded_leather"}, {"value": "hide", "label": "Gibão de peles", "compendium_id": "armor.hide"}, {"value": "chain_shirt", "label": "Camisão de malha", "compendium_id": "armor.chain_shirt"}, {"value": "scale_mail", "label": "Brunea", "compendium_id": "armor.scale_mail"}, {"value": "breastplate", "label": "Peitoral", "compendium_id": "armor.breastplate"}, {"value": "half_plate", "label": "Meia-armadura", "compendium_id": "armor.half_plate"}, {"value": "ring_mail", "label": "Cota de anéis", "compendium_id": "armor.ring_mail"}, {"value": "chain_mail", "label": "Cota de malha", "compendium_id": "armor.chain_mail"}, {"value": "splint", "label": "Cota de talas", "compendium_id": "armor.splint"}, {"value": "plate", "label": "Armadura de placas", "compendium_id": "armor.plate"}]}
+    ]
+  },
+  "progression": {
+    "tracks": [
+      {"id": "level", "label": "Nível de personagem", "path": "/progress/level", "max_step": 1, "measure": {"op": "max", "args": [{"budget": "xp", "of": "granted"}, {"op": "lookup", "key": {"budget": "milestones", "of": "granted"}, "steps": [[0, 0], [1, 300], [2, 900], [3, 2700], [4, 6500], [5, 14000], [6, 23000], [7, 34000], [8, 48000], [9, 64000], [10, 85000], [11, 100000], [12, 120000], [13, 140000], [14, 165000], [15, 195000], [16, 225000], [17, 265000], [18, 305000], [19, 355000]]}]}, "thresholds": [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000]}
+    ]
+  },
+  "resources": [
+    {
+      "id": "hp",
+      "label": "Pontos de Vida",
+      "path": "/resources/hp",
+      "max": {"derived": "hp_max"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "hit_dice",
+      "label": "Dados de Vida gastos",
+      "path": "/resources/hit_dice_spent",
+      "max": {"ref": "/progress/level"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "slots_1",
+      "label": "Espaços de 1º círculo gastos",
+      "path": "/resources/slots_used/l1",
+      "max": {"derived": "slot_1"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "slots_2",
+      "label": "Espaços de 2º círculo gastos",
+      "path": "/resources/slots_used/l2",
+      "max": {"derived": "slot_2"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "slots_3",
+      "label": "Espaços de 3º círculo gastos",
+      "path": "/resources/slots_used/l3",
+      "max": {"derived": "slot_3"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "slots_4",
+      "label": "Espaços de 4º círculo gastos",
+      "path": "/resources/slots_used/l4",
+      "max": {"derived": "slot_4"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "slots_5",
+      "label": "Espaços de 5º círculo gastos",
+      "path": "/resources/slots_used/l5",
+      "max": {"derived": "slot_5"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "slots_6",
+      "label": "Espaços de 6º círculo gastos",
+      "path": "/resources/slots_used/l6",
+      "max": {"derived": "slot_6"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "slots_7",
+      "label": "Espaços de 7º círculo gastos",
+      "path": "/resources/slots_used/l7",
+      "max": {"derived": "slot_7"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "slots_8",
+      "label": "Espaços de 8º círculo gastos",
+      "path": "/resources/slots_used/l8",
+      "max": {"derived": "slot_8"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "slots_9",
+      "label": "Espaços de 9º círculo gastos",
+      "path": "/resources/slots_used/l9",
+      "max": {"derived": "slot_9"},
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "pact_slots",
+      "label": "Espaços de Pacto gastos",
+      "path": "/resources/pact_used",
+      "max": {"derived": "pact_slots"},
+      "min": 0,
+      "recovery": "rest"
+    }
+  ],
+  "inventory": [
+    {
+      "id": "equipment",
+      "collection": "/inventory",
+      "weight_field": "weight",
+      "quantity_field": "quantity",
+      "equipped_field": "equipped"
+    }
+  ],
+  "rolls": [
+    {
+      "id": "ability_check",
+      "label": "Teste de atributo",
+      "strategy": "sum",
+      "dice": "1d20",
+      "inputs": {"ability": {"targets": ["/checks/*"]}},
+      "modifier": {"var": "ability"},
+      "target": {"min": 1, "max": 40},
+      "edge": {"extra_dice": 1, "force": {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/conditions/exhaustion"}, {"const": 1}]}, {"const": "disadvantage"}, {"const": "normal"}]}}
+    },
+    {
+      "id": "saving_throw",
+      "label": "Salvaguarda",
+      "strategy": "sum",
+      "dice": "1d20",
+      "inputs": {"save": {"targets": ["/saves/*"]}},
+      "modifier": {"var": "save"},
+      "target": {"min": 1, "max": 40},
+      "edge": {"extra_dice": 1, "force": {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/conditions/exhaustion"}, {"const": 3}]}, {"const": "disadvantage"}, {"const": "normal"}]}}
+    },
+    {
+      "id": "skill_check",
+      "label": "Teste de perícia",
+      "strategy": "sum",
+      "dice": "1d20",
+      "inputs": {"skill": {"targets": ["/skill_bonus/*"]}},
+      "modifier": {"var": "skill"},
+      "target": {"min": 1, "max": 40},
+      "edge": {"extra_dice": 1, "force": {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/conditions/exhaustion"}, {"const": 1}]}, {"const": "disadvantage"}, {"const": "normal"}]}}
+    },
+    {
+      "id": "initiative",
+      "label": "Iniciativa",
+      "strategy": "sum",
+      "dice": "1d20",
+      "modifier": {"derived": "initiative"},
+      "edge": {"extra_dice": 1}
+    },
+    {
+      "id": "attack",
+      "label": "Jogada de ataque",
+      "strategy": "sum",
+      "dice": "1d20",
+      "inputs": {"bonus": {"targets": ["/combat/attack/*"]}},
+      "modifier": {"var": "bonus"},
+      "target": {"min": 1, "max": 40},
+      "critical_at_least": {"op": "subtract", "args": [{"const": 20}, {"op": "add", "args": [{"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/subclass"}, {"const": "champion"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 3}]}]}, {"const": 1}, {"const": 0}]}, {"op": "if", "args": [{"op": "and", "args": [{"op": "compare", "cmp": "eq", "args": [{"ref": "/character/subclass"}, {"const": "champion"}]}, {"op": "compare", "cmp": "ge", "args": [{"ref": "/progress/level"}, {"const": 15}]}]}, {"const": 1}, {"const": 0}]}]}]},
+      "fumble_at_most": 1,
+      "edge": {"extra_dice": 1, "force": {"op": "if", "args": [{"op": "compare", "cmp": "ge", "args": [{"ref": "/conditions/exhaustion"}, {"const": 3}]}, {"const": "disadvantage"}, {"const": "normal"}]}}
+    },
+    {
+      "id": "hit_die",
+      "label": "Dado de Vida (descanso curto)",
+      "strategy": "sum",
+      "dice": "1d6",
+      "faces": {"derived": "hit_die"},
+      "modifier": {"derived": "mod_con"}
+    },
+    {
+      "id": "death_save",
+      "label": "Salvaguarda contra a morte",
+      "strategy": "sum",
+      "dice": "1d20",
+      "target": {"default": 10, "min": 10, "max": 10},
+      "critical_at_least": 20,
+      "fumble_at_most": 1,
+      "edge": {"extra_dice": 1}
+    }
+  ],
+  "governance": {
+    "lock_during_session": true
+  }
+}

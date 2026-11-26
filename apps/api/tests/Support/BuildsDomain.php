@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
+use App\Application\PresetImporter;
 use App\Domain\CampaignRole;
 use App\Domain\ChangeRequestStatus;
 use App\Domain\MemberStatus;
@@ -69,7 +70,24 @@ trait BuildsDomain
             'engine_version' => '0.1.0',
             'imported_by' => $importer->getKey(),
             'published_at' => $status === PresetVersionStatus::Published ? now() : null,
+            'rights_status' => $status === PresetVersionStatus::Published ? 'approved' : 'draft',
         ]);
+    }
+
+    /** Publishes one of the authorial demo presets (presets/novtt-demo) through the real importer. */
+    protected function publishDemoPreset(User $team, string $variant, ?callable $mutate = null): PresetVersion
+    {
+        [$raw] = PresetImporter::readDirectory(__DIR__ . '/../../../../presets/novtt-demo/' . $variant . '/1.0.0');
+        $importer = app(PresetImporter::class);
+        [$package] = $importer->parse((string) $raw);
+        if ($mutate !== null) {
+            $package = $mutate($package);
+        }
+        $raw = json_encode($package, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION);
+        [$package, $objects] = $importer->parse($raw);
+        [$version] = $importer->import($team, $package, $objects, canonical: true);
+
+        return $version;
     }
 
     protected function makeCampaign(User $master, ?PresetVersion $version = null): Campaign

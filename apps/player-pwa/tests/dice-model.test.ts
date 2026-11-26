@@ -44,12 +44,12 @@ describe('skins', () => {
 })
 
 describe('arrangement', () => {
-  it('rows dice at the player edge, flat on the result with the number upright, without crossing', () => {
+  it('rows dice at the player edge in result order, flat on the result with the number upright', () => {
     const rng = seeded(9)
     const dice = [{ shape: 'd20' as const, face: 17, group: 0 }, { shape: 'd6' as const, face: 2, group: 1 }, { shape: 'd4' as const, face: 3, group: 2 }]
     const finals = [{ p: v(3, 1, 0), q: randomRotation(rng) }, { p: v(-4, 1, 2), q: randomRotation(rng) }, { p: v(0, 1, -3), q: randomRotation(rng) }]
     const { targets, order } = arrange(dice, finals)
-    expect(order).toEqual([1, 2, 0])
+    expect(order).toEqual([0, 1, 2]) // same sequence as the result card, wherever they stopped
     const xs = order.map(i => targets[i].p.x)
     expect([...xs].sort((a, b) => a - b)).toEqual(xs)
     dice.forEach((d, i) => {

@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "dnd-5e srd-5-2-1 0.1.0 sheet",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"name": {"type": "string", "maxLength": 120}, "player": {"type": "string", "maxLength": 120}, "alignment": {"type": "string", "enum": ["lg", "ng", "cg", "ln", "n", "cn", "le", "ne", "ce"]}, "age": {"type": "string", "maxLength": 40}}
+    },
+    "character": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"class": {"type": "string", "enum": ["barbarian", "bard", "cleric", "druid", "fighter", "monk", "paladin", "ranger", "rogue", "sorcerer", "warlock", "wizard"]}, "subclass": {"type": "string", "enum": ["path_of_the_berserker", "college_of_lore", "life_domain", "circle_of_the_land", "champion", "warrior_of_the_open_hand", "oath_of_devotion", "hunter", "thief", "draconic_sorcery", "fiend_patron", "evoker"]}, "ability_method": {"type": "string", "enum": ["point_cost", "standard_array", "random_generation"], "default": "point_cost"}, "divine_order": {"type": "string", "enum": ["protector", "thaumaturge"]}, "primal_order": {"type": "string", "enum": ["magician", "warden"]}}
+    },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"species": {"type": "string", "enum": ["dragonborn", "dwarf", "elf", "gnome", "goliath", "halfling", "human", "orc", "tiefling"]}, "background": {"type": "string", "enum": ["acolyte", "criminal", "sage", "soldier"]}, "lineage": {"type": "string", "enum": ["dragon_black", "dragon_blue", "dragon_brass", "dragon_bronze", "dragon_copper", "dragon_gold", "dragon_green", "dragon_red", "dragon_silver", "dragon_white", "drow", "high_elf", "wood_elf", "forest_gnome", "rock_gnome", "cloud_giant", "fire_giant", "frost_giant", "hill_giant", "stone_giant", "storm_giant", "abyssal", "chthonic", "infernal"]}, "lineage_ability": {"type": "string", "enum": ["int", "wis", "cha"]}, "keen_senses": {"type": "string", "enum": ["insight", "perception", "survival"]}, "size": {"type": "string", "enum": ["medium", "small"]}, "species_feat": {"type": "string", "enum": ["alert", "magic_initiate_cleric", "magic_initiate_druid", "magic_initiate_wizard", "savage_attacker", "skilled"]}, "background_feat": {"type": "string"}}
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"level": {"type": "integer", "minimum": 1, "maximum": 20, "default": 1}, "xp": {"type": "integer"}, "proficiency_bonus": {"type": "integer"}}
+    },
+    "abilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"base": {"type": "object", "additionalProperties": false, "properties": {"str": {"type": "integer", "minimum": 8, "maximum": 15, "default": 8}, "dex": {"type": "integer", "minimum": 8, "maximum": 15, "default": 8}, "con": {"type": "integer", "minimum": 8, "maximum": 15, "default": 8}, "int": {"type": "integer", "minimum": 8, "maximum": 15, "default": 8}, "wis": {"type": "integer", "minimum": 8, "maximum": 15, "default": 8}, "cha": {"type": "integer", "minimum": 8, "maximum": 15, "default": 8}}}, "assigned": {"type": "object", "additionalProperties": false, "properties": {"str": {"type": "integer", "minimum": 3, "maximum": 18, "default": 10}, "dex": {"type": "integer", "minimum": 3, "maximum": 18, "default": 10}, "con": {"type": "integer", "minimum": 3, "maximum": 18, "default": 10}, "int": {"type": "integer", "minimum": 3, "maximum": 18, "default": 10}, "wis": {"type": "integer", "minimum": 3, "maximum": 18, "default": 10}, "cha": {"type": "integer", "minimum": 3, "maximum": 18, "default": 10}}}, "origin": {"type": "object", "additionalProperties": false, "properties": {"str": {"type": "integer", "minimum": 0, "maximum": 2, "default": 0}, "dex": {"type": "integer", "minimum": 0, "maximum": 2, "default": 0}, "con": {"type": "integer", "minimum": 0, "maximum": 2, "default": 0}, "int": {"type": "integer", "minimum": 0, "maximum": 2, "default": 0}, "wis": {"type": "integer", "minimum": 0, "maximum": 2, "default": 0}, "cha": {"type": "integer", "minimum": 0, "maximum": 2, "default": 0}}}, "improvement": {"type": "object", "additionalProperties": false, "properties": {"str": {"type": "integer", "minimum": 0, "maximum": 12, "default": 0}, "dex": {"type": "integer", "minimum": 0, "maximum": 12, "default": 0}, "con": {"type": "integer", "minimum": 0, "maximum": 12, "default": 0}, "int": {"type": "integer", "minimum": 0, "maximum": 12, "default": 0}, "wis": {"type": "integer", "minimum": 0, "maximum": 12, "default": 0}, "cha": {"type": "integer", "minimum": 0, "maximum": 12, "default": 0}}}, "adjust": {"type": "object", "additionalProperties": false, "properties": {"str": {"type": "integer", "minimum": -10, "maximum": 20, "default": 0}, "dex": {"type": "integer", "minimum": -10, "maximum": 20, "default": 0}, "con": {"type": "integer", "minimum": -10, "maximum": 20, "default": 0}, "int": {"type": "integer", "minimum": -10, "maximum": 20, "default": 0}, "wis": {"type": "integer", "minimum": -10, "maximum": 20, "default": 0}, "cha": {"type": "integer", "minimum": -10, "maximum": 20, "default": 0}}}, "score": {"type": "object", "additionalProperties": false, "properties": {"str": {"type": "integer"}, "dex": {"type": "integer"}, "con": {"type": "integer"}, "int": {"type": "integer"}, "wis": {"type": "integer"}, "cha": {"type": "integer"}}}, "mod": {"type": "object", "additionalProperties": false, "properties": {"str": {"type": "integer"}, "dex": {"type": "integer"}, "con": {"type": "integer"}, "int": {"type": "integer"}, "wis": {"type": "integer"}, "cha": {"type": "integer"}}}}
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"str": {"type": "integer"}, "dex": {"type": "integer"}, "con": {"type": "integer"}, "int": {"type": "integer"}, "wis": {"type": "integer"}, "cha": {"type": "integer"}}
+    },
+    "saving_throws": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"str": {"type": "boolean", "default": false}, "dex": {"type": "boolean", "default": false}, "con": {"type": "boolean", "default": false}, "int": {"type": "boolean", "default": false}, "wis": {"type": "boolean", "default": false}, "cha": {"type": "boolean", "default": false}}
+    },
+    "saves": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"str": {"type": "integer"}, "dex": {"type": "integer"}, "con": {"type": "integer"}, "int": {"type": "integer"}, "wis": {"type": "integer"}, "cha": {"type": "integer"}}
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"acrobatics": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "animal_handling": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "arcana": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "athletics": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "deception": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "history": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "insight": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "intimidation": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "investigation": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "medicine": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "nature": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "perception": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "performance": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "persuasion": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "religion": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "sleight_of_hand": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "stealth": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "survival": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}}
+    },
+    "expertise": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"acrobatics": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "animal_handling": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "arcana": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "athletics": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "deception": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "history": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "insight": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "intimidation": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "investigation": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "medicine": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "nature": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "perception": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "performance": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "persuasion": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "religion": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "sleight_of_hand": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "stealth": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}, "survival": {"type": "integer", "minimum": 0, "maximum": 1, "default": 0}}
+    },
+    "skill_bonus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"acrobatics": {"type": "integer"}, "animal_handling": {"type": "integer"}, "arcana": {"type": "integer"}, "athletics": {"type": "integer"}, "deception": {"type": "integer"}, "history": {"type": "integer"}, "insight": {"type": "integer"}, "intimidation": {"type": "integer"}, "investigation": {"type": "integer"}, "medicine": {"type": "integer"}, "nature": {"type": "integer"}, "perception": {"type": "integer"}, "performance": {"type": "integer"}, "persuasion": {"type": "integer"}, "religion": {"type": "integer"}, "sleight_of_hand": {"type": "integer"}, "stealth": {"type": "integer"}, "survival": {"type": "integer"}}
+    },
+    "senses": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"passive_perception": {"type": "integer"}, "darkvision": {"type": "integer"}}
+    },
+    "proficiencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"armor_light": {"type": "boolean", "default": false}, "armor_medium": {"type": "boolean", "default": false}, "armor_heavy": {"type": "boolean", "default": false}, "shields": {"type": "boolean", "default": false}, "weapons_simple": {"type": "boolean", "default": false}, "weapons_martial": {"type": "boolean", "default": false}, "class_notes": {"type": "string"}, "other": {"type": "string", "maxLength": 500}, "tools": {"type": "string", "maxLength": 300}, "languages": {"type": "string", "maxLength": 300}}
+    },
+    "combat": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"armor": {"type": "string", "enum": ["none", "padded", "leather", "studded_leather", "hide", "chain_shirt", "scale_mail", "breastplate", "half_plate", "ring_mail", "chain_mail", "splint", "plate"], "default": "none"}, "shield": {"type": "boolean", "default": false}, "ac_bonus": {"type": "integer", "minimum": -5, "maximum": 10, "default": 0}, "armor_class": {"type": "integer"}, "initiative": {"type": "integer"}, "speed": {"type": "integer"}, "hp_max": {"type": "integer"}, "hit_die": {"type": "integer"}, "hp_adjust": {"type": "integer", "minimum": -999, "maximum": 999, "default": 0}, "death_successes": {"type": "integer", "minimum": 0, "maximum": 3, "default": 0}, "death_failures": {"type": "integer", "minimum": 0, "maximum": 3, "default": 0}, "inspiration": {"type": "boolean", "default": false}, "attack": {"type": "object", "additionalProperties": false, "properties": {"melee": {"type": "integer"}, "ranged": {"type": "integer"}, "finesse": {"type": "integer"}, "spell": {"type": "integer"}}}}
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"hp": {"type": "integer", "minimum": 0, "maximum": 999, "default": 0}, "temp_hp": {"type": "integer", "minimum": 0, "maximum": 999, "default": 0}, "hit_dice_spent": {"type": "integer", "minimum": 0, "maximum": 20, "default": 0}, "slots_used": {"type": "object", "additionalProperties": false, "properties": {"l1": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}, "l2": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}, "l3": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}, "l4": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}, "l5": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}, "l6": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}, "l7": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}, "l8": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}, "l9": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}}}, "pact_used": {"type": "integer", "minimum": 0, "maximum": 4, "default": 0}}
+    },
+    "spellcasting": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"ability": {"type": "string"}, "modifier": {"type": "integer"}, "save_dc": {"type": "integer"}, "attack_bonus": {"type": "integer"}, "cantrips_known": {"type": "integer"}, "prepared": {"type": "integer"}, "pact_slots": {"type": "integer"}, "pact_slot_level": {"type": "integer"}, "slots": {"type": "object", "additionalProperties": false, "properties": {"l1": {"type": "integer"}, "l2": {"type": "integer"}, "l3": {"type": "integer"}, "l4": {"type": "integer"}, "l5": {"type": "integer"}, "l6": {"type": "integer"}, "l7": {"type": "integer"}, "l8": {"type": "integer"}, "l9": {"type": "integer"}}}}
+    },
+    "conditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"blinded": {"type": "boolean", "default": false}, "charmed": {"type": "boolean", "default": false}, "deafened": {"type": "boolean", "default": false}, "frightened": {"type": "boolean", "default": false}, "grappled": {"type": "boolean", "default": false}, "incapacitated": {"type": "boolean", "default": false}, "invisible": {"type": "boolean", "default": false}, "paralyzed": {"type": "boolean", "default": false}, "petrified": {"type": "boolean", "default": false}, "poisoned": {"type": "boolean", "default": false}, "prone": {"type": "boolean", "default": false}, "restrained": {"type": "boolean", "default": false}, "stunned": {"type": "boolean", "default": false}, "unconscious": {"type": "boolean", "default": false}, "exhaustion": {"type": "integer", "minimum": 0, "maximum": 6, "default": 0}}
+    },
+    "currency": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"cp": {"type": "integer", "minimum": 0, "maximum": 999999, "default": 0}, "sp": {"type": "integer", "minimum": 0, "maximum": 999999, "default": 0}, "ep": {"type": "integer", "minimum": 0, "maximum": 999999, "default": 0}, "gp": {"type": "integer", "minimum": 0, "maximum": 999999, "default": 0}, "pp": {"type": "integer", "minimum": 0, "maximum": 999999, "default": 0}}
+    },
+    "load": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"carried": {"type": "number"}, "capacity": {"type": "integer"}}
+    },
+    "computed": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"off_list_a": {"type": "integer"}, "off_list_b": {"type": "integer"}, "off_list_c": {"type": "integer"}, "caster_type": {"type": "string"}}
+    },
+    "attacks": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"}, "name": {"type": "string", "maxLength": 80}, "bonus": {"type": "string", "maxLength": 20}, "damage": {"type": "string", "maxLength": 40}, "damage_type": {"type": "string", "maxLength": 40}, "range": {"type": "string", "maxLength": 40}, "notes": {"type": "string", "maxLength": 200}}}
+    },
+    "inventory": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"}, "name": {"type": "string", "maxLength": 80}, "quantity": {"type": "integer", "minimum": 0, "maximum": 9999, "default": 1}, "weight": {"type": "number", "minimum": 0, "maximum": 10000}, "equipped": {"type": "boolean", "default": false}, "notes": {"type": "string", "maxLength": 200}}}
+    },
+    "spells": {
+      "type": "array",
+      "maxItems": 120,
+      "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"}, "name": {"type": "string", "maxLength": 80}, "level": {"type": "integer", "minimum": 0, "maximum": 9, "default": 0}, "school": {"type": "string", "enum": ["abjuration", "conjuration", "divination", "enchantment", "evocation", "illusion", "necromancy", "transmutation"]}, "prepared": {"type": "boolean", "default": false}, "concentration": {"type": "boolean", "default": false}, "ritual": {"type": "boolean", "default": false}, "notes": {"type": "string", "maxLength": 300}}}
+    },
+    "features": {
+      "type": "array",
+      "maxItems": 80,
+      "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"}, "name": {"type": "string", "maxLength": 80}, "source": {"type": "string", "enum": ["class", "subclass", "species", "background", "feat", "other"]}, "level": {"type": "integer", "minimum": 1, "maximum": 20, "default": 1}, "uses_max": {"type": "integer", "minimum": 0, "maximum": 99, "default": 0}, "uses_spent": {"type": "integer", "minimum": 0, "maximum": 99, "default": 0}, "notes": {"type": "string", "maxLength": 300}}}
+    },
+    "feats": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {"type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": {"id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"}, "name": {"type": "string", "maxLength": 80}, "category": {"type": "string", "maxLength": 40}, "notes": {"type": "string", "maxLength": 300}}}
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"personality": {"type": "string", "maxLength": 1000}, "ideals": {"type": "string", "maxLength": 500}, "bonds": {"type": "string", "maxLength": 500}, "flaws": {"type": "string", "maxLength": 500}, "appearance": {"type": "string", "maxLength": 1000}, "backstory": {"type": "string", "maxLength": 4000}, "notes": {"type": "string", "maxLength": 4000}}
+    }
+  }
+}

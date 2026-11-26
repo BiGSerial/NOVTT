@@ -1,0 +1,63 @@
+{
+  "description": "Invalid variations of presets/novtt-demo/demo-linhagens/1.0.0, each with the stable rule_id the engine must report. Authors and agents can use them to learn what the validator rejects. Each case applies JSON Pointer `add`/`replace` operations to one part of the package.",
+  "base": "demo-linhagens",
+  "cases": [
+    {
+      "id": "derived-cycle",
+      "explain": "Two derived values that depend on each other.",
+      "patch": [
+        { "op": "add", "part": "rules", "path": "/derived/-", "value": { "id": "a", "path": "/resources/resolve", "formula": { "derived": "b" } } },
+        { "op": "add", "part": "rules", "path": "/derived/-", "value": { "id": "b", "path": "/notes/secret", "formula": { "derived": "a" } } }
+      ],
+      "expect": "rules.derived_cycle"
+    },
+    {
+      "id": "unknown-reference",
+      "explain": "A formula reads a field that the sheet schema does not declare.",
+      "patch": [{ "op": "replace", "part": "rules", "path": "/derived/0/formula", "value": { "op": "add", "args": [{ "ref": "/attributes/physical/sorte" }, { "const": 3 }] } }],
+      "expect": "rules.unknown_target"
+    },
+    {
+      "id": "operator-not-allowed",
+      "explain": "Only allow-listed operators exist; there is no way to run code.",
+      "patch": [{ "op": "replace", "part": "rules", "path": "/derived/0/formula", "value": { "op": "exec", "args": [{ "const": "rm -rf /" }] } }],
+      "expect": "UNSUPPORTED_CAPABILITY"
+    },
+    {
+      "id": "effect-without-target",
+      "explain": "Effects modify declared derived values only.",
+      "patch": [{ "op": "replace", "part": "rules", "path": "/effects/0/target", "value": "speed" }],
+      "expect": "rules.unknown_derived"
+    },
+    {
+      "id": "choice-option-outside-enum",
+      "explain": "A choice option must be a value the schema accepts.",
+      "patch": [{ "op": "add", "part": "rules", "path": "/creation/choices/0/options/-", "value": { "value": "ocaso" } }],
+      "expect": "rules.option_not_in_enum"
+    },
+    {
+      "id": "pool-difficulty-outside-faces",
+      "explain": "A d10 pool cannot have difficulty 11.",
+      "patch": [{ "op": "replace", "part": "rules", "path": "/rolls/0/difficulty/max", "value": 11 }],
+      "expect": "rules.invalid_bounds"
+    },
+    {
+      "id": "budget-amount-reads-budget",
+      "explain": "A budget amount may read the sheet, but not budgets or derived values (no cycles through money).",
+      "patch": [{ "op": "replace", "part": "rules", "path": "/budgets/0/amount", "value": { "budget": "xp", "of": "granted" } }],
+      "expect": "formula.reference_not_allowed"
+    },
+    {
+      "id": "compendium-unknown-kind",
+      "explain": "Every compendium entry uses a kind declared in the preset taxonomy.",
+      "patch": [{ "op": "replace", "part": "compendium", "path": "/items/0/kind", "value": "race" }],
+      "expect": "compendium.unknown_kind"
+    },
+    {
+      "id": "compendium-dangling-mechanical-ref",
+      "explain": "Mechanical references must point at declared rule elements.",
+      "patch": [{ "op": "add", "part": "compendium", "path": "/items/0/mechanical_refs/-", "value": "effect:does_not_exist" }],
+      "expect": "compendium.unknown_mechanical_ref"
+    }
+  ]
+}

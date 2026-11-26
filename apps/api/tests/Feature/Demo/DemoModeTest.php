@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature\Demo;
 
 use App\Demo\DemoMode;
+use App\Demo\TableDemoSeeder;
 use App\Models\Campaign;
 use App\Models\CampaignCharacter;
+use App\Models\CampaignNpc;
+use App\Models\LiveState;
 use App\Models\PresetVersion;
+use App\Models\Roteiro;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 final class DemoModeTest extends TestCase
@@ -87,5 +92,35 @@ final class DemoModeTest extends TestCase
         $this->deleteJson('/api/dev/demo/session', [], self::ORIGIN)->assertNoContent();
         $this->postJson('/api/dev/demo/session', ['role' => 'master'], self::ORIGIN)->assertOk()->assertJsonPath('user.role', 'master');
         $this->getJson("/api/v1/campaigns/{$state['campaign_id']}/characters", self::ORIGIN)->assertOk();
+    }
+
+    public function test_table_demo_is_a_playable_session_world(): void
+    {
+        $this->enable();
+        $this->artisan('novtt:demo:seed')->assertSuccessful();
+        $campaign = Campaign::query()->where('name', TableDemoSeeder::CAMPAIGN_NAME)->sole();
+        $this->assertSame(5, CampaignCharacter::query()->where('campaign_id', $campaign->getKey())->where('status', 'approved')->count());
+        $this->assertSame(10, CampaignNpc::query()->where('campaign_id', $campaign->getKey())->count());
+
+        // The master starts the session from the roteiro and a player rolls a combination.
+        $this->postJson('/api/dev/demo/session', ['role' => 'master'], self::ORIGIN)->assertOk()->assertJsonPath('table_campaign_id', $campaign->getKey());
+        $roteiro = Roteiro::query()->where('campaign_id', $campaign->getKey())->sole();
+        $session = $this->postJson("/api/v1/campaigns/{$campaign->getKey()}/sessions", ['title' => 'Sessão 1', 'roteiro_id' => $roteiro->getKey()], self::ORIGIN + ['Idempotency-Key' => (string) Str::uuid()])->assertCreated();
+        $lyra = CampaignCharacter::query()->where('campaign_id', $campaign->getKey())->where('name', 'Lyra')->sole();
+        $request = $this->postJson("/api/v1/sessions/{$session->json('id')}/roll-requests", [
+            'campaign_character_id' => $lyra->getKey(), 'paths' => ['/attributes/agilidade', '/skills/furtividade'],
+            'dice' => ['faces' => 10, 'count_mode' => 'pool', 'reading' => 'successes', 'threshold' => 6, 'target' => 2],
+        ], self::ORIGIN)->assertCreated()->assertJsonPath('max_dice', 7);
+
+        $this->postJson('/api/dev/demo/session', ['role' => 'player'], self::ORIGIN)->assertOk()->assertJsonPath('user.role', 'player');
+        $this->app['auth']->forgetGuards();
+        $this->postJson("/api/v1/roll-requests/{$request->json('id')}/rolls", ['expected_revision' => 0], self::ORIGIN + ['Idempotency-Key' => (string) Str::uuid()])->assertCreated()->assertJsonCount(7, 'results');
+        $this->postJson('/api/dev/demo/session', ['role' => 'player3'], self::ORIGIN)->assertOk()->assertJsonPath('user.role', 'player3');
+        $this->postJson('/api/dev/demo/session', ['role' => 'player5'], self::ORIGIN)->assertOk()->assertJsonPath('user.role', 'player5');
+
+        // The roteiro carries a five-scene plot into the session, and characters start with items.
+        $session->assertJsonCount(5, 'plot.scenes')->assertJsonPath('plot.scenes.0.art', 'bridge')->assertJsonPath('plot.current', 0);
+        $tome = CampaignCharacter::query()->where('campaign_id', $campaign->getKey())->where('name', 'Tomé')->sole();
+        $this->assertSame('Remo de freixo', LiveState::query()->where('subject_id', $tome->getKey())->sole()->items[0]['label']);
     }
 }

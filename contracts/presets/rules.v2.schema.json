@@ -1,0 +1,1137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:novtt:contract:rules:2",
+  "title": "novtt.rules/2",
+  "description": "Declarative mechanics, superset of novtt.rules/1: budgets (fixed or formula amounts), phase costs (including formula costs), phase limits, structural dependencies, derived values, typed effects with stacking, n-ary constraints, creation steps and choices with prerequisites, progression tracks (level/milestone), resources, inventory capacity, roll declarations by generic strategy (sum, pool) and governance. Formulas are ASTs of the allow-listed operators documented in docs/presets/PRESET_MANUAL.md; JSON Schema only checks their outer shape, the engine checks the rest. No executable code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "budgets",
+    "costs"
+  ],
+  "properties": {
+    "contract": {
+      "const": "novtt.rules/2"
+    },
+    "budgets": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "kind": {
+            "enum": [
+              "initial",
+              "bonus",
+              "experience",
+              "other"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "initial_amount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000,
+            "default": 0
+          },
+          "amount": {
+            "$ref": "#/$defs/formula",
+            "description": "Formula for the starting amount (may read sheet values, e.g. a priority choice or a level). Overrides initial_amount."
+          }
+        }
+      }
+    },
+    "costs": {
+      "type": "array",
+      "maxItems": 256,
+      "description": "For a rated field change in a phase, the first matching rule (in order) prices each increment.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "phase",
+          "budget",
+          "targets",
+          "model"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "phase": {
+            "$ref": "#/$defs/phase"
+          },
+          "budget": {
+            "$ref": "#/$defs/id"
+          },
+          "targets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 128,
+            "items": {
+              "$ref": "#/$defs/target"
+            }
+          },
+          "model": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "amount"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "fixed_per_dot"
+                  },
+                  "amount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "multiplier"
+                ],
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "current_rating_multiplier",
+                      "new_rating_multiplier"
+                    ]
+                  },
+                  "multiplier": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "when_zero": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000,
+                    "description": "Cost of the first dot when the current rating is zero."
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type",
+                  "formula"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "formula"
+                  },
+                  "formula": {
+                    "$ref": "#/$defs/formula",
+                    "description": "Cost of one increment; variables `current` and `new`."
+                  }
+                }
+              }
+            ]
+          },
+          "free_dots": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "default": 0,
+            "description": "Dots per target that cost nothing in this phase (e.g. a printed starting dot)."
+          },
+          "applies_when": {
+            "$ref": "#/$defs/formula",
+            "description": "Boolean formula over the sheet and the variables `current` / `new` (the increment being priced). When false, this rule does not price that increment and the next rule for the target is tried (e.g. priority points only up to 3, then freebies)."
+          },
+          "refund_on_decrease": {
+            "type": "boolean",
+            "default": true,
+            "description": "false: lowering a rating paid by this rule removes the paid levels without refunding them (losses such as degeneration)."
+          }
+        }
+      }
+    },
+    "phase_limits": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "phase",
+          "targets",
+          "max"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "phase": {
+            "$ref": "#/$defs/phase"
+          },
+          "targets": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 128,
+            "items": {
+              "$ref": "#/$defs/target"
+            }
+          },
+          "max": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "maxItems": 256,
+      "description": "Directed structural dependencies: a non-empty/non-zero value at `path` requires every path in `requires` to be set. Must be acyclic.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "path",
+          "requires"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "path": {
+            "$ref": "#/$defs/pointer"
+          },
+          "requires": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "items": {
+              "$ref": "#/$defs/pointer"
+            }
+          }
+        }
+      }
+    },
+    "derived": {
+      "type": "array",
+      "maxItems": 256,
+      "description": "Values computed by the engine and never stored as authority. Writes to `path` are rejected for every actor.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "path",
+          "formula"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "path": {
+            "$ref": "#/$defs/pointer"
+          },
+          "formula": {
+            "$ref": "#/$defs/formula"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        }
+      }
+    },
+    "effects": {
+      "type": "array",
+      "maxItems": 256,
+      "description": "Typed modifiers of derived values. `add` effects stack by `stack_group` (sum or highest); the highest-priority `set` overrides the result.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "target",
+          "value"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "target": {
+            "$ref": "#/$defs/id"
+          },
+          "mode": {
+            "enum": [
+              "add",
+              "set"
+            ],
+            "default": "add"
+          },
+          "value": {
+            "$ref": "#/$defs/formula"
+          },
+          "when": {
+            "$ref": "#/$defs/formula"
+          },
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "collection"
+            ],
+            "properties": {
+              "collection": {
+                "$ref": "#/$defs/pointer"
+              },
+              "where": {
+                "$ref": "#/$defs/formula"
+              }
+            }
+          },
+          "stack_group": {
+            "$ref": "#/$defs/id"
+          },
+          "stacking": {
+            "enum": [
+              "sum",
+              "highest"
+            ],
+            "default": "sum"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": -1000,
+            "maximum": 1000,
+            "default": 0
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "duration": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "unit"
+            ],
+            "properties": {
+              "unit": {
+                "enum": [
+                  "permanent",
+                  "scene",
+                  "session",
+                  "rounds",
+                  "manual"
+                ]
+              },
+              "amount": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              }
+            }
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "maxItems": 256,
+      "description": "N-ary mechanical restrictions evaluated on the whole candidate sheet.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "assert",
+          "paths"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "phase": {
+            "enum": [
+              "creation",
+              "advancement",
+              "always"
+            ],
+            "default": "always"
+          },
+          "assert": {
+            "$ref": "#/$defs/formula"
+          },
+          "paths": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 32,
+            "items": {
+              "$ref": "#/$defs/pointer"
+            }
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        }
+      }
+    },
+    "creation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "steps": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "paths": {
+                "type": "array",
+                "maxItems": 128,
+                "items": {
+                  "$ref": "#/$defs/target"
+                }
+              },
+              "required": {
+                "type": "array",
+                "maxItems": 64,
+                "items": {
+                  "$ref": "#/$defs/pointer"
+                }
+              },
+              "complete_when": {
+                "$ref": "#/$defs/formula"
+              }
+            }
+          }
+        },
+        "choices": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "path",
+              "options"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "path": {
+                "$ref": "#/$defs/pointer"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "options": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 256,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": [
+                        "string",
+                        "integer",
+                        "boolean"
+                      ]
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120
+                    },
+                    "requires": {
+                      "$ref": "#/$defs/formula"
+                    },
+                    "compendium_id": {
+                      "type": "string",
+                      "maxLength": 128
+                    },
+                    "fixes": {
+                      "type": "array",
+                      "maxItems": 16,
+                      "description": "While this option is selected, each path holds the given value (exact) or at least it (at_least). Held levels are given, not bought; leaving the option returns the field to its default.",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "path",
+                          "value"
+                        ],
+                        "properties": {
+                          "path": {
+                            "$ref": "#/$defs/pointer"
+                          },
+                          "value": {
+                            "$ref": "#/$defs/formula"
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 120
+                          },
+                          "mode": {
+                            "enum": [
+                              "exact",
+                              "at_least"
+                            ],
+                            "default": "exact",
+                            "description": "exact: the field holds the value; at_least: the field is raised to the value and may go higher (levels up to it are free)."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "progression": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tracks": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "path",
+              "measure",
+              "thresholds"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "path": {
+                "$ref": "#/$defs/pointer"
+              },
+              "measure": {
+                "$ref": "#/$defs/formula"
+              },
+              "thresholds": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 100,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100000000
+                }
+              },
+              "max_step": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20,
+                "default": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "path",
+          "max"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "path": {
+            "$ref": "#/$defs/pointer"
+          },
+          "max": {
+            "$ref": "#/$defs/formula"
+          },
+          "min": {
+            "type": "integer",
+            "minimum": -1000,
+            "maximum": 1000,
+            "default": 0
+          },
+          "recovery": {
+            "enum": [
+              "scene",
+              "session",
+              "rest",
+              "manual"
+            ],
+            "default": "manual"
+          }
+        }
+      }
+    },
+    "inventory": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "collection"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "collection": {
+            "$ref": "#/$defs/pointer"
+          },
+          "weight_field": {
+            "$ref": "#/$defs/id"
+          },
+          "quantity_field": {
+            "$ref": "#/$defs/id"
+          },
+          "equipped_field": {
+            "$ref": "#/$defs/id"
+          },
+          "capacity": {
+            "$ref": "#/$defs/formula"
+          }
+        }
+      }
+    },
+    "rolls": {
+      "type": "array",
+      "maxItems": 128,
+      "description": "Roll declarations resolved by a generic strategy. Requests may only pick declared inputs and bounded parameters.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "strategy"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "strategy": {
+            "enum": [
+              "sum",
+              "pool",
+              "keep"
+            ]
+          },
+          "inputs": {
+            "type": "object",
+            "maxProperties": 4,
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]{0,31}$"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "targets"
+              ],
+              "properties": {
+                "targets": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 32,
+                  "items": {
+                    "$ref": "#/$defs/target"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "strategy",
+              "dice"
+            ],
+            "properties": {
+              "id": true,
+              "label": true,
+              "inputs": true,
+              "strategy": {
+                "const": "sum"
+              },
+              "dice": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 64,
+                "description": "Dice expression, e.g. 1d20 or 2d6+1."
+              },
+              "modifier": {
+                "$ref": "#/$defs/formula"
+              },
+              "target": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "min",
+                  "max"
+                ],
+                "properties": {
+                  "default": {
+                    "type": "integer"
+                  },
+                  "min": {
+                    "type": "integer"
+                  },
+                  "max": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "critical_at_least": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "$ref": "#/$defs/formula"
+                  }
+                ],
+                "description": "A face, or a formula over the sheet (e.g. a wider critical range from a feature)."
+              },
+              "fumble_at_most": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "$ref": "#/$defs/formula"
+                  }
+                ],
+                "description": "A face, or a formula over the sheet (e.g. a wider critical range from a feature)."
+              },
+              "edge": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "extra_dice": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "default": 1
+                  },
+                  "force": {
+                    "$ref": "#/$defs/formula",
+                    "description": "Advantage imposed by the rules: formula returning \"advantage\", \"disadvantage\" or \"normal\". Combined with the requested edge; advantage and disadvantage cancel."
+                  }
+                }
+              },
+              "faces": {
+                "$ref": "#/$defs/formula",
+                "description": "Optional: faces of the first dice group from a formula (e.g. the class hit die). Must be 2–1000."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "strategy",
+              "count",
+              "faces",
+              "difficulty"
+            ],
+            "properties": {
+              "id": true,
+              "label": true,
+              "inputs": true,
+              "strategy": {
+                "const": "pool"
+              },
+              "count": {
+                "$ref": "#/$defs/formula"
+              },
+              "faces": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 1000
+              },
+              "difficulty": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "min",
+                  "max"
+                ],
+                "properties": {
+                  "default": {
+                    "type": "integer"
+                  },
+                  "min": {
+                    "type": "integer"
+                  },
+                  "max": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "min",
+                  "max"
+                ],
+                "properties": {
+                  "default": {
+                    "type": "integer"
+                  },
+                  "min": {
+                    "type": "integer"
+                  },
+                  "max": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "cancel_at_most": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "bonus_at_least": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "bonus_successes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10
+              },
+              "explode_at_least": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "botch_at_most": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000
+              },
+              "count_modifier": {
+                "$ref": "#/$defs/formula",
+                "description": "Added to the dice count (result floored at 0), computed on the server from the sheet (e.g. a wound penalty)."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "strategy",
+              "count",
+              "faces"
+            ],
+            "description": "Roll `count` dice of `faces` and keep the `keep` highest or lowest (mode from a formula: \"highest\" | \"lowest\"); total = kept dice + modifier. E.g. a d20 per point of an attribute keeping the best, or the worst of two at 0.",
+            "properties": {
+              "id": true,
+              "label": true,
+              "inputs": true,
+              "strategy": {
+                "const": "keep"
+              },
+              "count": {
+                "$ref": "#/$defs/formula"
+              },
+              "faces": {
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 1000
+              },
+              "keep": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20,
+                "default": 1
+              },
+              "keep_mode": {
+                "$ref": "#/$defs/formula"
+              },
+              "modifier": {
+                "$ref": "#/$defs/formula"
+              },
+              "target": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "min",
+                  "max"
+                ],
+                "properties": {
+                  "default": {
+                    "type": "integer"
+                  },
+                  "min": {
+                    "type": "integer"
+                  },
+                  "max": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "critical_at_least": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "$ref": "#/$defs/formula"
+                  }
+                ],
+                "description": "A face, or a formula over the sheet (e.g. a wider critical range from a feature)."
+              },
+              "fumble_at_most": {
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  {
+                    "$ref": "#/$defs/formula"
+                  }
+                ],
+                "description": "A face, or a formula over the sheet (e.g. a wider critical range from a feature)."
+              }
+            }
+          }
+        ]
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lock_during_session": {
+          "type": "boolean",
+          "default": true,
+          "description": "While the campaign has an active live session, players cannot submit sheet proposals for its characters."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$"
+    },
+    "phase": {
+      "enum": [
+        "creation",
+        "advancement"
+      ]
+    },
+    "pointer": {
+      "type": "string",
+      "maxLength": 512,
+      "pattern": "^(/([^/~_]|~[01])([^/~]|~[01])*)+$"
+    },
+    "target": {
+      "type": "string",
+      "maxLength": 512,
+      "description": "A JSON Pointer, or a pointer ending in /* matching direct children.",
+      "pattern": "^(/([^/~_]|~[01])([^/~]|~[01])*)+(/\\*)?$"
+    },
+    "formula": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 5,
+      "description": "Formula AST node; structure checked by the engine (FormulaChecker).",
+      "properties": {
+        "op": {
+          "enum": [
+            "add",
+            "subtract",
+            "multiply",
+            "divide",
+            "floor",
+            "min",
+            "max",
+            "compare",
+            "and",
+            "or",
+            "not",
+            "if",
+            "lookup",
+            "sum",
+            "count"
+          ]
+        },
+        "args": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/formula"
+          }
+        },
+        "const": {
+          "type": [
+            "string",
+            "integer",
+            "number",
+            "boolean",
+            "null"
+          ]
+        },
+        "ref": {
+          "$ref": "#/$defs/pointer"
+        },
+        "derived": {
+          "$ref": "#/$defs/id"
+        },
+        "budget": {
+          "$ref": "#/$defs/id"
+        },
+        "of": {
+          "enum": [
+            "balance",
+            "granted",
+            "spent",
+            "amount"
+          ]
+        },
+        "var": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "item": {
+          "$ref": "#/$defs/id"
+        },
+        "cmp": {
+          "enum": [
+            "eq",
+            "ne",
+            "lt",
+            "le",
+            "gt",
+            "ge"
+          ]
+        },
+        "key": {
+          "$ref": "#/$defs/formula"
+        },
+        "default": {
+          "$ref": "#/$defs/formula"
+        },
+        "table": {
+          "type": "object",
+          "maxProperties": 128
+        },
+        "steps": {
+          "type": "array",
+          "maxItems": 128
+        },
+        "collection": {
+          "$ref": "#/$defs/pointer"
+        },
+        "value": {
+          "$ref": "#/$defs/formula"
+        },
+        "where": {
+          "$ref": "#/$defs/formula"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

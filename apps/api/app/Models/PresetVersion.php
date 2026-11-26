@@ -11,8 +11,9 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Novtt\Engine\Presets\PublicationGate;
 
-#[Fillable(['definition_id', 'version', 'status', 'content_hash', 'manifest', 'sheet_schema', 'sheet_ui', 'rules', 'validation_report', 'engine_version', 'imported_by', 'published_at'])]
+#[Fillable(['definition_id', 'version', 'status', 'content_hash', 'manifest', 'sheet_schema', 'sheet_ui', 'rules', 'validation_report', 'engine_version', 'imported_by', 'published_at', 'rights_status', 'rights_updated_at', 'compendium'])]
 class PresetVersion extends Model
 {
     use HasFactory, HasUuids;
@@ -30,6 +31,8 @@ class PresetVersion extends Model
             'rules' => JsonDocumentCast::class,
             'validation_report' => JsonDocumentCast::class,
             'published_at' => 'immutable_datetime',
+            'rights_updated_at' => 'immutable_datetime',
+            'compendium' => JsonDocumentCast::class,
         ];
     }
 
@@ -49,6 +52,20 @@ class PresetVersion extends Model
     public function sheetSchemaArray(): array
     {
         return json_decode((string) $this->getRawOriginal('sheet_schema'), true, 64, JSON_THROW_ON_ERROR);
+    }
+
+    /** Whether the version may appear in (and be pinned from) the public catalogue. */
+    public function isPubliclyListable(): bool
+    {
+        return PublicationGate::publiclyListable($this->status->value, $this->rights_status);
+    }
+
+    /** The rules revision declared by a manifest/2 (null for manifest/1). */
+    public function rulesRevision(): ?string
+    {
+        $revision = $this->manifest['rules_revision'] ?? null;
+
+        return is_string($revision) ? $revision : null;
     }
 
     public function isCanonical(): bool

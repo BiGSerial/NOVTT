@@ -1,0 +1,165 @@
+{
+  "contract": "novtt.compendium/1",
+  "taxonomy": [
+    {
+      "kind": "vocation",
+      "labels": {
+        "pt-BR": "Vocação"
+      }
+    },
+    {
+      "kind": "specialization",
+      "labels": {
+        "pt-BR": "Especialização"
+      },
+      "parent_kind": "vocation"
+    }
+  ],
+  "items": [
+    {
+      "canonical_id": "vocation.lamina",
+      "kind": "vocation",
+      "labels": {
+        "pt-BR": "Lâmina"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "novtt-demo-heroico",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:vocation:lamina"
+      ],
+      "content_hash": "f8ba9b8990ddce6815e6d35b7cc20372b0bae0f8360afdcce3f3ec87cf8694ef"
+    },
+    {
+      "canonical_id": "vocation.arcano",
+      "kind": "vocation",
+      "labels": {
+        "pt-BR": "Arcano"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "novtt-demo-heroico",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:vocation:arcano"
+      ],
+      "content_hash": "ff95a6b6646bc8b1d32b80b394d41055bb782339fdcbea0d22ae500dd535d593"
+    },
+    {
+      "canonical_id": "vocation.andarilho",
+      "kind": "vocation",
+      "labels": {
+        "pt-BR": "Andarilho"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "novtt-demo-heroico",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:vocation:andarilho"
+      ],
+      "content_hash": "bbc083ffc4e98912233e225a42be2938a51394cd778ae4e605f39192f0c22e29"
+    },
+    {
+      "canonical_id": "specialization.duelista",
+      "kind": "specialization",
+      "parent_id": "vocation.lamina",
+      "labels": {
+        "pt-BR": "Duelista"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "novtt-demo-heroico",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:specialization:duelista"
+      ],
+      "content_hash": "4606a095dc8ec90f927148991d7a6e8467f4b0d0363912562247fe89b24cf645"
+    },
+    {
+      "canonical_id": "specialization.baluarte",
+      "kind": "specialization",
+      "parent_id": "vocation.lamina",
+      "labels": {
+        "pt-BR": "Baluarte"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "novtt-demo-heroico",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:specialization:baluarte",
+        "effect:bulwark_hp"
+      ],
+      "content_hash": "c80be8f69bee545bfe4e136115629279f2c498212709ac80d6aca1bd60c6ec09"
+    },
+    {
+      "canonical_id": "specialization.runista",
+      "kind": "specialization",
+      "parent_id": "vocation.arcano",
+      "labels": {
+        "pt-BR": "Runista"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "novtt-demo-heroico",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:specialization:runista"
+      ],
+      "content_hash": "8fc1365350ea9314a0c7af8d03db037e3362dc098aa8cbfcdb244fb1c953ffc3"
+    },
+    {
+      "canonical_id": "specialization.batedor",
+      "kind": "specialization",
+      "parent_id": "vocation.andarilho",
+      "labels": {
+        "pt-BR": "Batedor"
+      },
+      "rules_revision": "original-2026",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "novtt-demo-heroico",
+        "source_authenticity": "original",
+        "rights_status": "approved",
+        "license_id": "NOVTT-original",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:specialization:batedor"
+      ],
+      "content_hash": "603449e1228fa96d6538f3798df29c9bf21188112da60c11e981fd60d31eab25"
+    }
+  ]
+}

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['campaign_id', 'library_character_id', 'player_user_id', 'custodian_user_id', 'preset_version_id', 'name', 'status', 'sheet', 'sheet_revision', 'approved_by', 'approved_at', 'archived_at'])]
+#[Fillable(['campaign_id', 'library_character_id', 'player_user_id', 'custodian_user_id', 'preset_version_id', 'name', 'status', 'sheet', 'sheet_revision', 'approved_by', 'approved_at', 'archived_at', 'portrait_image_id'])]
 class CampaignCharacter extends Model
 {
     use HasFactory, HasUuids;

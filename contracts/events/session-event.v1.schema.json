@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://novtt.invalid/contracts/events/session-event.v1.schema.json",
+  "title": "novtt.session-event/1",
+  "description": "One authoritative session event (SPEC-MVP-002 LT-03). Delivered on a private Reverb channel as event 'session.event' and by GET /sessions/{id}/events. seq is strictly increasing per session; a participant only sees the events of its audiences, so gaps are normal: refetch after the last seen seq when unsure. Consumers MUST deduplicate by seq.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "session_id", "seq", "type", "occurred_at", "payload"],
+  "properties": {
+    "contract": { "const": "novtt.session-event/1" },
+    "session_id": { "type": "string", "format": "uuid" },
+    "seq": { "type": "integer", "minimum": 1 },
+    "type": {
+      "enum": [
+        "session.status",
+        "roll.requested", "roll.request_updated", "roll.resolved", "roll.revealed",
+        "suggestion.created", "suggestion.resolved",
+        "live.updated", "compass.updated", "initiative.updated",
+        "note.saved", "note.deleted",
+        "whisper.received",
+        "clue.saved", "clue.revealed",
+        "npc.revealed",
+        "plot.updated", "stage.updated", "portrait.updated", "atmosphere.updated", "clocks.updated", "places.updated", "item_offer.created", "item_offer.resolved", "map.updated", "map.view"
+      ]
+    },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "payload": { "type": "object", "description": "Shape by type: roll.* → OfficialRoll / RollRequest (openapi.v1.yaml); whisper.received → Whisper; note.* → MasterNote; clue.* → Clue; live.updated → {subject, live}; compass.updated → {revision, compass}; initiative.updated → {revision, initiative}; session.status → {status, title}; npc.revealed → RevealedNpc; plot.updated → {revision, plot, compass} (master); stage.updated → {revision, stage} (table); atmosphere.updated → Atmosphere (table); places.updated → Places (table); item_offer.* → ItemOffer (master, giver, receiver); map.updated → SessionMap (master); map.view → SessionMap as players see it (table); clocks.updated → {clocks: PlayerClock[]} (one player, only when that player's visible clocks changed); portrait.updated → {kind, id, portrait_image_id}; suggestion.* → RollSuggestion or {id, status, roll_request_id}." }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "demo-heroico 1.0.0 sheet",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 120
+        }
+      }
+    },
+    "calling": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vocation": {
+          "type": "string",
+          "enum": [
+            "lamina",
+            "arcano",
+            "andarilho"
+          ]
+        },
+        "specialization": {
+          "type": "string",
+          "enum": [
+            "duelista",
+            "baluarte",
+            "runista",
+            "batedor"
+          ]
+        }
+      }
+    },
+    "abilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "forca": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 18,
+          "default": 8
+        },
+        "agilidade": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 18,
+          "default": 8
+        },
+        "mente": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 18,
+          "default": 8
+        },
+        "presenca": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 18,
+          "default": 8
+        }
+      }
+    },
+    "modifiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "forca": {
+          "type": "integer"
+        },
+        "agilidade": {
+          "type": "integer"
+        },
+        "mente": {
+          "type": "integer"
+        },
+        "presenca": {
+          "type": "integer"
+        }
+      }
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 1
+        },
+        "proficiency": {
+          "type": "integer"
+        },
+        "max_hp": {
+          "type": "integer"
+        }
+      }
+    },
+    "talents": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "golpe_firme": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0
+        },
+        "passo_leve": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0
+        },
+        "foco_arcano": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200,
+          "default": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "note": "Exemplo conceitual de regras autorais, não é preset V20 nem formato final validado pela engine.",
+  "creation": {
+    "attribute_groups": [
+      {"id": "physical", "points": 7},
+      {"id": "social", "points": 5},
+      {"id": "mental", "points": 3}
+    ],
+    "attribute_minimum": 1
+  },
+  "roll": {"type": "dice_pool", "die": "d10", "count_formula": {"op": "add", "args": [{"ref": "attribute"}, {"ref": "skill"}]}, "threshold": 6},
+  "progression": {
+    "type": "point_buy",
+    "currency": "xp",
+    "cost_formula": {"op": "multiply", "args": [{"ref": "trait.current"}, {"const": 4}]},
+    "requires_gm_approval": true
+  }
+}

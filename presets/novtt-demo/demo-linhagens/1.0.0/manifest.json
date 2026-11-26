@@ -1,0 +1,52 @@
+{
+  "contract": "novtt.preset-manifest/2",
+  "family_id": "novtt-demo",
+  "variant_id": "demo-linhagens",
+  "version": "1.0.0",
+  "display_name": "Linhagens (demonstração autoral)",
+  "locale": "pt-BR",
+  "rules_revision": "original-2026",
+  "source_version": "demo-1",
+  "errata_reference": null,
+  "license": {
+    "identifier": "NOVTT-original",
+    "source_url": "https://github.com/BiGSerial/NOVTT",
+    "rights_status": "approved",
+    "requires_attribution": false,
+    "attribution": "Conteúdo original da equipe NOVTT.",
+    "consulted_at": "2026-11-23",
+    "policy_version": null
+  },
+  "provenance": {
+    "source_authenticity": "original",
+    "authors": [
+      "Equipe NOVTT"
+    ],
+    "notes": "Mecânicas autorais de reserva de d10 e compra por experiência, criadas para provar a engine. Nenhum nome, texto ou tabela de terceiros."
+  },
+  "capabilities": {
+    "character_creation": true,
+    "character_progression": true,
+    "dice_resolution": true,
+    "inventory": true,
+    "resource_tracking": true,
+    "effects": true
+  },
+  "coverage": "playable_core",
+  "limitations": [
+    "Demonstração: poucos atributos e habilidades.",
+    "Sem regras de combate detalhadas."
+  ],
+  "publication": {
+    "public": true
+  },
+  "engine": {
+    "min_version": "0.2.0"
+  },
+  "files": {
+    "sheet_schema": "sheet.schema.json",
+    "sheet_ui": "sheet.ui.json",
+    "rules": "rules.json",
+    "compendium": "compendium.json"
+  }
+}

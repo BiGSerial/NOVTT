@@ -7,8 +7,10 @@ import { DEFAULT_SKIN, parseSkin, type DiceSkin } from './skins'
  * official rolls); the seed only shapes the throw. Same record ⇒ same animation on every client.
  */
 export const CONTRACT = 'novtt.dice-roll-animation/1'
-/** Physical dice on the table per roll (a d100 uses two). */
+/** Physical dice on the table per local roll (a d100 uses two). */
 export const MAX_DICE = 6
+/** Physical dice per official roll (a master's pool can reach 12 dice; SPEC-MVP-002). */
+export const MAX_OFFICIAL_DICE = 12
 
 export const ROLL_TYPES = [...DIE_TYPES, 'd100'] as const
 export type RollType = (typeof ROLL_TYPES)[number]
@@ -17,7 +19,8 @@ export const ROLL_SIDES: Record<RollType, number> = { d4: 4, d6: 6, d8: 8, d10: 
 export interface RollAnimationRecord {
   contract: typeof CONTRACT
   id: string
-  origin: 'local_unofficial'
+  /** local_unofficial: crypto RNG in this browser; official: faces committed by the server. */
+  origin: 'local_unofficial' | 'official'
   seed: number
   dice: { type: RollType; result: number }[]
   skin: DiceSkin

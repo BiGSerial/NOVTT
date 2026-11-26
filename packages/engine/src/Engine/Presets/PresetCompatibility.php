@@ -16,7 +16,7 @@ use Novtt\Engine\Validation\ValidationResult;
  */
 final class PresetCompatibility
 {
-    public const ENGINE_VERSION = '0.1.0';
+    public const ENGINE_VERSION = '0.3.0';
 
     private const ALLOWED_SCHEMA_KEYWORDS = [
         '$schema', 'title', 'description', 'type', 'properties', 'additionalProperties', 'required',
@@ -29,9 +29,10 @@ final class PresetCompatibility
      * @param array<string, mixed> $manifest novtt.preset-manifest/1
      * @param array<string, mixed> $sheetSchema
      * @param array<string, mixed> $sheetUi novtt.sheet-ui/1
-     * @param array<string, mixed> $rules novtt.rules/1
+     * @param array<string, mixed> $rules novtt.rules/1 or novtt.rules/2
+     * @param array<string, mixed>|null $compendium novtt.compendium/1
      */
-    public function check(array $manifest, array $sheetSchema, array $sheetUi, array $rules): ValidationResult
+    public function check(array $manifest, array $sheetSchema, array $sheetUi, array $rules, ?array $compendium = null): ValidationResult
     {
         $issues = [];
         if (version_compare((string) $manifest['engine']['min_version'], self::ENGINE_VERSION, '>')) {
@@ -48,8 +49,74 @@ final class PresetCompatibility
         $schema = new SchemaNavigator($sheetSchema);
         $this->checkUi($schema, $sheetUi, $issues);
         $this->checkRules($schema, $rules, $issues);
+        if (($rules['contract'] ?? null) === 'novtt.rules/2') {
+            array_push($issues, ...RulesCompatibility::check($schema, $rules));
+        }
+        if ($compendium !== null) {
+            $this->checkCompendium($rules, $compendium, $issues);
+        }
+        $declaresCompendium = isset($manifest['files']['compendium']);
+        if ($declaresCompendium !== ($compendium !== null)) {
+            $issues[] = $this->error('package.compendium_mismatch', ['/manifest/files']);
+        }
 
         return new ValidationResult($issues);
+    }
+
+    /**
+     * Compendium entries are data linked to rules: ids are unique, `kind` is declared in the
+     * taxonomy (so the interface shows the preset's own category names), and every
+     * `mechanical_refs` entry points at a declared rule element.
+     *
+     * @param array<string, mixed> $rules
+     * @param array<string, mixed> $compendium
+     * @param list<ValidationIssue> $issues
+     */
+    private function checkCompendium(array $rules, array $compendium, array &$issues): void
+    {
+        $kinds = [];
+        foreach ($compendium['taxonomy'] ?? [] as $k => $kind) {
+            if (isset($kinds[$kind['kind']])) {
+                $issues[] = $this->error('compendium.duplicate_kind', ["/compendium/taxonomy/{$k}"], ['kind' => $kind['kind']]);
+            }
+            $kinds[$kind['kind']] = true;
+        }
+        $known = [];
+        $prefixes = ['derived' => 'derived', 'effects' => 'effect', 'constraints' => 'constraint', 'rolls' => 'roll', 'costs' => 'cost', 'resources' => 'resource'];
+        foreach ($prefixes as $group => $prefix) {
+            foreach ($rules[$group] ?? [] as $element) {
+                $known[$prefix . ':' . $element['id']] = true;
+            }
+        }
+        foreach ($rules['progression']['tracks'] ?? [] as $track) {
+            $known['track:' . $track['id']] = true;
+        }
+        foreach ($rules['creation']['choices'] ?? [] as $choice) {
+            foreach ($choice['options'] as $option) {
+                $known['choice:' . $choice['id'] . ':' . (is_bool($option['value']) ? ($option['value'] ? 'true' : 'false') : (string) $option['value'])] = true;
+            }
+        }
+        $ids = [];
+        $attributions = (array) ($compendium['attributions'] ?? []);
+        foreach ($compendium['items'] ?? [] as $i => $item) {
+            $at = "/compendium/items/{$i}";
+            if (isset($ids[$item['canonical_id']])) {
+                $issues[] = $this->error('compendium.duplicate_id', [$at], ['canonical_id' => $item['canonical_id']]);
+            }
+            $ids[$item['canonical_id']] = true;
+            if (!isset($kinds[$item['kind']])) {
+                $issues[] = $this->error('compendium.unknown_kind', [$at . '/kind'], ['kind' => $item['kind']]);
+            }
+            foreach ($item['mechanical_refs'] ?? [] as $r => $ref) {
+                if (!isset($known[$ref])) {
+                    $issues[] = $this->error('compendium.unknown_mechanical_ref', ["{$at}/mechanical_refs/{$r}"], ['ref' => $ref]);
+                }
+            }
+            $ref = $item['source']['attribution_ref'] ?? null;
+            if ($ref !== null && !isset($attributions[$ref])) {
+                $issues[] = $this->error('compendium.unknown_attribution', [$at . '/source/attribution_ref'], ['ref' => $ref]);
+            }
+        }
     }
 
     /** @param list<ValidationIssue> $issues */

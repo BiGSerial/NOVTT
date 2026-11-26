@@ -1,0 +1,55 @@
+{
+  "contract": "novtt.preset-manifest/2",
+  "family_id": "dnd-5e",
+  "variant_id": "srd-5-1",
+  "version": "0.1.0",
+  "display_name": "Quinta edição — SRD 5.1 (regras de 2014, compatível com 5E)",
+  "locale": "pt-BR",
+  "rules_revision": "2014",
+  "source_version": "SRD 5.1",
+  "errata_reference": null,
+  "license": {
+    "identifier": "CC-BY-4.0",
+    "source_url": "https://www.dndbeyond.com/srd",
+    "rights_status": "approved",
+    "requires_attribution": true,
+    "attribution": "This work includes material taken from the System Reference Document 5.1 (“SRD 5.1”) by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode.\n\nThis work includes material from the System Reference Document 5.2.1 (“SRD 5.2.1”) by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.",
+    "consulted_at": "2026-11-24",
+    "policy_version": "SRD 5.1"
+  },
+  "provenance": {
+    "source_authenticity": "licensed",
+    "authors": [
+      "Equipe NOVTT"
+    ],
+    "notes": "Regras e listas do System Reference Document 5.1 (CC BY 4.0). A tabela de compra de pontos vem do SRD 5.2.1 (CC BY 4.0, atribuído também), porque o SRD 5.1 não traz regras de geração de atributos; pendente de confirmação do dono do projeto. Alterações em relação ao SRD: rótulos traduzidos para pt-BR pela equipe NOVTT (o nome original fica no compêndio), tabelas reorganizadas como fórmulas, nenhum texto descritivo copiado. Sem logotipos nem alegação de afiliação."
+  },
+  "capabilities": {
+    "character_creation": true,
+    "character_progression": true,
+    "dice_resolution": true,
+    "resource_tracking": true,
+    "effects": true
+  },
+  "coverage": "playable_core",
+  "limitations": [
+    "Apenas o conteúdo do SRD 5.1: uma subclasse por classe, 9 raças e 4 sub-raças, o antecedente Acólito e o talento Agarrador.",
+    "O SRD 5.1 não define a geração de atributos: a compra de pontos usa a tabela do SRD 5.2.1 (pendente); o mestre pode definir os valores.",
+    "Multiclasse não é modelada: uma classe por personagem.",
+    "Características de classe, subclasse e raça são registradas pelo jogador; só as de efeito numérico fixo são calculadas.",
+    "Exaustão e condições que impõem desvantagem não alteram as rolagens automaticamente.",
+    "PV por nível usam o valor fixo da classe; rolagens de PV entram como ajuste do mestre."
+  ],
+  "publication": {
+    "public": true
+  },
+  "engine": {
+    "min_version": "0.3.0"
+  },
+  "files": {
+    "sheet_schema": "sheet.schema.json",
+    "sheet_ui": "sheet.ui.json",
+    "rules": "rules.json",
+    "compendium": "compendium.json"
+  }
+}

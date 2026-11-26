@@ -1,7 +1,24 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import '@fontsource/cinzel/latin-500.css'
+import '@fontsource/cinzel/latin-600.css'
+import '@fontsource/cinzel/latin-700.css'
+import '@fontsource/alegreya/latin-400.css'
+import '@fontsource/alegreya/latin-400-italic.css'
+import '@fontsource/alegreya/latin-700.css'
+import '@fontsource/alegreya-sans/latin-400.css'
+import '@fontsource/alegreya-sans/latin-500.css'
+import '@fontsource/alegreya-sans/latin-700.css'
+import '@fontsource/alegreya-sans/latin-800.css'
 import './styles/base.css'
+import './styles/table.css'
+import './styles/narrative.css'
+import './styles/campaign.css'
+import './styles/atmosphere.css'
+import './styles/shell.css'
+import { installPlatform } from './live/platform'
 
+installPlatform()
 createApp(App).mount('#app')
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {

@@ -1,0 +1,991 @@
+{
+  "contract": "novtt.sheet-ui/1",
+  "default_access": "read_only",
+  "sections": [
+    {
+      "id": "identity",
+      "tab": "Ficha",
+      "label": "Identidade",
+      "access": "editable",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/identity/name",
+          "label": "Nome",
+          "widget": "text"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/player",
+          "label": "Jogador",
+          "widget": "text"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/chronicle",
+          "label": "Crônica",
+          "widget": "text"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/concept",
+          "label": "Conceito",
+          "widget": "text"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/nature",
+          "label": "Natureza",
+          "widget": "text"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/demeanor",
+          "label": "Comportamento",
+          "widget": "text"
+        },
+        {
+          "kind": "field",
+          "path": "/identity/sire",
+          "label": "Senhor",
+          "widget": "text"
+        }
+      ]
+    },
+    {
+      "id": "clan",
+      "tab": "Ficha",
+      "label": "Clã",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/clan/clan",
+          "label": "Clã",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/clan/sect",
+          "label": "Seita",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/generation",
+          "label": "Geração · a conferir",
+          "widget": "integer",
+          "access": "read_only"
+        }
+      ]
+    },
+    {
+      "id": "priorities",
+      "tab": "Ficha",
+      "label": "Prioridades",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/priorities/physical",
+          "label": "Atributos físicos",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/priorities/social",
+          "label": "Atributos sociais",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/priorities/mental",
+          "label": "Atributos mentais",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/priorities/talents",
+          "label": "Talentos",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/priorities/skills",
+          "label": "Perícias",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/priorities/knowledges",
+          "label": "Conhecimentos",
+          "widget": "select"
+        }
+      ]
+    },
+    {
+      "id": "attributes-physical",
+      "tab": "Ficha",
+      "label": "Atributos físicos",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/attributes/physical/strength",
+          "label": "Força",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/physical/dexterity",
+          "label": "Destreza",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/physical/stamina",
+          "label": "Vigor",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "attributes-social",
+      "tab": "Ficha",
+      "label": "Atributos sociais",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/attributes/social/charisma",
+          "label": "Carisma",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/social/manipulation",
+          "label": "Manipulação",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/social/appearance",
+          "label": "Aparência",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "attributes-mental",
+      "tab": "Ficha",
+      "label": "Atributos mentais",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/attributes/mental/perception",
+          "label": "Percepção",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/mental/intelligence",
+          "label": "Inteligência",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/attributes/mental/wits",
+          "label": "Raciocínio",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "resources",
+      "tab": "Ficha",
+      "label": "Recursos",
+      "access": "editable",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/resources/blood",
+          "label": "Pontos de sangue",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/resources/willpower",
+          "label": "Força de Vontade atual",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/resources/bashing",
+          "label": "Dano por contusão",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/resources/lethal",
+          "label": "Dano letal",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/resources/aggravated",
+          "label": "Dano agravado",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "derived",
+      "tab": "Ficha",
+      "label": "Valores calculados",
+      "access": "read_only",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/derived/blood_pool_max",
+          "label": "Reserva de sangue máxima · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/blood_per_turn",
+          "label": "Sangue por turno · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/trait_max",
+          "label": "Máximo de características · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/initiative",
+          "label": "Iniciativa (Destreza + Raciocínio) · a conferir",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/damage_total",
+          "label": "Níveis de vitalidade marcados",
+          "widget": "integer"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/health_state",
+          "label": "Vitalidade · a conferir",
+          "widget": "text"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/wound_penalty",
+          "label": "Penalidade de ferimento · a conferir",
+          "widget": "integer"
+        }
+      ]
+    },
+    {
+      "id": "abilities-talents",
+      "tab": "Habilidades",
+      "label": "Talentos",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/abilities/talents/alertness",
+          "label": "Prontidão",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/talents/athletics",
+          "label": "Esportes",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/talents/awareness",
+          "label": "Percepção do sobrenatural",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/talents/brawl",
+          "label": "Briga",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/talents/empathy",
+          "label": "Empatia",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/talents/expression",
+          "label": "Expressão",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/talents/intimidation",
+          "label": "Intimidação",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/talents/leadership",
+          "label": "Liderança",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/talents/streetwise",
+          "label": "Manha",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/talents/subterfuge",
+          "label": "Lábia",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "abilities-skills",
+      "tab": "Habilidades",
+      "label": "Perícias",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/abilities/skills/animal_ken",
+          "label": "Empatia com animais",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/skills/crafts",
+          "label": "Ofícios",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/skills/drive",
+          "label": "Condução",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/skills/etiquette",
+          "label": "Etiqueta",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/skills/firearms",
+          "label": "Armas de fogo",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/skills/larceny",
+          "label": "Furto",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/skills/melee",
+          "label": "Armas brancas",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/skills/performance",
+          "label": "Performance",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/skills/stealth",
+          "label": "Furtividade",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/skills/survival",
+          "label": "Sobrevivência",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "abilities-knowledges",
+      "tab": "Habilidades",
+      "label": "Conhecimentos",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/academics",
+          "label": "Acadêmicos",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/computer",
+          "label": "Computação",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/finance",
+          "label": "Finanças",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/investigation",
+          "label": "Investigação",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/law",
+          "label": "Direito",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/medicine",
+          "label": "Medicina",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/occult",
+          "label": "Ocultismo",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/politics",
+          "label": "Política",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/science",
+          "label": "Ciências",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/abilities/knowledges/technology",
+          "label": "Tecnologia",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "specialties",
+      "tab": "Habilidades",
+      "label": "Especializações",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/specialties",
+          "label": "Especializações",
+          "max_items": 40,
+          "item_fields": [
+            {
+              "field": "ability",
+              "label": "Característica",
+              "widget": "text"
+            },
+            {
+              "field": "name",
+              "label": "Especialização",
+              "widget": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "disciplines",
+      "tab": "Disciplinas",
+      "label": "Disciplinas",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/disciplines/animalism",
+          "label": "Animalismo",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/auspex",
+          "label": "Auspícios",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/celerity",
+          "label": "Rapidez",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/chimerstry",
+          "label": "Quimerismo",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/dementation",
+          "label": "Demência",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/dominate",
+          "label": "Dominação",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/fortitude",
+          "label": "Fortitude",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/necromancy",
+          "label": "Necromancia",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/obfuscate",
+          "label": "Ofuscação",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/obtenebration",
+          "label": "Tenebrosidade",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/potence",
+          "label": "Potência",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/presence",
+          "label": "Presença",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/protean",
+          "label": "Metamorfose",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/quietus",
+          "label": "Quietus",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/serpentis",
+          "label": "Serpentis",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/thaumaturgy",
+          "label": "Taumaturgia",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/disciplines/vicissitude",
+          "label": "Vicissitude",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "discipline-paths",
+      "tab": "Disciplinas",
+      "label": "Trilhas de Disciplina",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/discipline_paths",
+          "label": "Trilhas",
+          "max_items": 20,
+          "item_fields": [
+            {
+              "field": "name",
+              "label": "Trilha",
+              "widget": "text"
+            },
+            {
+              "field": "discipline",
+              "label": "Disciplina",
+              "widget": "text"
+            },
+            {
+              "field": "rating",
+              "label": "Nível",
+              "widget": "dot_rating"
+            },
+            {
+              "field": "note",
+              "label": "Anotação do jogador",
+              "widget": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rituals",
+      "tab": "Disciplinas",
+      "label": "Rituais",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/rituals",
+          "label": "Rituais",
+          "max_items": 40,
+          "item_fields": [
+            {
+              "field": "name",
+              "label": "Ritual",
+              "widget": "text"
+            },
+            {
+              "field": "level",
+              "label": "Nível",
+              "widget": "integer"
+            },
+            {
+              "field": "note",
+              "label": "Anotação do jogador",
+              "widget": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backgrounds",
+      "tab": "Vantagens",
+      "label": "Antecedentes",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/backgrounds/allies",
+          "label": "Aliados",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/alternate_identity",
+          "label": "Identidade alternativa",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/contacts",
+          "label": "Contatos",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/domain",
+          "label": "Domínio",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/fame",
+          "label": "Fama",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/generation",
+          "label": "Geração",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/herd",
+          "label": "Rebanho",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/influence",
+          "label": "Influência",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/mentor",
+          "label": "Mentor",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/resources",
+          "label": "Recursos",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/retainers",
+          "label": "Lacaios",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/backgrounds/status",
+          "label": "Status",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "virtues",
+      "tab": "Vantagens",
+      "label": "Virtudes",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/morality/first_virtue",
+          "label": "Primeira virtude",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/morality/second_virtue",
+          "label": "Segunda virtude",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/virtues/conscience",
+          "label": "Consciência / Convicção",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/virtues/self_control",
+          "label": "Autocontrole / Instinto",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/virtues/courage",
+          "label": "Coragem",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "morality",
+      "tab": "Vantagens",
+      "label": "Humanidade / Senda",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/morality/path",
+          "label": "Senda",
+          "widget": "select"
+        },
+        {
+          "kind": "field",
+          "path": "/derived/morality_base",
+          "label": "Base pelas virtudes · a conferir",
+          "widget": "integer",
+          "access": "read_only"
+        },
+        {
+          "kind": "field",
+          "path": "/morality/rating",
+          "label": "Humanidade / Senda",
+          "widget": "dot_rating"
+        },
+        {
+          "kind": "field",
+          "path": "/willpower/permanent",
+          "label": "Força de Vontade",
+          "widget": "dot_rating"
+        }
+      ]
+    },
+    {
+      "id": "merits-flaws",
+      "tab": "Vantagens",
+      "label": "Qualidades e Defeitos · a conferir",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/merits_flaws",
+          "label": "Qualidades e Defeitos",
+          "max_items": 30,
+          "item_fields": [
+            {
+              "field": "name",
+              "label": "Nome",
+              "widget": "text"
+            },
+            {
+              "field": "kind",
+              "label": "Tipo",
+              "widget": "select"
+            },
+            {
+              "field": "points",
+              "label": "Pontos",
+              "widget": "integer"
+            },
+            {
+              "field": "note",
+              "label": "Anotação do jogador",
+              "widget": "textarea"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "weapons",
+      "tab": "Itens",
+      "label": "Armas",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/weapons",
+          "label": "Armas",
+          "max_items": 20,
+          "item_fields": [
+            {
+              "field": "name",
+              "label": "Arma",
+              "widget": "text"
+            },
+            {
+              "field": "difficulty",
+              "label": "Dificuldade",
+              "widget": "integer"
+            },
+            {
+              "field": "damage",
+              "label": "Dano",
+              "widget": "text"
+            },
+            {
+              "field": "range",
+              "label": "Alcance",
+              "widget": "text"
+            },
+            {
+              "field": "note",
+              "label": "Anotação",
+              "widget": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inventory",
+      "tab": "Itens",
+      "label": "Equipamento",
+      "access": "approval_required",
+      "elements": [
+        {
+          "kind": "collection",
+          "path": "/inventory",
+          "label": "Itens",
+          "max_items": 40,
+          "item_fields": [
+            {
+              "field": "name",
+              "label": "Item",
+              "widget": "text"
+            },
+            {
+              "field": "quantity",
+              "label": "Quantidade",
+              "widget": "integer"
+            },
+            {
+              "field": "note",
+              "label": "Anotação",
+              "widget": "text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "description",
+      "tab": "Detalhes",
+      "label": "Descrição",
+      "access": "editable",
+      "elements": [
+        {
+          "kind": "field",
+          "path": "/description/appearance",
+          "label": "Aparência",
+          "widget": "textarea"
+        },
+        {
+          "kind": "field",
+          "path": "/description/haven",
+          "label": "Refúgio",
+          "widget": "textarea"
+        },
+        {
+          "kind": "field",
+          "path": "/description/history",
+          "label": "Histórico",
+          "widget": "textarea"
+        },
+        {
+          "kind": "field",
+          "path": "/description/notes",
+          "label": "Anotações",
+          "widget": "textarea"
+        }
+      ]
+    }
+  ]
+}

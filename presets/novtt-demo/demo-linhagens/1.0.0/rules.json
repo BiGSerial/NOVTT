@@ -1,0 +1,679 @@
+{
+  "contract": "novtt.rules/2",
+  "budgets": [
+    {
+      "id": "physical",
+      "kind": "initial",
+      "label": "Pontos de atributos físicos",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/priorities/physical"
+        },
+        "table": {
+          "primary": 7,
+          "secondary": 5,
+          "tertiary": 3
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "social",
+      "kind": "initial",
+      "label": "Pontos de atributos sociais",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/priorities/social"
+        },
+        "table": {
+          "primary": 7,
+          "secondary": 5,
+          "tertiary": 3
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "mental",
+      "kind": "initial",
+      "label": "Pontos de atributos mentais",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/priorities/mental"
+        },
+        "table": {
+          "primary": 7,
+          "secondary": 5,
+          "tertiary": 3
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "skill_points",
+      "kind": "initial",
+      "label": "Pontos de habilidade",
+      "initial_amount": 6
+    },
+    {
+      "id": "xp",
+      "kind": "experience",
+      "label": "Experiência",
+      "initial_amount": 0
+    }
+  ],
+  "costs": [
+    {
+      "id": "physical_creation",
+      "phase": "creation",
+      "budget": "physical",
+      "targets": [
+        "/attributes/physical/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "social_creation",
+      "phase": "creation",
+      "budget": "social",
+      "targets": [
+        "/attributes/social/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "mental_creation",
+      "phase": "creation",
+      "budget": "mental",
+      "targets": [
+        "/attributes/mental/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "skill_creation",
+      "phase": "creation",
+      "budget": "skill_points",
+      "targets": [
+        "/skills/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "physical_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/attributes/physical/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 4
+      }
+    },
+    {
+      "id": "social_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/attributes/social/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 4
+      }
+    },
+    {
+      "id": "mental_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/attributes/mental/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 4
+      }
+    },
+    {
+      "id": "skill_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/skills/*"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ],
+              "cmp": "eq"
+            },
+            {
+              "const": 3
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 2
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "phase_limits": [
+    {
+      "id": "creation_skill_cap",
+      "phase": "creation",
+      "targets": [
+        "/skills/*"
+      ],
+      "max": 3
+    }
+  ],
+  "dependencies": [],
+  "derived": [
+    {
+      "id": "vitality",
+      "path": "/derived/vitality",
+      "label": "Vitalidade",
+      "formula": {
+        "op": "add",
+        "args": [
+          {
+            "ref": "/attributes/physical/vigor"
+          },
+          {
+            "const": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "initiative",
+      "path": "/derived/initiative",
+      "label": "Iniciativa",
+      "formula": {
+        "op": "add",
+        "args": [
+          {
+            "ref": "/attributes/physical/destreza"
+          },
+          {
+            "ref": "/attributes/mental/raciocinio"
+          }
+        ]
+      }
+    },
+    {
+      "id": "load_capacity",
+      "path": "/derived/load_capacity",
+      "label": "Carga máxima",
+      "formula": {
+        "op": "multiply",
+        "args": [
+          {
+            "ref": "/attributes/physical/forca"
+          },
+          {
+            "const": 5
+          }
+        ]
+      }
+    }
+  ],
+  "effects": [
+    {
+      "id": "equipped_initiative",
+      "target": "initiative",
+      "mode": "add",
+      "label": "Objeto em uso",
+      "source": {
+        "collection": "/inventory",
+        "where": {
+          "item": "equipped"
+        }
+      },
+      "value": {
+        "item": "initiative_bonus"
+      },
+      "stack_group": "trinkets",
+      "stacking": "highest",
+      "duration": {
+        "unit": "permanent"
+      }
+    },
+    {
+      "id": "mist_initiative",
+      "target": "initiative",
+      "mode": "add",
+      "label": "Dom: sussurro",
+      "when": {
+        "op": "compare",
+        "args": [
+          {
+            "ref": "/origin/gift"
+          },
+          {
+            "const": "sussurro"
+          }
+        ],
+        "cmp": "eq"
+      },
+      "value": {
+        "const": 1
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "id": "distinct_priorities",
+      "phase": "creation",
+      "paths": [
+        "/priorities/physical",
+        "/priorities/social",
+        "/priorities/mental"
+      ],
+      "label": "Cada prioridade uma vez",
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "compare",
+                "args": [
+                  {
+                    "ref": "/priorities/physical"
+                  },
+                  {
+                    "const": ""
+                  }
+                ],
+                "cmp": "eq"
+              },
+              {
+                "op": "compare",
+                "args": [
+                  {
+                    "ref": "/priorities/social"
+                  },
+                  {
+                    "const": ""
+                  }
+                ],
+                "cmp": "eq"
+              },
+              {
+                "op": "compare",
+                "args": [
+                  {
+                    "ref": "/priorities/mental"
+                  },
+                  {
+                    "const": ""
+                  }
+                ],
+                "cmp": "eq"
+              }
+            ]
+          },
+          {
+            "op": "and",
+            "args": [
+              {
+                "op": "compare",
+                "args": [
+                  {
+                    "ref": "/priorities/physical"
+                  },
+                  {
+                    "ref": "/priorities/social"
+                  }
+                ],
+                "cmp": "ne"
+              },
+              {
+                "op": "compare",
+                "args": [
+                  {
+                    "ref": "/priorities/physical"
+                  },
+                  {
+                    "ref": "/priorities/mental"
+                  }
+                ],
+                "cmp": "ne"
+              },
+              {
+                "op": "compare",
+                "args": [
+                  {
+                    "ref": "/priorities/social"
+                  },
+                  {
+                    "ref": "/priorities/mental"
+                  }
+                ],
+                "cmp": "ne"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "creation": {
+    "steps": [
+      {
+        "id": "identity",
+        "label": "Identidade",
+        "paths": [
+          "/identity/*"
+        ],
+        "required": [
+          "/identity/name"
+        ]
+      },
+      {
+        "id": "origin",
+        "label": "Origem",
+        "paths": [
+          "/origin/*"
+        ],
+        "required": [
+          "/origin/lineage",
+          "/origin/gift"
+        ]
+      },
+      {
+        "id": "attributes",
+        "label": "Atributos e habilidades",
+        "paths": [
+          "/priorities/*",
+          "/attributes/physical/*",
+          "/attributes/social/*",
+          "/attributes/mental/*",
+          "/skills/*"
+        ],
+        "required": [
+          "/priorities/physical",
+          "/priorities/social",
+          "/priorities/mental"
+        ],
+        "complete_when": {
+          "op": "and",
+          "args": [
+            {
+              "op": "compare",
+              "args": [
+                {
+                  "budget": "physical",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ],
+              "cmp": "eq"
+            },
+            {
+              "op": "compare",
+              "args": [
+                {
+                  "budget": "social",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ],
+              "cmp": "eq"
+            },
+            {
+              "op": "compare",
+              "args": [
+                {
+                  "budget": "mental",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ],
+              "cmp": "eq"
+            },
+            {
+              "op": "compare",
+              "args": [
+                {
+                  "budget": "skill_points",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ],
+              "cmp": "eq"
+            }
+          ]
+        }
+      },
+      {
+        "id": "review",
+        "label": "Revisão",
+        "paths": [
+          "/resources/*"
+        ],
+        "complete_when": {
+          "const": true
+        }
+      }
+    ],
+    "choices": [
+      {
+        "id": "lineage",
+        "path": "/origin/lineage",
+        "label": "Linhagem",
+        "options": [
+          {
+            "value": "aurora",
+            "label": "Aurora",
+            "compendium_id": "lineage.aurora"
+          },
+          {
+            "value": "brasa",
+            "label": "Brasa",
+            "compendium_id": "lineage.brasa"
+          },
+          {
+            "value": "nevoa",
+            "label": "Névoa",
+            "compendium_id": "lineage.nevoa"
+          }
+        ]
+      },
+      {
+        "id": "gift",
+        "path": "/origin/gift",
+        "label": "Dom",
+        "options": [
+          {
+            "value": "voo_curto",
+            "label": "Voo curto",
+            "compendium_id": "gift.voo_curto",
+            "requires": {
+              "op": "compare",
+              "args": [
+                {
+                  "ref": "/origin/lineage"
+                },
+                {
+                  "const": "aurora"
+                }
+              ],
+              "cmp": "eq"
+            }
+          },
+          {
+            "value": "pele_de_pedra",
+            "label": "Pele de pedra",
+            "compendium_id": "gift.pele_de_pedra",
+            "requires": {
+              "op": "compare",
+              "args": [
+                {
+                  "ref": "/origin/lineage"
+                },
+                {
+                  "const": "brasa"
+                }
+              ],
+              "cmp": "eq"
+            }
+          },
+          {
+            "value": "sussurro",
+            "label": "Sussurro",
+            "compendium_id": "gift.sussurro"
+          }
+        ]
+      }
+    ]
+  },
+  "resources": [
+    {
+      "id": "vitality",
+      "label": "Vitalidade",
+      "path": "/resources/vitality_current",
+      "max": {
+        "derived": "vitality"
+      },
+      "min": 0,
+      "recovery": "rest"
+    },
+    {
+      "id": "resolve",
+      "label": "Determinação",
+      "path": "/resources/resolve",
+      "max": {
+        "const": 10
+      },
+      "min": 0,
+      "recovery": "session"
+    }
+  ],
+  "inventory": [
+    {
+      "id": "belongings",
+      "collection": "/inventory",
+      "weight_field": "weight",
+      "quantity_field": "quantity",
+      "equipped_field": "equipped",
+      "capacity": {
+        "derived": "load_capacity"
+      }
+    }
+  ],
+  "rolls": [
+    {
+      "id": "test",
+      "label": "Teste (atributo + habilidade)",
+      "strategy": "pool",
+      "inputs": {
+        "attribute": {
+          "targets": [
+            "/attributes/physical/*",
+            "/attributes/social/*",
+            "/attributes/mental/*"
+          ]
+        },
+        "skill": {
+          "targets": [
+            "/skills/*"
+          ]
+        }
+      },
+      "count": {
+        "op": "add",
+        "args": [
+          {
+            "var": "attribute"
+          },
+          {
+            "var": "skill"
+          }
+        ]
+      },
+      "faces": 10,
+      "difficulty": {
+        "default": 6,
+        "min": 2,
+        "max": 10
+      },
+      "required": {
+        "default": 1,
+        "min": 1,
+        "max": 10
+      },
+      "cancel_at_most": 1,
+      "bonus_at_least": 10,
+      "bonus_successes": 1,
+      "botch_at_most": 1
+    },
+    {
+      "id": "initiative",
+      "label": "Iniciativa",
+      "strategy": "sum",
+      "dice": "1d10",
+      "modifier": {
+        "derived": "initiative"
+      }
+    }
+  ],
+  "governance": {
+    "lock_during_session": true
+  }
+}

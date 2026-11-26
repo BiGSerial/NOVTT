@@ -13,6 +13,7 @@ use App\Http\Problems\ApiProblem;
 use App\Http\Resources\CampaignPresenter;
 use App\Models\Campaign;
 use App\Models\CampaignMember;
+use App\Models\GameSession;
 use App\Models\PresetVersion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -40,10 +41,110 @@ final class CampaignController extends ApiController
             ->orderBy('campaign_id')
             ->cursorPaginate($limit);
 
+        $ids = array_map(static fn (CampaignMember $m): string => $m->campaign_id, $page->items());
+        $summaries = $this->summaries($ids);
+
         return new JsonResponse([
-            'data' => array_map(static fn (CampaignMember $m): array => CampaignPresenter::toArray($m->campaign, $m->role->value), $page->items()),
+            'data' => array_map(static fn (CampaignMember $m): array => CampaignPresenter::toArray($m->campaign, $m->role->value) + ($summaries[$m->campaign_id] ?? []), $page->items()),
             'next_cursor' => $page->nextCursor()?->encode(),
         ]);
+    }
+
+    /**
+     * The master moves the campaign to another version of the same preset (e.g. 0.1.0 → 0.1.1).
+     * Characters keep their version until each one is adapted (owner or master), so nothing is
+     * rewritten behind anyone's back.
+     */
+    public function upgradePreset(Request $request, string $campaignId): JsonResponse
+    {
+        $actor = $this->actor($request);
+        $data = $this->input($request, ['preset_version_id' => ['required', 'uuid'], 'expected_revision' => ['required', 'integer', 'min:1']]);
+        $campaign = DB::transaction(function () use ($actor, $campaignId, $data): Campaign {
+            $campaign = Campaign::query()->lockForUpdate()->find($campaignId) ?? throw ApiProblem::notFound();
+            $role = CampaignMember::query()->where(['campaign_id' => $campaignId, 'user_id' => $actor->getKey(), 'status' => MemberStatus::Active])->value('role');
+            if ($role === null) {
+                throw ApiProblem::notFound();
+            }
+            if ((is_string($role) ? $role : $role->value) !== CampaignRole::Master->value) {
+                throw new ApiProblem(403, 'campaign.master_only');
+            }
+            if ($campaign->status !== CampaignStatus::Active) {
+                throw ApiProblem::conflict('campaign.archived');
+            }
+            if ($campaign->revision !== (int) $data['expected_revision']) {
+                throw ApiProblem::conflict('campaign.revision_mismatch', $campaign->revision);
+            }
+            $current = PresetVersion::query()->findOrFail($campaign->preset_version_id);
+            $target = PresetVersion::query()->find($data['preset_version_id']);
+            if ($target === null || $target->definition_id !== $current->definition_id || !Gate::forUser($actor)->allows('pin', $target) || $target->getKey() === $current->getKey()) {
+                throw ApiProblem::validation(new ValidationResult([new ValidationIssue('campaign.preset_upgrade_unavailable', Severity::Error, [], ['/preset_version_id'])]), 'campaign.preset_upgrade_unavailable');
+            }
+            $campaign->fill(['preset_version_id' => $target->getKey(), 'revision' => $campaign->revision + 1])->save();
+            $this->audit->record($actor, $campaignId, 'campaign.preset_upgraded', $campaign, ['from_version_id' => $current->getKey(), 'to_version_id' => $target->getKey()]);
+            $this->audit->emit($campaignId, 'campaign.updated', $campaign, ['campaign_id' => $campaignId, 'revision' => $campaign->revision]);
+
+            return $campaign;
+        });
+
+        return new JsonResponse(CampaignPresenter::toArray($campaign, CampaignRole::Master->value));
+    }
+
+    /** Newer versions of the campaign's preset the master may move to. */
+    public function presetUpgrades(Request $request, string $campaignId): JsonResponse
+    {
+        $actor = $this->actor($request);
+        $campaign = Campaign::query()->find($campaignId);
+        $role = $campaign === null ? null : CampaignMember::query()->where(['campaign_id' => $campaignId, 'user_id' => $actor->getKey(), 'status' => MemberStatus::Active])->value('role');
+        if ($role === null) {
+            throw ApiProblem::notFound();
+        }
+        $current = PresetVersion::query()->findOrFail($campaign->preset_version_id);
+        $versions = PresetVersion::query()->where('definition_id', $current->definition_id)->whereKeyNot($current->getKey())->get()
+            ->filter(fn (PresetVersion $v): bool => version_compare($v->version, $current->version, '>') && Gate::forUser($actor)->allows('pin', $v))
+            ->sortBy(fn (PresetVersion $v): string => $v->version, SORT_NATURAL)->values();
+
+        return new JsonResponse(['current' => ['id' => $current->getKey(), 'version' => $current->version], 'data' => $versions->map(static fn (PresetVersion $v): array => ['id' => $v->getKey(), 'version' => $v->version])->all()]);
+    }
+
+    /**
+     * Who masters each campaign, how many play and the latest session, in three queries for the
+     * whole page (no N+1). Only display names of fellow members: no e-mails.
+     *
+     * @param list<string> $ids
+     * @return array<string, array<string, mixed>>
+     */
+    private function summaries(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+        $out = array_fill_keys($ids, ['masters' => [], 'players_count' => 0, 'last_session' => null]);
+        $members = CampaignMember::query()->join('users', 'users.id', '=', 'campaign_members.user_id')
+            ->whereIn('campaign_members.campaign_id', $ids)->where('campaign_members.status', MemberStatus::Active)
+            ->orderBy('users.name')
+            ->get(['campaign_members.campaign_id', 'campaign_members.role', 'campaign_members.user_id', 'users.name']);
+        foreach ($members as $m) {
+            $role = is_string($m->role) ? $m->role : $m->role->value;
+            if ($role === CampaignRole::Master->value) {
+                $out[$m->campaign_id]['masters'][] = ['user_id' => $m->user_id, 'name' => $m->name];
+            } else {
+                $out[$m->campaign_id]['players_count']++;
+            }
+        }
+        $latest = GameSession::query()->whereIn('campaign_id', $ids)
+            ->select(['campaign_id', 'title', 'status', 'started_at', 'ended_at'])
+            ->whereIn('id', GameSession::query()->selectRaw('DISTINCT ON (campaign_id) id')->whereIn('campaign_id', $ids)->orderBy('campaign_id')->orderByDesc('started_at'))
+            ->get();
+        foreach ($latest as $session) {
+            $out[$session->campaign_id]['last_session'] = [
+                'title' => $session->title,
+                'status' => $session->status,
+                'started_at' => $session->started_at?->format(DATE_RFC3339_EXTENDED),
+                'ended_at' => $session->ended_at?->format(DATE_RFC3339_EXTENDED),
+            ];
+        }
+
+        return $out;
     }
 
     public function store(Request $request, Idempotency $idempotency): JsonResponse

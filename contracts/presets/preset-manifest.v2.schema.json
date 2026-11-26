@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:novtt:contract:preset-manifest:2",
+  "title": "novtt.preset-manifest/2",
+  "description": "Identity, rules revision, source/errata, licence and rights status, provenance, capabilities, coverage and file list of one immutable preset version. Carries no rules. `version` is the technical version of the encoding (SemVer), distinct from `rules_revision` (edition/revision of the game) and `source_version` (document or errata consulted). See ADR 0012.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "family_id", "variant_id", "version", "display_name", "locale", "rules_revision", "license", "provenance", "capabilities", "coverage", "publication", "engine", "files"],
+  "properties": {
+    "contract": { "const": "novtt.preset-manifest/2" },
+    "family_id": { "$ref": "#/$defs/slug", "description": "Technical grouping for the catalogue. Never a code branch." },
+    "variant_id": { "$ref": "#/$defs/slug", "description": "Immutable preset identity inside the family, e.g. one edition/revision." },
+    "version": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?$"
+    },
+    "display_name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "locale": { "type": "string", "pattern": "^[a-z]{2}(-[A-Z]{2})?$" },
+    "rules_revision": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "source_version": { "type": ["string", "null"], "maxLength": 120 },
+    "errata_reference": { "type": ["string", "null"], "maxLength": 200 },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "source_url", "rights_status", "consulted_at"],
+      "properties": {
+        "identifier": { "type": "string", "minLength": 1, "maxLength": 64, "description": "SPDX-like id, e.g. CC-BY-4.0 or NOVTT-original." },
+        "source_url": { "type": "string", "format": "uri", "maxLength": 500 },
+        "rights_status": { "enum": ["draft", "rights_review", "approved", "quarantined", "published", "retired"] },
+        "requires_attribution": { "type": "boolean", "description": "Overrides the default (true for CC-BY*)." },
+        "attribution": { "type": "string", "maxLength": 4000, "description": "Exact attribution statement required by the licence, copied verbatim." },
+        "consulted_at": { "type": "string", "format": "date", "description": "Date the licence/policy text was consulted." },
+        "policy_version": { "type": ["string", "null"], "maxLength": 120 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_authenticity", "authors"],
+      "properties": {
+        "source_authenticity": { "enum": ["official", "licensed", "community", "original"] },
+        "authors": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "type": "string", "minLength": 1, "maxLength": 120 } },
+        "notes": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "character_creation": { "type": "boolean" },
+        "character_progression": { "type": "boolean" },
+        "dice_resolution": { "type": "boolean" }
+      },
+      "additionalProperties": { "type": "boolean" },
+      "required": ["character_creation", "character_progression", "dice_resolution"],
+      "maxProperties": 32
+    },
+    "coverage": { "enum": ["schema_only", "character_creation", "progression", "playable_core", "full_licensed_scope"] },
+    "limitations": { "type": "array", "maxItems": 50, "items": { "type": "string", "minLength": 1, "maxLength": 300 } },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public"],
+      "properties": { "public": { "type": "boolean" } }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min_version"],
+      "properties": { "min_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" } }
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sheet_schema", "sheet_ui", "rules"],
+      "properties": {
+        "sheet_schema": { "const": "sheet.schema.json" },
+        "sheet_ui": { "const": "sheet.ui.json" },
+        "rules": { "const": "rules.json" },
+        "compendium": { "const": "compendium.json" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "publication": { "properties": { "public": { "const": true } }, "required": ["public"] } } },
+      "then": { "properties": { "license": { "properties": { "rights_status": { "enum": ["approved", "published"] } } } } }
+    }
+  ],
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" }
+  }
+}

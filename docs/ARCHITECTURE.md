@@ -44,6 +44,16 @@ A master creates a session; a player joins from Android; the player requests a r
 - Persistence: PostgreSQL only (partial unique indexes, JSONB, row locks, append-only triggers). Domain tables and invariants: `docs/development/domain-model.md`.
 - Authentication: Sanctum (ADR 0009); every `/api/v1` route requires an authenticated actor and policies are default-deny.
 
+## Live table (SPEC-MVP-002)
+
+- `apps/api/app/Live`: session access by role, the session event stream (`SessionStream`, the
+  realtime outbox: gap-free `seq` under the session row lock, audience table / master / one user),
+  roll requests and the PostgreSQL `OfficialRollStore`, snapshot filtering per participant.
+- Delivery: events are committed first, then a queued job (Redis) broadcasts them on private Reverb
+  channels; `novtt:events:relay` retries anything pending. Clients reconcile with
+  `GET /sessions/{id}/events?after=` and deduplicate by `seq`.
+- Lock order inside a session command: session row, then the specific row (request, note, clue).
+
 ## Security
 
 Never run arbitrary PHP, JavaScript or shell from preset definitions. Enforce per-campaign authorization, strict schemas, rate limits, and audit trails. Use secure random number generation for official dice rolls.

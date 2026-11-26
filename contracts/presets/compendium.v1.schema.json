@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:novtt:contract:compendium:1",
+  "title": "novtt.compendium/1",
+  "description": "Versioned catalogue entries (lineages, classes, clans, powers, spells, creatures, conditions...) linked to rule elements, with provenance and rights per entry. `kind` values come from the preset's own taxonomy, never from the engine. Short functional labels only: no rulebook prose. See ADR 0012.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "taxonomy", "items"],
+  "properties": {
+    "contract": { "const": "novtt.compendium/1" },
+    "taxonomy": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "labels"],
+        "properties": {
+          "kind": { "$ref": "#/$defs/id" },
+          "labels": { "$ref": "#/$defs/labels" },
+          "parent_kind": { "$ref": "#/$defs/id", "description": "e.g. a subclass kind whose parent is a class kind." }
+        }
+      }
+    },
+    "attributions": {
+      "type": "object",
+      "maxProperties": 32,
+      "propertyNames": { "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+      "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 4000 }
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["canonical_id", "kind", "labels", "rules_revision", "locale", "source"],
+        "properties": {
+          "canonical_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$" },
+          "kind": { "$ref": "#/$defs/id" },
+          "parent_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$" },
+          "labels": { "$ref": "#/$defs/labels" },
+          "source_label": { "type": "string", "maxLength": 120, "description": "Name as printed in the source, only when distribution is allowed." },
+          "aliases": { "type": "array", "maxItems": 10, "items": { "type": "string", "maxLength": 120 } },
+          "rules_revision": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "locale": { "type": "string", "pattern": "^[a-z]{2}(-[A-Z]{2})?$" },
+          "summary": { "type": "string", "maxLength": 300, "description": "Original short functional summary. Never copied text." },
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_id", "source_authenticity", "rights_status", "license_id", "review_status"],
+            "properties": {
+              "source_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+              "source_authenticity": { "enum": ["official", "licensed", "community", "original"] },
+              "rights_status": { "enum": ["draft", "rights_review", "approved", "quarantined", "published", "retired"] },
+              "license_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+              "requires_attribution": { "type": "boolean" },
+              "attribution_ref": { "$ref": "#/$defs/id" },
+              "review_status": { "enum": ["verified", "unverified", "rejected"] },
+              "edition": { "type": "string", "maxLength": 64 },
+              "errata": { "type": ["string", "null"], "maxLength": 200 },
+              "location": { "type": "string", "maxLength": 200, "description": "Section or page in the source." }
+            }
+          },
+          "mechanical_refs": {
+            "type": "array",
+            "maxItems": 64,
+            "items": { "type": "string", "pattern": "^(derived|effect|constraint|roll|cost|resource|track):[a-z0-9][a-z0-9_-]{0,63}$|^choice:[a-z0-9][a-z0-9_-]{0,63}:.{1,120}$" }
+          },
+          "content_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+    "labels": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 16,
+      "propertyNames": { "pattern": "^[a-z]{2}(-[A-Z]{2})?$" },
+      "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 120 }
+    }
+  }
+}

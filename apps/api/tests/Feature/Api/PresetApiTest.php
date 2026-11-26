@@ -55,7 +55,8 @@ final class PresetApiTest extends TestCase
         $response->assertJsonPath('status', 'engine_compatible')
             ->assertJsonPath('canonical', false)
             ->assertJsonPath('validation_report.valid', true)
-            ->assertJsonPath('engine_version', '0.1.0');
+            ->assertJsonPath('engine_version', \Novtt\Engine\Presets\PresetCompatibility::ENGINE_VERSION)
+            ->assertJsonPath('rights_status', 'approved');
         // {} vs [] preserved: the empty-object default survives the round trip.
         $this->assertIsArray($response->json('sheet_schema.properties'));
         $this->assertDatabaseHas('user_preset_library', ['user_id' => $alice->getKey(), 'preset_version_id' => $response->json('id')]);

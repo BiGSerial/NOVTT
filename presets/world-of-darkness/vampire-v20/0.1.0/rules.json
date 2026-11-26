@@ -1,0 +1,4174 @@
+{
+  "contract": "novtt.rules/2",
+  "budgets": [
+    {
+      "id": "physical",
+      "kind": "initial",
+      "label": "Pontos de atributos físicos · a conferir",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/priorities/physical"
+        },
+        "table": {
+          "primary": 7,
+          "secondary": 5,
+          "tertiary": 3
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "social",
+      "kind": "initial",
+      "label": "Pontos de atributos sociais · a conferir",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/priorities/social"
+        },
+        "table": {
+          "primary": 7,
+          "secondary": 5,
+          "tertiary": 3
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "mental",
+      "kind": "initial",
+      "label": "Pontos de atributos mentais · a conferir",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/priorities/mental"
+        },
+        "table": {
+          "primary": 7,
+          "secondary": 5,
+          "tertiary": 3
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "talents",
+      "kind": "initial",
+      "label": "Pontos de talentos · a conferir",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/priorities/talents"
+        },
+        "table": {
+          "primary": 13,
+          "secondary": 9,
+          "tertiary": 5
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "skills",
+      "kind": "initial",
+      "label": "Pontos de perícias · a conferir",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/priorities/skills"
+        },
+        "table": {
+          "primary": 13,
+          "secondary": 9,
+          "tertiary": 5
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "knowledges",
+      "kind": "initial",
+      "label": "Pontos de conhecimentos · a conferir",
+      "amount": {
+        "op": "lookup",
+        "key": {
+          "ref": "/priorities/knowledges"
+        },
+        "table": {
+          "primary": 13,
+          "secondary": 9,
+          "tertiary": 5
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "disciplines",
+      "kind": "initial",
+      "label": "Pontos de Disciplinas · a conferir",
+      "initial_amount": 3
+    },
+    {
+      "id": "backgrounds",
+      "kind": "initial",
+      "label": "Pontos de Antecedentes · a conferir",
+      "initial_amount": 5
+    },
+    {
+      "id": "virtues",
+      "kind": "initial",
+      "label": "Pontos de Virtudes · a conferir",
+      "initial_amount": 7
+    },
+    {
+      "id": "freebies",
+      "kind": "bonus",
+      "label": "Pontos de bônus · a conferir",
+      "initial_amount": 15
+    },
+    {
+      "id": "xp",
+      "kind": "experience",
+      "label": "Experiência (concedida pelo mestre)",
+      "initial_amount": 0
+    }
+  ],
+  "costs": [
+    {
+      "id": "physical_creation",
+      "phase": "creation",
+      "budget": "physical",
+      "targets": [
+        "/attributes/physical/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "physical_freebies",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/attributes/physical/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 5
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "physical_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/attributes/physical/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 4
+      }
+    },
+    {
+      "id": "social_creation",
+      "phase": "creation",
+      "budget": "social",
+      "targets": [
+        "/attributes/social/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "social_freebies",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/attributes/social/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 5
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "social_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/attributes/social/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 4
+      }
+    },
+    {
+      "id": "mental_creation",
+      "phase": "creation",
+      "budget": "mental",
+      "targets": [
+        "/attributes/mental/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "mental_freebies",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/attributes/mental/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 5
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "mental_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/attributes/mental/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 4
+      }
+    },
+    {
+      "id": "talents_creation",
+      "phase": "creation",
+      "budget": "talents",
+      "targets": [
+        "/abilities/talents/*"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "le",
+        "args": [
+          {
+            "var": "new"
+          },
+          {
+            "const": 3
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "talents_freebies",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/abilities/talents/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 2
+      }
+    },
+    {
+      "id": "talents_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/abilities/talents/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 2,
+        "when_zero": 3
+      }
+    },
+    {
+      "id": "skills_creation",
+      "phase": "creation",
+      "budget": "skills",
+      "targets": [
+        "/abilities/skills/*"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "le",
+        "args": [
+          {
+            "var": "new"
+          },
+          {
+            "const": 3
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "skills_freebies",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/abilities/skills/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 2
+      }
+    },
+    {
+      "id": "skills_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/abilities/skills/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 2,
+        "when_zero": 3
+      }
+    },
+    {
+      "id": "knowledges_creation",
+      "phase": "creation",
+      "budget": "knowledges",
+      "targets": [
+        "/abilities/knowledges/*"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "le",
+        "args": [
+          {
+            "var": "new"
+          },
+          {
+            "const": 3
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "knowledges_freebies",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/abilities/knowledges/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 2
+      }
+    },
+    {
+      "id": "knowledges_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/abilities/knowledges/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 2,
+        "when_zero": 3
+      }
+    },
+    {
+      "id": "disc_animalism_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/animalism"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "gangrel": 1,
+              "nosferatu": 1,
+              "ravnos": 1,
+              "tzimisce": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_auspex_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/auspex"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "malkavian": 1,
+              "toreador": 1,
+              "tremere": 1,
+              "tzimisce": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_celerity_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/celerity"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "assamite": 1,
+              "brujah": 1,
+              "toreador": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_chimerstry_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/chimerstry"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "ravnos": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_dementation_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/dementation"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "malkavian": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_dominate_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/dominate"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "giovanni": 1,
+              "lasombra": 1,
+              "tremere": 1,
+              "ventrue": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_fortitude_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/fortitude"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "gangrel": 1,
+              "ravnos": 1,
+              "ventrue": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_necromancy_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/necromancy"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "giovanni": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_obfuscate_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/obfuscate"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "assamite": 1,
+              "followers_of_set": 1,
+              "malkavian": 1,
+              "nosferatu": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_obtenebration_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/obtenebration"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "lasombra": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_potence_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/potence"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "brujah": 1,
+              "giovanni": 1,
+              "lasombra": 1,
+              "nosferatu": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_presence_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/presence"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "brujah": 1,
+              "followers_of_set": 1,
+              "toreador": 1,
+              "ventrue": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_protean_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/protean"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "gangrel": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_quietus_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/quietus"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "assamite": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_serpentis_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/serpentis"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "followers_of_set": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_thaumaturgy_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/thaumaturgy"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "tremere": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disc_vicissitude_creation",
+      "phase": "creation",
+      "budget": "disciplines",
+      "targets": [
+        "/disciplines/vicissitude"
+      ],
+      "applies_when": {
+        "op": "compare",
+        "cmp": "eq",
+        "args": [
+          {
+            "op": "lookup",
+            "key": {
+              "ref": "/clan/clan"
+            },
+            "table": {
+              "tzimisce": 1,
+              "caitiff": 1
+            },
+            "default": {
+              "const": 0
+            }
+          },
+          {
+            "const": 1
+          }
+        ]
+      },
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "disciplines_freebies",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/disciplines/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 7
+      }
+    },
+    {
+      "id": "disc_animalism_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/animalism"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "gangrel": 5,
+                    "nosferatu": 5,
+                    "ravnos": 5,
+                    "tzimisce": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_auspex_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/auspex"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "malkavian": 5,
+                    "toreador": 5,
+                    "tremere": 5,
+                    "tzimisce": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_celerity_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/celerity"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "assamite": 5,
+                    "brujah": 5,
+                    "toreador": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_chimerstry_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/chimerstry"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "ravnos": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_dementation_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/dementation"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "malkavian": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_dominate_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/dominate"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "giovanni": 5,
+                    "lasombra": 5,
+                    "tremere": 5,
+                    "ventrue": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_fortitude_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/fortitude"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "gangrel": 5,
+                    "ravnos": 5,
+                    "ventrue": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_necromancy_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/necromancy"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "giovanni": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_obfuscate_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/obfuscate"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "assamite": 5,
+                    "followers_of_set": 5,
+                    "malkavian": 5,
+                    "nosferatu": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_obtenebration_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/obtenebration"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "lasombra": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_potence_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/potence"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "brujah": 5,
+                    "giovanni": 5,
+                    "lasombra": 5,
+                    "nosferatu": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_presence_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/presence"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "brujah": 5,
+                    "followers_of_set": 5,
+                    "toreador": 5,
+                    "ventrue": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_protean_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/protean"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "gangrel": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_quietus_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/quietus"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "assamite": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_serpentis_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/serpentis"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "followers_of_set": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_thaumaturgy_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/thaumaturgy"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "tremere": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "disc_vicissitude_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/disciplines/vicissitude"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "const": 10
+            },
+            {
+              "op": "multiply",
+              "args": [
+                {
+                  "var": "current"
+                },
+                {
+                  "op": "lookup",
+                  "key": {
+                    "ref": "/clan/clan"
+                  },
+                  "table": {
+                    "tzimisce": 5,
+                    "caitiff": 6
+                  },
+                  "default": {
+                    "const": 7
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "backgrounds_creation",
+      "phase": "creation",
+      "budget": "backgrounds",
+      "targets": [
+        "/backgrounds/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "backgrounds_freebies",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/backgrounds/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      }
+    },
+    {
+      "id": "virtues_creation",
+      "phase": "creation",
+      "budget": "virtues",
+      "targets": [
+        "/virtues/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 1
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "virtues_freebies",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/virtues/*"
+      ],
+      "model": {
+        "type": "fixed_per_dot",
+        "amount": 2
+      },
+      "free_dots": 1
+    },
+    {
+      "id": "virtues_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/virtues/*"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 2
+      }
+    },
+    {
+      "id": "morality_creation",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/morality/rating"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "le",
+              "args": [
+                {
+                  "var": "new"
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "/virtues/conscience"
+                    },
+                    {
+                      "ref": "/virtues/self_control"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "const": 0
+            },
+            {
+              "const": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "morality_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/morality/rating"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 2
+      },
+      "refund_on_decrease": false
+    },
+    {
+      "id": "willpower_creation",
+      "phase": "creation",
+      "budget": "freebies",
+      "targets": [
+        "/willpower/permanent"
+      ],
+      "model": {
+        "type": "formula",
+        "formula": {
+          "op": "if",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "le",
+              "args": [
+                {
+                  "var": "new"
+                },
+                {
+                  "ref": "/virtues/courage"
+                }
+              ]
+            },
+            {
+              "const": 0
+            },
+            {
+              "const": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "willpower_xp",
+      "phase": "advancement",
+      "budget": "xp",
+      "targets": [
+        "/willpower/permanent"
+      ],
+      "model": {
+        "type": "current_rating_multiplier",
+        "multiplier": 1
+      },
+      "refund_on_decrease": false
+    }
+  ],
+  "phase_limits": [],
+  "dependencies": [],
+  "derived": [
+    {
+      "id": "generation",
+      "path": "/derived/generation",
+      "label": "Geração · a conferir",
+      "formula": {
+        "op": "subtract",
+        "args": [
+          {
+            "const": 13
+          },
+          {
+            "ref": "/backgrounds/generation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "blood_pool_max",
+      "path": "/derived/blood_pool_max",
+      "label": "Reserva de sangue máxima · a conferir",
+      "formula": {
+        "op": "lookup",
+        "key": {
+          "derived": "generation"
+        },
+        "table": {
+          "8": 15,
+          "9": 14,
+          "10": 13,
+          "11": 12,
+          "12": 11,
+          "13": 10
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "blood_per_turn",
+      "path": "/derived/blood_per_turn",
+      "label": "Sangue por turno · a conferir",
+      "formula": {
+        "op": "lookup",
+        "key": {
+          "derived": "generation"
+        },
+        "table": {
+          "8": 3,
+          "9": 2,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1
+        },
+        "default": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "id": "trait_max",
+      "path": "/derived/trait_max",
+      "label": "Máximo de características · a conferir",
+      "formula": {
+        "op": "lookup",
+        "key": {
+          "derived": "generation"
+        },
+        "table": {
+          "8": 5,
+          "9": 5,
+          "10": 5,
+          "11": 5,
+          "12": 5,
+          "13": 5
+        },
+        "default": {
+          "const": 5
+        }
+      }
+    },
+    {
+      "id": "morality_base",
+      "path": "/derived/morality_base",
+      "label": "Humanidade / Senda pelas virtudes · a conferir",
+      "formula": {
+        "op": "add",
+        "args": [
+          {
+            "ref": "/virtues/conscience"
+          },
+          {
+            "ref": "/virtues/self_control"
+          }
+        ]
+      }
+    },
+    {
+      "id": "initiative",
+      "path": "/derived/initiative",
+      "label": "Iniciativa · a conferir",
+      "formula": {
+        "op": "add",
+        "args": [
+          {
+            "ref": "/attributes/physical/dexterity"
+          },
+          {
+            "ref": "/attributes/mental/wits"
+          }
+        ]
+      }
+    },
+    {
+      "id": "damage_total",
+      "path": "/derived/damage_total",
+      "label": "Níveis de vitalidade marcados",
+      "formula": {
+        "op": "add",
+        "args": [
+          {
+            "ref": "/resources/bashing"
+          },
+          {
+            "ref": "/resources/lethal"
+          },
+          {
+            "ref": "/resources/aggravated"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wound_penalty",
+      "path": "/derived/wound_penalty",
+      "label": "Penalidade de ferimento · a conferir",
+      "formula": {
+        "op": "lookup",
+        "key": {
+          "derived": "damage_total"
+        },
+        "steps": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            -1
+          ],
+          [
+            3,
+            -1
+          ],
+          [
+            4,
+            -2
+          ],
+          [
+            5,
+            -2
+          ],
+          [
+            6,
+            -5
+          ],
+          [
+            7,
+            -5
+          ]
+        ]
+      }
+    },
+    {
+      "id": "health_state",
+      "path": "/derived/health_state",
+      "label": "Vitalidade · a conferir",
+      "formula": {
+        "op": "lookup",
+        "key": {
+          "derived": "damage_total"
+        },
+        "steps": [
+          [
+            0,
+            "Ileso"
+          ],
+          [
+            1,
+            "Escoriado"
+          ],
+          [
+            2,
+            "Machucado"
+          ],
+          [
+            3,
+            "Ferido"
+          ],
+          [
+            4,
+            "Ferido gravemente"
+          ],
+          [
+            5,
+            "Espancado"
+          ],
+          [
+            6,
+            "Aleijado"
+          ],
+          [
+            7,
+            "Incapacitado"
+          ]
+        ]
+      }
+    }
+  ],
+  "effects": [],
+  "constraints": [
+    {
+      "id": "distinct_attribute_priorities",
+      "phase": "creation",
+      "label": "Cada prioridade de atributos uma vez",
+      "paths": [
+        "/priorities/physical",
+        "/priorities/social",
+        "/priorities/mental"
+      ],
+      "assert": {
+        "op": "and",
+        "args": [
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/physical"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/social"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "ne",
+                "args": [
+                  {
+                    "ref": "/priorities/physical"
+                  },
+                  {
+                    "ref": "/priorities/social"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/physical"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/mental"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "ne",
+                "args": [
+                  {
+                    "ref": "/priorities/physical"
+                  },
+                  {
+                    "ref": "/priorities/mental"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/social"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/mental"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "ne",
+                "args": [
+                  {
+                    "ref": "/priorities/social"
+                  },
+                  {
+                    "ref": "/priorities/mental"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "distinct_ability_priorities",
+      "phase": "creation",
+      "label": "Cada prioridade de habilidades uma vez",
+      "paths": [
+        "/priorities/talents",
+        "/priorities/skills",
+        "/priorities/knowledges"
+      ],
+      "assert": {
+        "op": "and",
+        "args": [
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/talents"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/skills"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "ne",
+                "args": [
+                  {
+                    "ref": "/priorities/talents"
+                  },
+                  {
+                    "ref": "/priorities/skills"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/talents"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/knowledges"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "ne",
+                "args": [
+                  {
+                    "ref": "/priorities/talents"
+                  },
+                  {
+                    "ref": "/priorities/knowledges"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "or",
+            "args": [
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/skills"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "eq",
+                "args": [
+                  {
+                    "ref": "/priorities/knowledges"
+                  },
+                  {
+                    "const": ""
+                  }
+                ]
+              },
+              {
+                "op": "compare",
+                "cmp": "ne",
+                "args": [
+                  {
+                    "ref": "/priorities/skills"
+                  },
+                  {
+                    "ref": "/priorities/knowledges"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "appearance_at_least_one",
+      "phase": "creation",
+      "label": "Aparência começa em 1, exceto no clã que a mantém em 0 · a conferir",
+      "paths": [
+        "/attributes/social/appearance"
+      ],
+      "assert": {
+        "op": "or",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "eq",
+            "args": [
+              {
+                "ref": "/clan/clan"
+              },
+              {
+                "const": "nosferatu"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "ge",
+            "args": [
+              {
+                "ref": "/attributes/social/appearance"
+              },
+              {
+                "const": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "health_levels",
+      "label": "No máximo 7 níveis de vitalidade marcados · a conferir",
+      "paths": [
+        "/resources/bashing",
+        "/resources/lethal",
+        "/resources/aggravated"
+      ],
+      "assert": {
+        "op": "compare",
+        "cmp": "le",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "ref": "/resources/bashing"
+              },
+              {
+                "ref": "/resources/lethal"
+              },
+              {
+                "ref": "/resources/aggravated"
+              }
+            ]
+          },
+          {
+            "const": 7
+          }
+        ]
+      }
+    },
+    {
+      "id": "trait_max_attributes",
+      "label": "Atributos até o máximo da geração · a conferir",
+      "paths": [
+        "/attributes/physical/strength",
+        "/attributes/physical/dexterity",
+        "/attributes/physical/stamina",
+        "/attributes/social/charisma",
+        "/attributes/social/manipulation",
+        "/attributes/social/appearance",
+        "/attributes/mental/perception",
+        "/attributes/mental/intelligence",
+        "/attributes/mental/wits"
+      ],
+      "assert": {
+        "op": "and",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/attributes/physical/strength"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/attributes/physical/dexterity"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/attributes/physical/stamina"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/attributes/social/charisma"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/attributes/social/manipulation"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/attributes/social/appearance"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/attributes/mental/perception"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/attributes/mental/intelligence"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/attributes/mental/wits"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "trait_max_abilities",
+      "label": "Habilidades até o máximo da geração · a conferir",
+      "paths": [
+        "/abilities/talents/alertness",
+        "/abilities/talents/athletics",
+        "/abilities/talents/awareness",
+        "/abilities/talents/brawl",
+        "/abilities/talents/empathy",
+        "/abilities/talents/expression",
+        "/abilities/talents/intimidation",
+        "/abilities/talents/leadership",
+        "/abilities/talents/streetwise",
+        "/abilities/talents/subterfuge",
+        "/abilities/skills/animal_ken",
+        "/abilities/skills/crafts",
+        "/abilities/skills/drive",
+        "/abilities/skills/etiquette",
+        "/abilities/skills/firearms",
+        "/abilities/skills/larceny",
+        "/abilities/skills/melee",
+        "/abilities/skills/performance",
+        "/abilities/skills/stealth",
+        "/abilities/skills/survival",
+        "/abilities/knowledges/academics",
+        "/abilities/knowledges/computer",
+        "/abilities/knowledges/finance",
+        "/abilities/knowledges/investigation",
+        "/abilities/knowledges/law",
+        "/abilities/knowledges/medicine",
+        "/abilities/knowledges/occult",
+        "/abilities/knowledges/politics",
+        "/abilities/knowledges/science",
+        "/abilities/knowledges/technology"
+      ],
+      "assert": {
+        "op": "and",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/alertness"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/athletics"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/awareness"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/brawl"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/empathy"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/expression"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/intimidation"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/leadership"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/streetwise"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/talents/subterfuge"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/animal_ken"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/crafts"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/drive"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/etiquette"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/firearms"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/larceny"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/melee"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/performance"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/stealth"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/skills/survival"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/academics"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/computer"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/finance"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/investigation"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/law"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/medicine"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/occult"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/politics"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/science"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/abilities/knowledges/technology"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "trait_max_disciplines",
+      "label": "Disciplinas até o máximo da geração · a conferir",
+      "paths": [
+        "/disciplines/animalism",
+        "/disciplines/auspex",
+        "/disciplines/celerity",
+        "/disciplines/chimerstry",
+        "/disciplines/dementation",
+        "/disciplines/dominate",
+        "/disciplines/fortitude",
+        "/disciplines/necromancy",
+        "/disciplines/obfuscate",
+        "/disciplines/obtenebration",
+        "/disciplines/potence",
+        "/disciplines/presence",
+        "/disciplines/protean",
+        "/disciplines/quietus",
+        "/disciplines/serpentis",
+        "/disciplines/thaumaturgy",
+        "/disciplines/vicissitude"
+      ],
+      "assert": {
+        "op": "and",
+        "args": [
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/animalism"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/auspex"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/celerity"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/chimerstry"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/dementation"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/dominate"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/fortitude"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/necromancy"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/obfuscate"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/obtenebration"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/potence"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/presence"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/protean"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/quietus"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/serpentis"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/thaumaturgy"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          },
+          {
+            "op": "compare",
+            "cmp": "le",
+            "args": [
+              {
+                "ref": "/disciplines/vicissitude"
+              },
+              {
+                "derived": "trait_max"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "creation": {
+    "steps": [
+      {
+        "id": "concept",
+        "label": "Conceito",
+        "paths": [
+          "/identity/*"
+        ],
+        "required": [
+          "/identity/name",
+          "/identity/concept",
+          "/identity/nature",
+          "/identity/demeanor"
+        ]
+      },
+      {
+        "id": "clan",
+        "label": "Clã",
+        "paths": [
+          "/clan/*"
+        ],
+        "required": [
+          "/clan/clan"
+        ]
+      },
+      {
+        "id": "attributes",
+        "label": "Atributos",
+        "paths": [
+          "/priorities/physical",
+          "/priorities/social",
+          "/priorities/mental",
+          "/attributes/physical/*",
+          "/attributes/social/*",
+          "/attributes/mental/*"
+        ],
+        "required": [
+          "/priorities/physical",
+          "/priorities/social",
+          "/priorities/mental"
+        ],
+        "complete_when": {
+          "op": "and",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "budget": "physical",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "budget": "social",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "budget": "mental",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "abilities",
+        "label": "Habilidades",
+        "paths": [
+          "/priorities/talents",
+          "/priorities/skills",
+          "/priorities/knowledges",
+          "/abilities/talents/*",
+          "/abilities/skills/*",
+          "/abilities/knowledges/*",
+          "/specialties"
+        ],
+        "required": [
+          "/priorities/talents",
+          "/priorities/skills",
+          "/priorities/knowledges"
+        ],
+        "complete_when": {
+          "op": "and",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "budget": "talents",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "budget": "skills",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "budget": "knowledges",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "advantages",
+        "label": "Vantagens",
+        "paths": [
+          "/disciplines/*",
+          "/backgrounds/*",
+          "/virtues/*",
+          "/morality/first_virtue",
+          "/morality/second_virtue"
+        ],
+        "required": [
+          "/morality/first_virtue",
+          "/morality/second_virtue"
+        ],
+        "complete_when": {
+          "op": "and",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "budget": "disciplines",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "budget": "backgrounds",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            },
+            {
+              "op": "compare",
+              "cmp": "eq",
+              "args": [
+                {
+                  "budget": "virtues",
+                  "of": "balance"
+                },
+                {
+                  "const": 0
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "finishing",
+        "label": "Toques finais",
+        "paths": [
+          "/morality/*",
+          "/willpower/*",
+          "/merits_flaws"
+        ],
+        "required": [
+          "/morality/path"
+        ],
+        "complete_when": {
+          "op": "and",
+          "args": [
+            {
+              "op": "compare",
+              "cmp": "ge",
+              "args": [
+                {
+                  "ref": "/morality/rating"
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "ref": "/virtues/conscience"
+                    },
+                    {
+                      "ref": "/virtues/self_control"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "compare",
+              "cmp": "ge",
+              "args": [
+                {
+                  "ref": "/willpower/permanent"
+                },
+                {
+                  "ref": "/virtues/courage"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "review",
+        "label": "Revisão",
+        "paths": [
+          "/resources/*",
+          "/description/*",
+          "/weapons",
+          "/inventory",
+          "/discipline_paths",
+          "/rituals"
+        ],
+        "complete_when": {
+          "const": true
+        }
+      }
+    ],
+    "choices": [
+      {
+        "id": "clan",
+        "path": "/clan/clan",
+        "label": "Clã",
+        "options": [
+          {
+            "value": "assamite",
+            "label": "Assamita",
+            "compendium_id": "clan.assamite"
+          },
+          {
+            "value": "brujah",
+            "label": "Brujah",
+            "compendium_id": "clan.brujah"
+          },
+          {
+            "value": "followers_of_set",
+            "label": "Seguidores de Set",
+            "compendium_id": "clan.followers_of_set"
+          },
+          {
+            "value": "gangrel",
+            "label": "Gangrel",
+            "compendium_id": "clan.gangrel"
+          },
+          {
+            "value": "giovanni",
+            "label": "Giovanni",
+            "compendium_id": "clan.giovanni"
+          },
+          {
+            "value": "lasombra",
+            "label": "Lasombra",
+            "compendium_id": "clan.lasombra"
+          },
+          {
+            "value": "malkavian",
+            "label": "Malkaviano",
+            "compendium_id": "clan.malkavian"
+          },
+          {
+            "value": "nosferatu",
+            "label": "Nosferatu",
+            "compendium_id": "clan.nosferatu",
+            "fixes": [
+              {
+                "path": "/attributes/social/appearance",
+                "value": {
+                  "const": 0
+                },
+                "label": "Aparência 0 pela fraqueza do clã · a conferir",
+                "mode": "exact"
+              }
+            ]
+          },
+          {
+            "value": "ravnos",
+            "label": "Ravnos",
+            "compendium_id": "clan.ravnos"
+          },
+          {
+            "value": "toreador",
+            "label": "Toreador",
+            "compendium_id": "clan.toreador"
+          },
+          {
+            "value": "tremere",
+            "label": "Tremere",
+            "compendium_id": "clan.tremere"
+          },
+          {
+            "value": "tzimisce",
+            "label": "Tzimisce",
+            "compendium_id": "clan.tzimisce"
+          },
+          {
+            "value": "ventrue",
+            "label": "Ventrue",
+            "compendium_id": "clan.ventrue"
+          },
+          {
+            "value": "caitiff",
+            "label": "Caitiff",
+            "compendium_id": "clan.caitiff"
+          }
+        ]
+      },
+      {
+        "id": "sect",
+        "path": "/clan/sect",
+        "label": "Seita",
+        "options": [
+          {
+            "value": "camarilla",
+            "label": "Camarilla",
+            "compendium_id": "sect.camarilla"
+          },
+          {
+            "value": "sabbat",
+            "label": "Sabá",
+            "compendium_id": "sect.sabbat"
+          },
+          {
+            "value": "anarch",
+            "label": "Movimento Anarquista",
+            "compendium_id": "sect.anarch"
+          },
+          {
+            "value": "independent",
+            "label": "Independente",
+            "compendium_id": "sect.independent"
+          }
+        ]
+      },
+      {
+        "id": "morality",
+        "path": "/morality/path",
+        "label": "Senda",
+        "options": [
+          {
+            "value": "humanity",
+            "label": "Humanidade",
+            "compendium_id": "path.humanity",
+            "fixes": [
+              {
+                "path": "/morality/first_virtue",
+                "value": {
+                  "const": "conscience"
+                },
+                "label": "A Humanidade usa Consciência · a conferir",
+                "mode": "exact"
+              },
+              {
+                "path": "/morality/second_virtue",
+                "value": {
+                  "const": "self_control"
+                },
+                "label": "A Humanidade usa Autocontrole · a conferir",
+                "mode": "exact"
+              }
+            ]
+          },
+          {
+            "value": "caine",
+            "label": "Senda de Caim",
+            "compendium_id": "path.caine"
+          },
+          {
+            "value": "cathari",
+            "label": "Senda dos Cátaros",
+            "compendium_id": "path.cathari"
+          },
+          {
+            "value": "death_and_the_soul",
+            "label": "Senda da Morte e da Alma",
+            "compendium_id": "path.death_and_the_soul"
+          },
+          {
+            "value": "evil_revelations",
+            "label": "Senda das Revelações Malignas",
+            "compendium_id": "path.evil_revelations"
+          },
+          {
+            "value": "feral_heart",
+            "label": "Senda do Coração Selvagem",
+            "compendium_id": "path.feral_heart"
+          },
+          {
+            "value": "honorable_accord",
+            "label": "Senda do Acordo Honrado",
+            "compendium_id": "path.honorable_accord"
+          },
+          {
+            "value": "lilith",
+            "label": "Senda de Lilith",
+            "compendium_id": "path.lilith"
+          },
+          {
+            "value": "night",
+            "label": "Senda da Noite",
+            "compendium_id": "path.night"
+          },
+          {
+            "value": "power_and_the_inner_voice",
+            "label": "Senda do Poder e da Voz Interior",
+            "compendium_id": "path.power_and_the_inner_voice"
+          }
+        ]
+      },
+      {
+        "id": "first_virtue",
+        "path": "/morality/first_virtue",
+        "label": "Primeira virtude",
+        "options": [
+          {
+            "value": "conscience",
+            "label": "Consciência",
+            "compendium_id": "virtue.conscience"
+          },
+          {
+            "value": "conviction",
+            "label": "Convicção",
+            "compendium_id": "virtue.conviction"
+          }
+        ]
+      },
+      {
+        "id": "second_virtue",
+        "path": "/morality/second_virtue",
+        "label": "Segunda virtude",
+        "options": [
+          {
+            "value": "self_control",
+            "label": "Autocontrole",
+            "compendium_id": "virtue.self_control"
+          },
+          {
+            "value": "instinct",
+            "label": "Instinto",
+            "compendium_id": "virtue.instinct"
+          }
+        ]
+      }
+    ]
+  },
+  "resources": [
+    {
+      "id": "blood",
+      "label": "Reserva de sangue",
+      "path": "/resources/blood",
+      "max": {
+        "derived": "blood_pool_max"
+      },
+      "min": 0,
+      "recovery": "manual"
+    },
+    {
+      "id": "willpower",
+      "label": "Força de Vontade",
+      "path": "/resources/willpower",
+      "max": {
+        "ref": "/willpower/permanent"
+      },
+      "min": 0,
+      "recovery": "manual"
+    },
+    {
+      "id": "health_bashing",
+      "label": "Dano por contusão",
+      "path": "/resources/bashing",
+      "max": {
+        "const": 7
+      },
+      "min": 0,
+      "recovery": "manual"
+    },
+    {
+      "id": "health_lethal",
+      "label": "Dano letal",
+      "path": "/resources/lethal",
+      "max": {
+        "const": 7
+      },
+      "min": 0,
+      "recovery": "manual"
+    },
+    {
+      "id": "health_aggravated",
+      "label": "Dano agravado",
+      "path": "/resources/aggravated",
+      "max": {
+        "const": 7
+      },
+      "min": 0,
+      "recovery": "manual"
+    }
+  ],
+  "rolls": [
+    {
+      "id": "test",
+      "label": "Teste (atributo + habilidade)",
+      "strategy": "pool",
+      "faces": 10,
+      "inputs": {
+        "attribute": {
+          "targets": [
+            "/attributes/physical/*",
+            "/attributes/social/*",
+            "/attributes/mental/*"
+          ]
+        },
+        "ability": {
+          "targets": [
+            "/abilities/talents/*",
+            "/abilities/skills/*",
+            "/abilities/knowledges/*"
+          ]
+        }
+      },
+      "count": {
+        "op": "add",
+        "args": [
+          {
+            "var": "attribute"
+          },
+          {
+            "var": "ability"
+          }
+        ]
+      },
+      "difficulty": {
+        "default": 6,
+        "min": 2,
+        "max": 10
+      },
+      "required": {
+        "default": 1,
+        "min": 1,
+        "max": 20
+      },
+      "cancel_at_most": 1,
+      "botch_at_most": 1,
+      "count_modifier": {
+        "derived": "wound_penalty"
+      }
+    },
+    {
+      "id": "specialty_test",
+      "label": "Teste com especialização (10 vale dois sucessos) · a conferir",
+      "strategy": "pool",
+      "faces": 10,
+      "inputs": {
+        "attribute": {
+          "targets": [
+            "/attributes/physical/*",
+            "/attributes/social/*",
+            "/attributes/mental/*"
+          ]
+        },
+        "ability": {
+          "targets": [
+            "/abilities/talents/*",
+            "/abilities/skills/*",
+            "/abilities/knowledges/*"
+          ]
+        }
+      },
+      "count": {
+        "op": "add",
+        "args": [
+          {
+            "var": "attribute"
+          },
+          {
+            "var": "ability"
+          }
+        ]
+      },
+      "difficulty": {
+        "default": 6,
+        "min": 2,
+        "max": 10
+      },
+      "required": {
+        "default": 1,
+        "min": 1,
+        "max": 20
+      },
+      "cancel_at_most": 1,
+      "botch_at_most": 1,
+      "bonus_at_least": 10,
+      "bonus_successes": 1,
+      "count_modifier": {
+        "derived": "wound_penalty"
+      }
+    },
+    {
+      "id": "attribute",
+      "label": "Atributo sozinho",
+      "strategy": "pool",
+      "faces": 10,
+      "inputs": {
+        "attribute": {
+          "targets": [
+            "/attributes/physical/*",
+            "/attributes/social/*",
+            "/attributes/mental/*"
+          ]
+        }
+      },
+      "count": {
+        "var": "attribute"
+      },
+      "difficulty": {
+        "default": 6,
+        "min": 2,
+        "max": 10
+      },
+      "required": {
+        "default": 1,
+        "min": 1,
+        "max": 20
+      },
+      "cancel_at_most": 1,
+      "botch_at_most": 1,
+      "count_modifier": {
+        "derived": "wound_penalty"
+      }
+    },
+    {
+      "id": "virtue",
+      "label": "Virtude",
+      "strategy": "pool",
+      "faces": 10,
+      "inputs": {
+        "virtue": {
+          "targets": [
+            "/virtues/*"
+          ]
+        }
+      },
+      "count": {
+        "var": "virtue"
+      },
+      "difficulty": {
+        "default": 6,
+        "min": 2,
+        "max": 10
+      },
+      "required": {
+        "default": 1,
+        "min": 1,
+        "max": 20
+      },
+      "cancel_at_most": 1,
+      "botch_at_most": 1
+    },
+    {
+      "id": "willpower",
+      "label": "Força de Vontade",
+      "strategy": "pool",
+      "faces": 10,
+      "count": {
+        "ref": "/willpower/permanent"
+      },
+      "difficulty": {
+        "default": 6,
+        "min": 2,
+        "max": 10
+      },
+      "required": {
+        "default": 1,
+        "min": 1,
+        "max": 20
+      },
+      "cancel_at_most": 1,
+      "botch_at_most": 1
+    },
+    {
+      "id": "initiative",
+      "label": "Iniciativa (1d10 + Destreza + Raciocínio) · a conferir",
+      "strategy": "sum",
+      "dice": "1d10",
+      "modifier": {
+        "derived": "initiative"
+      }
+    }
+  ],
+  "governance": {
+    "lock_during_session": true
+  }
+}

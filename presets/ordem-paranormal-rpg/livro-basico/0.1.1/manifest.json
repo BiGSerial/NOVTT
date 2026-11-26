@@ -1,0 +1,53 @@
+{
+  "contract": "novtt.preset-manifest/2",
+  "family_id": "ordem-paranormal-rpg",
+  "variant_id": "livro-basico",
+  "version": "0.1.1",
+  "display_name": "Ordem Paranormal RPG — livro básico (não oficial)",
+  "locale": "pt-BR",
+  "rules_revision": "pending-exact-source-revision",
+  "source_version": "livro-basico (revisão a confirmar)",
+  "errata_reference": null,
+  "license": {
+    "identifier": "OP-Community-1.0",
+    "source_url": "https://ordemparanormal.com.br/licenca",
+    "rights_status": "rights_review",
+    "requires_attribution": true,
+    "attribution": "Este é um conteúdo não oficial, publicado sob a Licença da Comunidade de Ordem Paranormal",
+    "consulted_at": "2026-11-23",
+    "policy_version": "1.0 (28/06/2026)"
+  },
+  "provenance": {
+    "source_authenticity": "licensed",
+    "authors": [
+      "Equipe NOVTT"
+    ],
+    "notes": "Terminologia geral e mecânicas sob a Licença da Comunidade v1.0. Sem textos, artes ou layout da ficha oficial. Valores marcados 'a conferir' ainda não foram conferidos no livro (ver SOURCE-REGISTER.md). Publicação bloqueada até revisão jurídica."
+  },
+  "capabilities": {
+    "character_creation": true,
+    "character_progression": true,
+    "dice_resolution": true,
+    "resource_tracking": true,
+    "effects": false
+  },
+  "coverage": "progression",
+  "limitations": [
+    "Valores de classe (PV/PE/SAN), perícias de origem, trilhas, graus de treinamento, patentes e custos de ritual: a conferir no livro.",
+    "Habilidades de classe, trilha e origem, poderes e rituais são registrados pelo jogador; efeitos mecânicos pendentes de curadoria.",
+    "Sobrevivendo ao Horror: não incluído (módulo desativado por padrão).",
+    "Carga, críticos de armas e economia de ações: pendentes."
+  ],
+  "publication": {
+    "public": false
+  },
+  "engine": {
+    "min_version": "0.3.0"
+  },
+  "files": {
+    "sheet_schema": "sheet.schema.json",
+    "sheet_ui": "sheet.ui.json",
+    "rules": "rules.json",
+    "compendium": "compendium.json"
+  }
+}

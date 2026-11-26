@@ -1,0 +1,390 @@
+import { computed, inject, provide, reactive, ref, watch, type ComputedRef, type InjectionKey, type Ref } from 'vue'
+import { ApiError } from '../../api/client'
+import { DEFAULT_ATMOSPHERE, type Atmosphere } from '../../live/atmosphere'
+import { images, party, rolls, session as sessionApi, table as tableApi, type RequestInput } from '../../live/api'
+import { plain } from '../../live/sheet'
+import type { TableState } from '../../live/table'
+import type { useLiveTable } from '../../live/useLiveTable'
+import { useSheets } from '../../live/useSheets'
+import type {
+  Campaign, Clock, Compass, ItemOffer, Place, SessionMap, DiceChoice, Item, LiveState, OfficialRoll, Plot, PlotScene, ResourceTrack, RollRequest, Stage, Suggestion, TableSnapshot,
+} from '../../live/types'
+
+export type SubjectKind = 'character' | 'npc'
+export interface Subject { kind: SubjectKind; id: string }
+export interface CastEntry {
+  kind: SubjectKind
+  id: string
+  name: string
+  sub: string
+  portrait: string | null
+  live: LiveState | null
+  preset: string
+  playerUserId: string | null
+  concept: string | null
+}
+export interface ComposerInput { paths: string[]; modifier: number; dice: DiceChoice; attempts: number; secret: boolean; allows_choice: boolean; label: string }
+
+/**
+ * Shared state and commands of the master's console. Server data lives in TableState (events);
+ * selection, "in scene" and the open tab are ephemeral workspace state of this window only.
+ */
+export function createMasterContext(table: ReturnType<typeof useLiveTable>, campaign: Campaign) {
+  const t = computed(() => table.state.value as TableState)
+  const s = computed(() => t.value.s as TableSnapshot)
+  const sheets = useSheets(campaign.id)
+  const busy = ref(false)
+
+  // ---------- Cast & selection ----------
+  const playerName = (id: string | null) => s.value.members.find(m => m.user_id === id)?.name ?? ''
+  const cast = computed<CastEntry[]>(() => [
+    ...s.value.characters.map(c => ({ kind: 'character' as const, id: c.id, name: c.name, sub: playerName(c.player_user_id), portrait: c.portrait_image_id ?? null, live: c.live, preset: c.preset_version_id, playerUserId: c.controlled_by, concept: c.concept ?? null })),
+    ...s.value.npcs.map(n => ({ kind: 'npc' as const, id: n.id, name: n.name, sub: 'PdM', portrait: n.portrait_image_id ?? null, live: n.live, preset: n.preset_version_id, playerUserId: null, concept: null })),
+  ])
+  const byId = (id: string) => cast.value.find(c => c.id === id) ?? null
+  const selection = ref<Subject[]>([])
+  const focus = computed(() => { const last = selection.value[selection.value.length - 1]; return last ? byId(last.id) : null })
+  const selected = (id: string) => selection.value.some(x => x.id === id)
+
+  async function loadSheet(e: CastEntry): Promise<void> {
+    try { await (e.kind === 'character' ? sheets.character(e.id, e.preset) : sheets.npc(e.id, e.preset)) } catch { table.toast('Não foi possível abrir a ficha.') }
+  }
+  /** Plain click: only this one. Additive (Ctrl/⌘/Shift or the checkbox): toggles it in the group. */
+  function select(kind: SubjectKind, id: string, additive = false): void {
+    if (!additive && focus.value?.id !== id) { paths.value = []; suggestionId.value = null }
+    if (additive) selection.value = selected(id) ? selection.value.filter(x => x.id !== id) : [...selection.value, { kind, id }]
+    else selection.value = [{ kind, id }]
+    const e = byId(id)
+    if (e) void loadSheet(e)
+    if (!additive) table.realtime()?.whisper(`workspace.${s.value.me.user_id}`, 'select', { kind, id })
+  }
+  function selectMany(list: Subject[]): void {
+    selection.value = list
+    list.forEach(x => { const e = byId(x.id); if (e) void loadSheet(e) })
+  }
+  const clearSelection = () => { selection.value = []; paths.value = [] }
+
+  // The combination being composed (attribute + skill paths) and the suggestion it came from.
+  const paths = ref<string[]>([])
+  const suggestionId = ref<string | null>(null)
+  const togglePath = (p: string) => { paths.value = paths.value.includes(p) ? paths.value.filter(x => x !== p) : [...paths.value, p] }
+  /** "Força + Luta" from the open sheet's labels; the path's last segment until it loads. */
+  function pathLabels(id: string, list: string[]): string {
+    const fields = fieldLabels(id)
+    return list.map(p => fields.get(p) ?? p.split('/').pop() ?? p).join(' + ')
+  }
+  function fieldLabels(id: string): Map<string, string> {
+    const out = new Map<string, string>()
+    sheets.byId.get(id)?.sections.forEach(sec => sec.fields.forEach(f => out.set(f.path, f.label)))
+    return out
+  }
+  function fromSuggestion(sg: Suggestion): void {
+    select('character', sg.campaign_character_id)
+    paths.value = [...sg.paths]
+    suggestionId.value = sg.id
+  }
+
+  // "Em cena": which NPCs are on stage right now (workspace state, per session).
+  const sceneKey = () => `novtt.inscene.${s.value.session.id}`
+  const inScene = ref<string[]>(readScene())
+  function readScene(): string[] {
+    try { return JSON.parse(sessionStorage.getItem(`novtt.inscene.${table.state.value?.s.session.id}`) ?? '[]') } catch { return [] }
+  }
+  watch(inScene, v => { try { sessionStorage.setItem(sceneKey(), JSON.stringify(v)) } catch { /* workspace only */ } }, { deep: true })
+  const toggleInScene = (id: string) => { inScene.value = inScene.value.includes(id) ? inScene.value.filter(x => x !== id) : [...inScene.value, id] }
+  function bringSceneNpcs(scene: PlotScene | null): void {
+    if (!scene?.npcs?.length) return
+    const names = scene.npcs.map(n => n.toLowerCase())
+    inScene.value = s.value.npcs.filter(n => names.some(x => n.name.toLowerCase().includes(x) || x.includes(n.name.toLowerCase()))).map(n => n.id)
+  }
+
+  // ---------- Errors ----------
+  function fail(e: unknown, fallback = 'Não deu certo. Tente de novo.'): void {
+    const code = e instanceof ApiError ? e.code : ''
+    const known: Record<string, string> = {
+      'session.revision_mismatch': 'Outra janela mudou a sessão; atualizei para a versão mais nova.',
+      'live_state.revision_mismatch': 'Essa ficha mudou em outra janela; tente de novo.',
+      'session.paused': 'A sessão está pausada.',
+      'roll.component_invalid': 'Essa combinação não existe na ficha.',
+      'whisper.recipient_invalid': 'Escolha um jogador para sussurrar.',
+      'image.type_unsupported': 'Use uma imagem JPG, PNG ou WebP.',
+      'image.too_large': 'Imagem grande demais (até 4 MB e 6000 px).',
+      'image.limit': 'A campanha atingiu o limite de imagens.',
+      'network.error': 'Sem conexão. Tente de novo.',
+    }
+    table.toast(known[code] ?? fallback)
+    if (code.endsWith('revision_mismatch')) void t.value.catchUp()
+  }
+
+  // ---------- Rolls ----------
+  async function request(targets: Subject[], input: ComposerInput, suggestionId: string | null = null): Promise<void> {
+    busy.value = true
+    let sent = 0
+    try {
+      for (const target of targets) {
+        if (target.kind === 'character') {
+          const body: RequestInput = { ...input, campaign_character_id: target.id, suggestion_id: targets.length === 1 ? suggestionId : null }
+          t.value.local.request(await rolls.request(s.value.session.id, body))
+        } else {
+          await rolls.npc(s.value.session.id, { campaign_npc_id: target.id, paths: input.paths, modifier: input.modifier, dice: input.dice, label: input.label, secret: input.secret })
+        }
+        sent++
+      }
+      const pcs = targets.filter(x => x.kind === 'character').length
+      if (pcs) table.toast(pcs === 1 ? `Pedido enviado a ${byId(targets.find(x => x.kind === 'character')!.id)?.name}` : `Pedido enviado a ${pcs} jogadores`)
+    } catch (e) {
+      fail(e)
+      if (sent) table.toast(`${sent} de ${targets.length} pedidos enviados.`)
+    } finally {
+      busy.value = false
+    }
+  }
+  const dismiss = async (sg: Suggestion) => {
+    try {
+      await rolls.dismiss(sg.id)
+      // Don't wait for the event to clear the flag; the event is idempotent with this.
+      s.value.suggestions.splice(0, s.value.suggestions.length, ...s.value.suggestions.filter(x => x.id !== sg.id))
+      if (suggestionId.value === sg.id) suggestionId.value = null
+    } catch (e) { fail(e) }
+  }
+  const cancel = async (r: RollRequest) => { try { t.value.local.request(await rolls.cancel(r.id)) } catch (e) { fail(e) } }
+  const grant = async (r: RollRequest) => { try { t.value.local.request(await rolls.grant(r.id)) } catch (e) { fail(e) } }
+  const reveal = async (roll: OfficialRoll) => { try { await rolls.reveal(roll.id); table.toast('Rolagem revelada à mesa') } catch (e) { fail(e) } }
+  const pendingFor = (id: string) => s.value.requests.filter(r => r.subject.id === id)
+
+  // ---------- Live state (vitals, conditions, items) ----------
+  async function saveLive(kind: SubjectKind, id: string, patch: { resources?: ResourceTrack[]; conditions?: string[]; items?: Item[] }): Promise<boolean> {
+    const target = (kind === 'character' ? s.value.characters : s.value.npcs).find(x => x.id === id)
+    if (!target) return false
+    const live = target.live
+    try {
+      const r = await tableApi.live(campaign.id, kind, id, live?.revision ?? 0, patch.resources ?? live?.resources ?? [], patch.conditions ?? live?.conditions ?? [], patch.items)
+      t.value.local.live(kind, id, r.live)
+      return true
+    } catch (e) { fail(e); return false }
+  }
+  /** Damage (negative) or healing on the first track of every selected subject. */
+  async function adjustMany(list: Subject[], delta: number): Promise<void> {
+    busy.value = true
+    try {
+      for (const x of list) {
+        const e = byId(x.id)
+        const track = e?.live?.resources?.[0]
+        if (!e || !track) continue
+        await saveLive(x.kind, x.id, { resources: e.live!.resources.map((r, i) => (i === 0 ? { ...r, current: Math.max(-99, Math.min(r.max, r.current + delta)) } : r)) })
+      }
+    } finally { busy.value = false }
+  }
+  async function conditionMany(list: Subject[], condition: string, on: boolean): Promise<void> {
+    busy.value = true
+    try {
+      for (const x of list) {
+        const e = byId(x.id)
+        if (!e) continue
+        const has = e.live?.conditions?.includes(condition) ?? false
+        if (has === on) continue
+        await saveLive(x.kind, x.id, { conditions: on ? [...(e.live?.conditions ?? []), condition] : (e.live?.conditions ?? []).filter(c => c !== condition) })
+      }
+    } finally { busy.value = false }
+  }
+
+  // ---------- Compass, plot & stage ----------
+  const compass = reactive<Compass>({ scene: '', objective: '', next_clue: '', clocks: [], spotlight: {} })
+  watch(() => s.value.session.compass, c => { if (c) Object.assign(compass, plain({ ...c, spotlight: { ...(c.spotlight ?? {}) } })) }, { immediate: true, deep: true })
+  /**
+   * Session edits are guarded by the session revision. When another window (a second master screen,
+   * the tablet) changed the session a moment before, catch up and apply the same intent once more,
+   * so the master's click is not lost to a race.
+   */
+  async function retrying<T>(op: () => Promise<T>): Promise<T> {
+    try { return await op() } catch (e) {
+      if (!(e instanceof ApiError) || e.code !== 'session.revision_mismatch') throw e
+      await t.value.catchUp()
+      // Some changes (pause/resume) carry no revision in their event; the 409 tells us the current one.
+      if (e.currentRevision !== undefined && s.value.session.revision < e.currentRevision) s.value.session.revision = e.currentRevision
+      return await op()
+    }
+  }
+  /** Applies a change to the compass and saves it; the change is re-applied on a revision race. */
+  async function editCompass(change: (c: Compass) => void): Promise<void> {
+    let first = true
+    try {
+      t.value.local.session(await retrying(() => {
+        // On the retry, start from the server's compass (the watcher may not have flushed yet).
+        if (!first && s.value.session.compass) Object.assign(compass, plain({ ...s.value.session.compass, spotlight: { ...(s.value.session.compass.spotlight ?? {}) } }))
+        first = false
+        change(compass)
+        return sessionApi.compass(s.value.session.id, s.value.session.revision, { ...plain(compass), spotlight: { ...compass.spotlight } })
+      }))
+    } catch (e) { fail(e) }
+  }
+  const saveCompass = () => editCompass(() => {})
+  function setClock(c: Clock, filled: number): void {
+    void editCompass(x => { x.clocks = x.clocks.map(k => (k.id === c.id ? { ...k, filled } : k)) })
+  }
+  function addClock(c: Omit<Clock, 'id' | 'filled'> & { filled?: number }): void {
+    const id = `c${Date.now().toString(36)}`
+    void editCompass(x => { if (!x.clocks.some(k => k.id === id)) x.clocks = [...x.clocks, { filled: 0, ...c, id }] })
+  }
+  function updateClock(c: Clock): void {
+    void editCompass(x => { x.clocks = x.clocks.map(k => (k.id === c.id ? { ...c, filled: Math.min(c.filled, c.segments) } : k)) })
+  }
+  function removeClock(c: Clock): void { void editCompass(x => { x.clocks = x.clocks.filter(k => k.id !== c.id) }) }
+  function spotlight(id: string): void {
+    // Counted once even if the save is retried: the bump is computed from the state it lands on.
+    const target = (compass.spotlight[id] ?? 0) + 1
+    void editCompass(x => { x.spotlight = { ...x.spotlight, [id]: Math.max(target, x.spotlight[id] ?? 0) } })
+  }
+  const spotlightLow = computed(() => {
+    const counts = s.value.characters.map(c => compass.spotlight[c.id] ?? 0)
+    const min = Math.min(...counts)
+    return new Set(s.value.characters.filter(c => (compass.spotlight[c.id] ?? 0) === min && Math.max(...counts) > min).map(c => c.id))
+  })
+
+  const plot = computed<Plot>(() => s.value.session.plot ?? { scenes: [], current: null })
+  const currentScene = computed<PlotScene | null>(() => (plot.value.current === null ? null : plot.value.scenes[plot.value.current] ?? null))
+  /** Saves the plot built from the latest state (rebuilt after a revision race). */
+  async function savePlot(build: () => Plot): Promise<boolean> {
+    try { t.value.local.session(await retrying(() => sessionApi.plot(s.value.session.id, s.value.session.revision, plain(build())))); return true } catch (e) { fail(e); return false }
+  }
+  /** Walks the story: the compass follows the new scene; its NPCs come on stage in this window. */
+  async function goToScene(index: number): Promise<void> {
+    if (index < 0 || index >= plot.value.scenes.length) return
+    if (await savePlot(() => ({ ...plot.value, current: index }))) {
+      bringSceneNpcs(plot.value.scenes[index] ?? null)
+      table.toast(`Cena: ${plot.value.scenes[index]?.title}`)
+    }
+  }
+  async function addScene(scene: Omit<PlotScene, 'id' | 'status'>, makeCurrent = false): Promise<void> {
+    const added = { ...scene, id: `s${Date.now().toString(36)}`, status: 'pending' as const }
+    if (await savePlot(() => {
+      const scenes = [...plot.value.scenes.filter(x => x.id !== added.id), added]
+      return { scenes, current: makeCurrent ? scenes.length - 1 : plot.value.current ?? 0 }
+    })) {
+      if (makeCurrent) bringSceneNpcs(added)
+    }
+  }
+  const stage = computed<Stage | null>(() => s.value.session.stage ?? null)
+  async function showStage(next: Omit<Stage, 'shown_at'> | null): Promise<void> {
+    try {
+      t.value.local.session(await retrying(() => sessionApi.stage(s.value.session.id, s.value.session.revision, next)))
+      table.toast(next ? 'Cena mostrada aos jogadores' : 'Tela dos jogadores recolhida')
+    } catch (e) { fail(e) }
+  }
+  // ---------- Places (who is near whom) and item offers ----------
+  const places = computed(() => s.value.session.places ?? null)
+  async function savePlaces(list: Place[]): Promise<boolean> {
+    try {
+      const saved = await party.setPlaces(s.value.session.id, places.value?.revision ?? 0, list)
+      s.value.session.places = saved
+      table.toast(list.length ? 'Locais atualizados' : 'O grupo está junto')
+      return true
+    } catch (e) { fail(e); return false }
+  }
+  const map = computed(() => s.value.session.map ?? null)
+  /** Saves the scene map; on a revision race (another master window) retries once on the latest revision. */
+  async function saveMap(next: Omit<SessionMap, 'revision'>): Promise<void> {
+    const put = (revision: number) => party.setMap(s.value.session.id, next, revision)
+    try {
+      s.value.session.map = await put(map.value?.revision ?? 0)
+    } catch (e) {
+      if (e instanceof ApiError && e.code === 'map.revision_mismatch' && e.currentRevision !== undefined) {
+        try { s.value.session.map = await put(e.currentRevision) } catch (again) { fail(again) }
+      } else fail(e)
+    }
+  }
+  const offers = computed(() => s.value.item_offers ?? [])
+  async function undoOffer(o: ItemOffer): Promise<void> {
+    try { await party.resolve(o.id, 'undo'); table.toast('Troca desfeita') } catch (e) { fail(e) }
+  }
+  // ---------- Atmosphere (weather, time of day) ----------
+  const atmosphere = computed<Atmosphere>(() => s.value.session.atmosphere ?? DEFAULT_ATMOSPHERE)
+  let atmosphereTimer: ReturnType<typeof setTimeout> | undefined
+  /** Previews at once on this screen, then saves (debounced) so dragging the clock stays light. */
+  function setAtmosphere(change: Partial<Atmosphere>): void {
+    const next = { ...atmosphere.value, ...change, set_at: new Date().toISOString() }
+    t.value.local.atmosphere({ ...next, revision: undefined })
+    clearTimeout(atmosphereTimer)
+    atmosphereTimer = setTimeout(async () => {
+      try {
+        const { hour, weather, intensity, time_scale, transition_seconds } = next
+        const fog = Math.round((next.fog ?? 0) * 100) / 100
+        t.value.local.atmosphere(await sessionApi.atmosphere(s.value.session.id, { hour, weather, intensity, fog, time_scale, transition_seconds }))
+      } catch (e) { fail(e) }
+    }, 350)
+  }
+  const showScene = (sc: PlotScene) => showStage({ title: sc.title, text: sc.read_aloud ?? '', art: sc.art ?? null, image_id: sc.image_id ?? null })
+
+  // ---------- Initiative ----------
+  const initiative = computed(() => s.value.session.initiative?.entries ?? [])
+  async function saveInitiative(entries: Subject[], turn: number, round: number): Promise<void> {
+    try { t.value.local.session(await retrying(() => sessionApi.initiative(s.value.session.id, s.value.session.revision, entries, turn, round))) } catch (e) { fail(e) }
+  }
+  const initFrom = (list: Subject[]) => saveInitiative(list, 0, 1)
+  function initMove(i: number, d: number): void {
+    const e: Subject[] = initiative.value.map(x => ({ kind: x.kind, id: x.id }))
+    const j = i + d
+    if (j < 0 || j >= e.length) return
+    ;[e[i], e[j]] = [e[j], e[i]]
+    void saveInitiative(e, s.value.session.initiative.turn ?? 0, s.value.session.initiative.round ?? 1)
+  }
+  const initRemove = (i: number) => saveInitiative(initiative.value.map(x => ({ kind: x.kind, id: x.id })).filter((_, k) => k !== i), 0, s.value.session.initiative.round ?? 1)
+  function nextTurn(): void {
+    const n = initiative.value.length
+    if (!n) return
+    const turn = (s.value.session.initiative.turn ?? 0) + 1
+    void saveInitiative(initiative.value.map(x => ({ kind: x.kind, id: x.id })), turn % n, (s.value.session.initiative.round ?? 1) + (turn >= n ? 1 : 0))
+  }
+  const endInitiative = () => saveInitiative([], 0, 1)
+
+  // ---------- Whispers, clues, NPC reveal ----------
+  const players = computed(() => s.value.members.filter(m => m.role === 'player'))
+  async function whisper(userId: string, body: string): Promise<boolean> {
+    if (!body.trim()) return false
+    try { t.value.local.whisper(await tableApi.whisper(campaign.id, userId, body.trim())); return true } catch (e) { fail(e); return false }
+  }
+  async function revealClue(id: string, to: 'table' | 'user', userId?: string): Promise<void> {
+    try {
+      t.value.local.clue(await tableApi.revealClue(id, to, userId))
+      table.toast(to === 'table' ? 'Pista revelada à mesa' : `Pista sussurrada a ${playerName(userId ?? null)}`)
+    } catch (e) { fail(e) }
+  }
+  async function addClue(title: string, body: string, scene: string | null, imageId: string | null = null): Promise<boolean> {
+    try { t.value.local.clue(await tableApi.createClue(s.value.session.id, title, body || title, scene, imageId)); return true } catch (e) { fail(e); return false }
+  }
+  async function revealNpc(id: string, summary: string): Promise<void> {
+    try { await tableApi.revealNpc(s.value.session.id, id, summary.slice(0, 300)); table.toast(`${byId(id)?.name} apresentado à mesa`) } catch (e) { fail(e) }
+  }
+  async function note(body: string, tags: string[]): Promise<void> {
+    try { t.value.local.note(await tableApi.createNote(campaign.id, body, tags)); table.toast('Anotado') } catch (e) { fail(e) }
+  }
+
+  // ---------- Images ----------
+  async function upload(file: File, kind: 'portrait' | 'scene' | 'handout'): Promise<string | null> {
+    try { return (await images.upload(campaign.id, file, kind)).id } catch (e) { fail(e, 'Não foi possível enviar a imagem.'); return null }
+  }
+  async function setPortrait(kind: SubjectKind, id: string, file: File): Promise<void> {
+    const imageId = await upload(file, 'portrait')
+    if (!imageId) return
+    try { await images.setPortrait(campaign.id, kind, id, imageId); t.value.local.portrait(kind, id, imageId) } catch (e) { fail(e) }
+  }
+
+  return {
+    table, campaign, t, s, sheets, busy, cast, byId, selection, focus, selected, select, selectMany, clearSelection,
+    inScene, toggleInScene, paths, togglePath, suggestionId, fromSuggestion, pathLabels, playerName, fail, request, dismiss, cancel, grant, reveal, pendingFor,
+    saveLive, adjustMany, conditionMany, compass, saveCompass, setClock, addClock, updateClock, removeClock, spotlight, spotlightLow,
+    places, savePlaces, offers, undoOffer, map, saveMap, plot, currentScene, savePlot, goToScene, addScene, stage, showStage, showScene, atmosphere, setAtmosphere,
+    initiative, initFrom, initMove, initRemove, nextTurn, endInitiative,
+    players, whisper, revealClue, addClue, revealNpc, note, upload, setPortrait,
+  }
+}
+
+export type MasterContext = ReturnType<typeof createMasterContext>
+const KEY: InjectionKey<MasterContext> = Symbol('novtt.master')
+export const provideMaster = (ctx: MasterContext) => provide(KEY, ctx)
+export function useMaster(): MasterContext {
+  const ctx = inject(KEY)
+  if (!ctx) throw new Error('useMaster outside the master table')
+  return ctx
+}
+export type { ComputedRef, Ref }

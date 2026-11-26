@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1.0",
+  "id": "demo-universal-creation",
+  "display_name": "Demonstração autoral de ficha e progressão",
+  "family_id": "novtt-demo",
+  "rules_revision": "original-2026",
+  "source_version": "demo-1",
+  "errata_reference": null,
+  "preset_version": "0.1.0",
+  "locale": "pt-BR",
+  "license": {
+    "identifier": "NOVTT-original",
+    "source_url": "https://example.org/novtt/demo",
+    "rights_status": "draft"
+  },
+  "capabilities": {
+    "character_creation": true,
+    "character_progression": true,
+    "dice_resolution": true,
+    "inventory": true,
+    "resource_tracking": true
+  },
+  "publication": {"public": false}
+}

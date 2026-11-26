@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BrandMark from '../components/BrandMark.vue'
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import { api, ApiError, ensureCsrfCookie } from '../api/client'
 import DiceTray from '../components/DiceTray.vue'
@@ -142,7 +143,8 @@ onBeforeUnmount(() => unsubscribe())
 <template>
   <main class="page demo">
     <header>
-      <p class="eyebrow">NOVTT · DEMONSTRAÇÃO LOCAL</p>
+      <BrandMark tagline />
+      <p class="eyebrow">DEMONSTRAÇÃO LOCAL</p>
       <h1>Ficha e revisão</h1>
       <p class="banner">Somente desenvolvimento: usuários e dados fictícios, entrada sem senha. Não existe fora do ambiente local.</p>
     </header>

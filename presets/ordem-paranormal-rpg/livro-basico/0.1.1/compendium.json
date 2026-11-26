@@ -1,0 +1,1946 @@
+{
+  "contract": "novtt.compendium/1",
+  "attributions": {
+    "op": "Este é um conteúdo não oficial, publicado sob a Licença da Comunidade de Ordem Paranormal"
+  },
+  "taxonomy": [
+    {
+      "kind": "atributo",
+      "labels": {
+        "pt-BR": "Atributo"
+      }
+    },
+    {
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Perícia"
+      }
+    },
+    {
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Origem"
+      }
+    },
+    {
+      "kind": "classe",
+      "labels": {
+        "pt-BR": "Classe"
+      }
+    },
+    {
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Trilha"
+      },
+      "parent_kind": "classe"
+    },
+    {
+      "kind": "elemento",
+      "labels": {
+        "pt-BR": "Elemento"
+      }
+    },
+    {
+      "kind": "patente",
+      "labels": {
+        "pt-BR": "Patente"
+      }
+    }
+  ],
+  "items": [
+    {
+      "canonical_id": "atributo.agi",
+      "kind": "atributo",
+      "labels": {
+        "pt-BR": "Agilidade (AGI)"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "atributo.for",
+      "kind": "atributo",
+      "labels": {
+        "pt-BR": "Força (FOR)"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "atributo.int",
+      "kind": "atributo",
+      "labels": {
+        "pt-BR": "Intelecto (INT)"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "atributo.pre",
+      "kind": "atributo",
+      "labels": {
+        "pt-BR": "Presença (PRE)"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "atributo.vig",
+      "kind": "atributo",
+      "labels": {
+        "pt-BR": "Vigor (VIG)"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "pericia.acrobacia",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Acrobacia"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_acrobacia"
+      ]
+    },
+    {
+      "canonical_id": "pericia.adestramento",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Adestramento"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_adestramento"
+      ]
+    },
+    {
+      "canonical_id": "pericia.artes",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Artes"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_artes"
+      ]
+    },
+    {
+      "canonical_id": "pericia.atletismo",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Atletismo"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_atletismo"
+      ]
+    },
+    {
+      "canonical_id": "pericia.atualidades",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Atualidades"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_atualidades"
+      ]
+    },
+    {
+      "canonical_id": "pericia.ciencias",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Ciências"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_ciencias"
+      ]
+    },
+    {
+      "canonical_id": "pericia.crime",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Crime"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_crime"
+      ]
+    },
+    {
+      "canonical_id": "pericia.diplomacia",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Diplomacia"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_diplomacia"
+      ]
+    },
+    {
+      "canonical_id": "pericia.enganacao",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Enganação"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_enganacao"
+      ]
+    },
+    {
+      "canonical_id": "pericia.fortitude",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Fortitude"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_fortitude"
+      ]
+    },
+    {
+      "canonical_id": "pericia.furtividade",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Furtividade"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_furtividade"
+      ]
+    },
+    {
+      "canonical_id": "pericia.iniciativa",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Iniciativa"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_iniciativa"
+      ]
+    },
+    {
+      "canonical_id": "pericia.intimidacao",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Intimidação"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_intimidacao"
+      ]
+    },
+    {
+      "canonical_id": "pericia.intuicao",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Intuição"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_intuicao"
+      ]
+    },
+    {
+      "canonical_id": "pericia.investigacao",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Investigação"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_investigacao"
+      ]
+    },
+    {
+      "canonical_id": "pericia.luta",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Luta"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_luta"
+      ]
+    },
+    {
+      "canonical_id": "pericia.medicina",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Medicina"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_medicina"
+      ]
+    },
+    {
+      "canonical_id": "pericia.ocultismo",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Ocultismo"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_ocultismo"
+      ]
+    },
+    {
+      "canonical_id": "pericia.percepcao",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Percepção"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_percepcao"
+      ]
+    },
+    {
+      "canonical_id": "pericia.pilotagem",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Pilotagem"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_pilotagem"
+      ]
+    },
+    {
+      "canonical_id": "pericia.pontaria",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Pontaria"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_pontaria"
+      ]
+    },
+    {
+      "canonical_id": "pericia.profissao",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Profissão"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_profissao"
+      ]
+    },
+    {
+      "canonical_id": "pericia.reflexos",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Reflexos"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_reflexos"
+      ]
+    },
+    {
+      "canonical_id": "pericia.religiao",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Religião"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_religiao"
+      ]
+    },
+    {
+      "canonical_id": "pericia.sobrevivencia",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Sobrevivência"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_sobrevivencia"
+      ]
+    },
+    {
+      "canonical_id": "pericia.tatica",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Tática"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_tatica"
+      ]
+    },
+    {
+      "canonical_id": "pericia.tecnologia",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Tecnologia"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_tecnologia"
+      ]
+    },
+    {
+      "canonical_id": "pericia.vontade",
+      "kind": "pericia",
+      "labels": {
+        "pt-BR": "Vontade"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "roll:pericia_vontade"
+      ]
+    },
+    {
+      "canonical_id": "origem.academico",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Acadêmico"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:academico"
+      ]
+    },
+    {
+      "canonical_id": "origem.agente_de_saude",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Agente de Saúde"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:agente_de_saude"
+      ]
+    },
+    {
+      "canonical_id": "origem.amnesico",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Amnésico"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:amnesico"
+      ]
+    },
+    {
+      "canonical_id": "origem.artista",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Artista"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:artista"
+      ]
+    },
+    {
+      "canonical_id": "origem.atleta",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Atleta"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:atleta"
+      ]
+    },
+    {
+      "canonical_id": "origem.chef",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Chef"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:chef"
+      ]
+    },
+    {
+      "canonical_id": "origem.criminoso",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Criminoso"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:criminoso"
+      ]
+    },
+    {
+      "canonical_id": "origem.cultista_arrependido",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Cultista Arrependido"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:cultista_arrependido"
+      ]
+    },
+    {
+      "canonical_id": "origem.desgarrado",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Desgarrado"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:desgarrado"
+      ]
+    },
+    {
+      "canonical_id": "origem.engenheiro",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Engenheiro"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:engenheiro"
+      ]
+    },
+    {
+      "canonical_id": "origem.executivo",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Executivo"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:executivo"
+      ]
+    },
+    {
+      "canonical_id": "origem.investigador",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Investigador"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:investigador"
+      ]
+    },
+    {
+      "canonical_id": "origem.lutador",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Lutador"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:lutador"
+      ]
+    },
+    {
+      "canonical_id": "origem.magnata",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Magnata"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:magnata"
+      ]
+    },
+    {
+      "canonical_id": "origem.mercenario",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Mercenário"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:mercenario"
+      ]
+    },
+    {
+      "canonical_id": "origem.militar",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Militar"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:militar"
+      ]
+    },
+    {
+      "canonical_id": "origem.operario",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Operário"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:operario"
+      ]
+    },
+    {
+      "canonical_id": "origem.policial",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Policial"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:policial"
+      ]
+    },
+    {
+      "canonical_id": "origem.religioso",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Religioso"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:religioso"
+      ]
+    },
+    {
+      "canonical_id": "origem.servidor_publico",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Servidor Público"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:servidor_publico"
+      ]
+    },
+    {
+      "canonical_id": "origem.teorico_da_conspiracao",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Teórico da Conspiração"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:teorico_da_conspiracao"
+      ]
+    },
+    {
+      "canonical_id": "origem.ti",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "T.I."
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:ti"
+      ]
+    },
+    {
+      "canonical_id": "origem.trabalhador_rural",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Trabalhador Rural"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:trabalhador_rural"
+      ]
+    },
+    {
+      "canonical_id": "origem.trambiqueiro",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Trambiqueiro"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:trambiqueiro"
+      ]
+    },
+    {
+      "canonical_id": "origem.universitario",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Universitário"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:universitario"
+      ]
+    },
+    {
+      "canonical_id": "origem.vitima",
+      "kind": "origem",
+      "labels": {
+        "pt-BR": "Vítima"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "mechanical_refs": [
+        "choice:origem:vitima"
+      ]
+    },
+    {
+      "canonical_id": "classe.combatente",
+      "kind": "classe",
+      "labels": {
+        "pt-BR": "Combatente"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:classe:combatente",
+        "derived:pv_max",
+        "derived:pe_max",
+        "derived:san_max"
+      ]
+    },
+    {
+      "canonical_id": "classe.especialista",
+      "kind": "classe",
+      "labels": {
+        "pt-BR": "Especialista"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:classe:especialista",
+        "derived:pv_max",
+        "derived:pe_max",
+        "derived:san_max"
+      ]
+    },
+    {
+      "canonical_id": "classe.ocultista",
+      "kind": "classe",
+      "labels": {
+        "pt-BR": "Ocultista"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      },
+      "mechanical_refs": [
+        "choice:classe:ocultista",
+        "derived:pv_max",
+        "derived:pe_max",
+        "derived:san_max"
+      ]
+    },
+    {
+      "canonical_id": "trilha.aniquilador",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Aniquilador"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.combatente",
+      "mechanical_refs": [
+        "choice:trilha:aniquilador"
+      ]
+    },
+    {
+      "canonical_id": "trilha.comandante_de_campo",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Comandante de Campo"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.combatente",
+      "mechanical_refs": [
+        "choice:trilha:comandante_de_campo"
+      ]
+    },
+    {
+      "canonical_id": "trilha.guerreiro",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Guerreiro"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.combatente",
+      "mechanical_refs": [
+        "choice:trilha:guerreiro"
+      ]
+    },
+    {
+      "canonical_id": "trilha.operacoes_especiais",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Operações Especiais"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.combatente",
+      "mechanical_refs": [
+        "choice:trilha:operacoes_especiais"
+      ]
+    },
+    {
+      "canonical_id": "trilha.tropa_de_choque",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Tropa de Choque"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.combatente",
+      "mechanical_refs": [
+        "choice:trilha:tropa_de_choque"
+      ]
+    },
+    {
+      "canonical_id": "trilha.atirador_de_elite",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Atirador de Elite"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.especialista",
+      "mechanical_refs": [
+        "choice:trilha:atirador_de_elite"
+      ]
+    },
+    {
+      "canonical_id": "trilha.infiltrador",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Infiltrador"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.especialista",
+      "mechanical_refs": [
+        "choice:trilha:infiltrador"
+      ]
+    },
+    {
+      "canonical_id": "trilha.medico_de_campo",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Médico de Campo"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.especialista",
+      "mechanical_refs": [
+        "choice:trilha:medico_de_campo"
+      ]
+    },
+    {
+      "canonical_id": "trilha.negociador",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Negociador"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.especialista",
+      "mechanical_refs": [
+        "choice:trilha:negociador"
+      ]
+    },
+    {
+      "canonical_id": "trilha.tecnico",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Técnico"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.especialista",
+      "mechanical_refs": [
+        "choice:trilha:tecnico"
+      ]
+    },
+    {
+      "canonical_id": "trilha.conduite",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Conduíte"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.ocultista",
+      "mechanical_refs": [
+        "choice:trilha:conduite"
+      ]
+    },
+    {
+      "canonical_id": "trilha.flagelador",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Flagelador"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.ocultista",
+      "mechanical_refs": [
+        "choice:trilha:flagelador"
+      ]
+    },
+    {
+      "canonical_id": "trilha.graduado",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Graduado"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.ocultista",
+      "mechanical_refs": [
+        "choice:trilha:graduado"
+      ]
+    },
+    {
+      "canonical_id": "trilha.intuitivo",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Intuitivo"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.ocultista",
+      "mechanical_refs": [
+        "choice:trilha:intuitivo"
+      ]
+    },
+    {
+      "canonical_id": "trilha.lamina_paranormal",
+      "kind": "trilha",
+      "labels": {
+        "pt-BR": "Lâmina Paranormal"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      },
+      "parent_id": "classe.ocultista",
+      "mechanical_refs": [
+        "choice:trilha:lamina_paranormal"
+      ]
+    },
+    {
+      "canonical_id": "elemento.sangue",
+      "kind": "elemento",
+      "labels": {
+        "pt-BR": "Sangue"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "elemento.morte",
+      "kind": "elemento",
+      "labels": {
+        "pt-BR": "Morte"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "elemento.conhecimento",
+      "kind": "elemento",
+      "labels": {
+        "pt-BR": "Conhecimento"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "elemento.energia",
+      "kind": "elemento",
+      "labels": {
+        "pt-BR": "Energia"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "elemento.medo",
+      "kind": "elemento",
+      "labels": {
+        "pt-BR": "Medo"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "verified"
+      }
+    },
+    {
+      "canonical_id": "patente.recruta",
+      "kind": "patente",
+      "labels": {
+        "pt-BR": "Recruta"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      }
+    },
+    {
+      "canonical_id": "patente.operador",
+      "kind": "patente",
+      "labels": {
+        "pt-BR": "Operador"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      }
+    },
+    {
+      "canonical_id": "patente.agente_especial",
+      "kind": "patente",
+      "labels": {
+        "pt-BR": "Agente Especial"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      }
+    },
+    {
+      "canonical_id": "patente.oficial_de_operacoes",
+      "kind": "patente",
+      "labels": {
+        "pt-BR": "Oficial de Operações"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      }
+    },
+    {
+      "canonical_id": "patente.agente_de_elite",
+      "kind": "patente",
+      "labels": {
+        "pt-BR": "Agente de Elite"
+      },
+      "rules_revision": "pending",
+      "locale": "pt-BR",
+      "source": {
+        "source_id": "op-livro-basico",
+        "source_authenticity": "official",
+        "rights_status": "rights_review",
+        "license_id": "OP-Community-1.0",
+        "requires_attribution": true,
+        "attribution_ref": "op",
+        "edition": "livro-basico",
+        "review_status": "unverified"
+      }
+    }
+  ]
+}

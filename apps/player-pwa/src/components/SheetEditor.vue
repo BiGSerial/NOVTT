@@ -15,6 +15,12 @@ const props = defineProps<{
   readonly?: boolean
   /** Budget id → player-facing label (preset rules). Raw ids are never shown. */
   budgetLabels?: Record<string, string>
+  /** Path → option value → label (from the preset's choices), so codes are never shown. */
+  optionLabels?: Record<string, Record<string, string>>
+  /** Server-computed values (derived fields of the draft preview) shown instead of the draft's. */
+  computedValues?: Record<string, unknown>
+  /** Inside the guided builder: no approval notes, no error summary, no revision footer. */
+  bare?: boolean
 }>()
 const emit = defineEmits<{ changed: [] }>()
 
@@ -23,6 +29,7 @@ const emit = defineEmits<{ changed: [] }>()
 const version = ref(0)
 function valueOf(path: string): unknown {
   void version.value
+  if (props.computedValues && path in props.computedValues) return props.computedValues[path]
   return props.draft.value(path)
 }
 function itemsOf(path: string) {
@@ -117,7 +124,7 @@ function display(value: unknown): string {
 
 <template>
   <form class="sheet" novalidate @submit.prevent>
-    <div v-if="issues.length" class="error-summary" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+    <div v-if="issues.length && !bare" class="error-summary" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
       <h2 id="error-summary-title">Há {{ issues.length }} {{ issues.length === 1 ? 'problema' : 'problemas' }} no rascunho</h2>
       <ul>
         <li v-for="(issue, index) in issues" :key="index">
@@ -130,7 +137,7 @@ function display(value: unknown): string {
 
     <fieldset v-for="{ section, elements } in visibleSections" :key="section.id" class="section">
       <legend>{{ section.label }}</legend>
-      <p v-if="sectionNeedsApproval(section, elements)" class="help approval-note">Mudanças nesta seção passam pela aprovação do mestre.</p>
+      <p v-if="!bare && sectionNeedsApproval(section, elements)" class="help approval-note">Mudanças nesta seção passam pela aprovação do mestre.</p>
       <template v-for="element in elements" :key="element.path">
         <div v-if="element.kind === 'field'" class="field" :class="{ invalid: errorsFor(element.path).length }">
           <template v-if="editable(section, element)">
@@ -156,6 +163,17 @@ function display(value: unknown): string {
                 :aria-describedby="describedBy(element.path, !!element.description)"
                 @change="setField(element.path, ($event.target as HTMLTextAreaElement).value)"
               />
+              <select
+                v-else-if="element.widget === 'select' && node(element.path).enum"
+                :id="fieldId(element.path)"
+                :value="(valueOf(element.path) as string) ?? ''"
+                :aria-invalid="errorsFor(element.path).length ? 'true' : undefined"
+                :aria-describedby="describedBy(element.path, !!element.description)"
+                @change="setField(element.path, ($event.target as HTMLSelectElement).value)"
+              >
+                <option value="">Escolha…</option>
+                <option v-for="option in node(element.path).enum" :key="String(option)" :value="String(option)">{{ optionLabels?.[element.path]?.[String(option)] ?? option }}</option>
+              </select>
               <input
                 v-else-if="element.widget === 'boolean'"
                 :id="fieldId(element.path)"
@@ -179,11 +197,11 @@ function display(value: unknown): string {
               />
             </template>
             <p v-if="element.description" :id="fieldId(element.path, '-help')" class="help">{{ element.description }}</p>
-            <p v-if="accessOf(ui, section, element) === 'approval_required' && !sectionNeedsApproval(section, elements)" class="help">Alterações neste campo passam pela aprovação do mestre.</p>
+            <p v-if="!bare && accessOf(ui, section, element) === 'approval_required' && !sectionNeedsApproval(section, elements)" class="help">Alterações neste campo passam pela aprovação do mestre.</p>
           </template>
           <dl v-else class="readonly">
             <dt :id="fieldId(element.path)">{{ element.label }}</dt>
-            <dd>{{ display(valueOf(element.path)) }}</dd>
+            <dd>{{ optionLabels?.[element.path]?.[String(valueOf(element.path))] ?? display(valueOf(element.path)) }}</dd>
           </dl>
           <p v-for="(issue, index) in errorsFor(element.path)" :id="index === 0 ? fieldId(element.path, '-error') : undefined" :key="index" class="error">
             {{ message(issue) }}
@@ -213,6 +231,6 @@ function display(value: unknown): string {
         </div>
       </template>
     </fieldset>
-    <p class="help">Revisão oficial nº {{ revision }}. O rascunho não altera a ficha oficial.</p>
+    <p v-if="!bare" class="help">Revisão oficial nº {{ revision }}. O rascunho não altera a ficha oficial.</p>
   </form>
 </template>

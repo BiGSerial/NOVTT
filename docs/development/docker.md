@@ -10,7 +10,8 @@ Docker Engine com Compose v2 (ou Docker Desktop), Git e portas locais disponíve
 | Composer | 2.x | `docker/php/Dockerfile` |
 | Node | 24 LTS | `.nvmrc`, `compose.yaml`, `apps/player-pwa/package.json` (`engines`), CI |
 | PostgreSQL | 18 | `compose.yaml` |
-| Redis | 7 | `compose.yaml` |
+| Redis | 7 | `compose.yaml` (cache, filas, escala do Reverb) |
+| Laravel Reverb | 1.x | `apps/api/composer.json`; servidor WebSocket no serviço `reverb` |
 
 Dependências são instaladas a partir dos lockfiles (`composer.lock`, `package-lock.json`) com `composer install` e `npm ci`. Para rodar fora do Docker, use as mesmas versões; o PHP do host precisa ser 8.5.
 
@@ -65,3 +66,17 @@ docker compose --profile test config
 docker compose --profile test run --rm engine php -v
 docker compose --profile player run --rm --no-deps player node -v
 ```
+
+## Tempo real (SPEC-MVP-002)
+
+`sh scripts/dev.sh api` e `demo` sobem, além da API e do PostgreSQL:
+
+- `redis`: cache, filas e o canal de escala do Reverb (sem porta publicada).
+- `reverb`: servidor WebSocket (protocolo Pusher) na rede interna, porta 8080. O servidor de
+  desenvolvimento do PWA faz proxy de `/app` para ele, então o navegador fala com uma origem só.
+- `worker`: `queue:work` (entrega os eventos depois do commit) e `novtt:events:relay --loop`
+  (reentrega o que ficou pendente, a cada 2 s).
+
+As credenciais locais do Reverb (`NOVTT_REVERB_APP_KEY` / `NOVTT_REVERB_APP_SECRET`) são geradas
+uma vez por checkout no `.env` da raiz, que não é versionado. A chave é pública (vai para o
+navegador); o segredo fica só nos processos da API.

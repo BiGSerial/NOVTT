@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+import { textureCanvas } from './textures'
+import { soundAllowed } from './skins'
 import { arrange, type Pose } from './arrange'
 import { DIE_TYPES, dieDef, type DieType } from './geometry'
 import { add, cross, qmul, scale, slerp, sub, v, type Quat } from './math'
@@ -177,6 +179,15 @@ export class DiceStage implements DiceAnimator {
     const body = new THREE.BufferGeometry()
     body.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
     body.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3))
+    // Box-projected UVs (each flat face onto its dominant axis): seamless per face, for textures.
+    const uv: number[] = []
+    for (let i = 0; i < pos.length; i += 3) {
+      const [x, y, z] = [pos[i]!, pos[i + 1]!, pos[i + 2]!]
+      const [nx, ny, nz] = [Math.abs(nor[i]!), Math.abs(nor[i + 1]!), Math.abs(nor[i + 2]!)]
+      const [a, b] = nx >= ny && nx >= nz ? [y, z] : ny >= nz ? [x, z] : [x, y]
+      uv.push(a * 0.6 + 0.5, b * 0.6 + 0.5)
+    }
+    body.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2))
     const labels = new THREE.BufferGeometry()
     labels.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3))
     labels.setAttribute('normal', new THREE.Float32BufferAttribute(ln, 3))
@@ -220,7 +231,15 @@ export class DiceStage implements DiceAnimator {
   }
 
   private bodyMaterial(skin: DiceSkin): THREE.Material {
-    return this.material(`body:${skin.body}:${skin.finish}`, () => new THREE.MeshStandardMaterial({ color: skin.body, ...FINISH[skin.finish], flatShading: true }))
+    const t = skin.texture
+    if (!t || t.pattern === 'none') return this.material(`body:${skin.body}:${skin.finish}`, () => new THREE.MeshStandardMaterial({ color: skin.body, ...FINISH[skin.finish], flatShading: true }))
+    return this.material(`body:${skin.body}:${skin.finish}:${t.pattern}:${t.accent}:${t.scale ?? 1}`, () => {
+      const texture = new THREE.CanvasTexture(textureCanvas(skin.body, t))
+      texture.colorSpace = THREE.SRGBColorSpace
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+      this.disposables.push(texture)
+      return new THREE.MeshStandardMaterial({ map: texture, ...FINISH[skin.finish], flatShading: true })
+    })
   }
 
   private clearDice(): void {
@@ -301,7 +320,7 @@ export class DiceStage implements DiceAnimator {
 
     if (mode !== 'animated' || this.lost) { showFinal(); return stats }
 
-    const stopSound = playImpacts(detectImpacts(rec, n), this.feedback)
+    const stopSound = playImpacts(detectImpacts(rec, n), { ...this.feedback, sound: this.feedback.sound && soundAllowed() })
     await new Promise<void>(resolve => {
       this.finish = () => { cancelAnimationFrame(this.frame); stopSound(); showFinal(); resolve() }
       const start = performance.now()

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Application\AuditTrail;
+use App\Application\CharacterAdaptation;
 use App\Application\Idempotency;
 use App\Application\SheetViews;
 use App\Domain\CampaignCharacterStatus;
@@ -20,12 +21,14 @@ use App\Models\CampaignNpc;
 use App\Models\ChangeRequest;
 use App\Models\LibraryCharacter;
 use App\Models\LibraryNpc;
+use App\Models\PresetVersion;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Novtt\Engine\Sheets\CanonicalJson;
+use Novtt\Engine\Sheets\SheetMigration;
 use Novtt\Engine\Validation\Severity;
 use Novtt\Engine\Validation\ValidationIssue;
 use Novtt\Engine\Validation\ValidationResult;
@@ -66,6 +69,7 @@ final class CampaignCharacterController extends ApiController
         $data = $this->input($request, [
             'name' => ['required', 'string', 'min:1', 'max:120'],
             'library_character_id' => ['sometimes', 'uuid'],
+            'from_campaign_character_id' => ['sometimes', 'uuid'],
         ]);
 
         [$status, $body] = DB::transaction(fn (): array => $idempotency->run($actor, 'campaign_character.create:' . $campaign->getKey(), $key, hash('sha256', CanonicalJson::encode($data)), function () use ($actor, $campaign, $data): array {
@@ -78,15 +82,31 @@ final class CampaignCharacterController extends ApiController
                     throw ApiProblem::conflict('character.already_in_campaign');
                 }
             }
+            // Bringing one's own character from another campaign: the same game carries the sheet
+            // (adapted to this campaign's version); another game starts a new sheet with the name.
+            [$sheet, $origin, $carried] = [(object) [], null, false];
+            if (isset($data['from_campaign_character_id'])) {
+                $origin = CampaignCharacter::query()->where('player_user_id', $actor->getKey())->where('status', '!=', CampaignCharacterStatus::Archived->value)->find($data['from_campaign_character_id'])
+                    ?? throw ApiProblem::validation(new ValidationResult([new ValidationIssue('character.source_unavailable', Severity::Error, [], ['/from_campaign_character_id'])]));
+                $target = PresetVersion::query()->findOrFail($campaign->preset_version_id);
+                $source = PresetVersion::query()->findOrFail($origin->preset_version_id);
+                if ($source->definition_id === $target->definition_id) {
+                    $migrated = SheetMigration::migrate((array) $origin->sheet, (array) $target->sheet_schema)['sheet'];
+                    unset($migrated[SheetMigration::LEDGER]); // points are re-checked by this campaign's master
+                    $sheet = $migrated === [] ? (object) [] : $migrated;
+                    $carried = true;
+                }
+            }
             $character = CampaignCharacter::query()->create([
                 'campaign_id' => $campaign->getKey(),
                 'library_character_id' => $libraryId,
                 'player_user_id' => $actor->getKey(),
                 'preset_version_id' => $campaign->preset_version_id,
                 'name' => $data['name'],
-                'sheet' => (object) [],
+                'sheet' => $sheet,
+                'portrait_image_id' => null,
             ]);
-            $this->audit->record($actor, $campaign->getKey(), 'campaign_character.created', $character, ['library_character_id' => $libraryId]);
+            $this->audit->record($actor, $campaign->getKey(), 'campaign_character.created', $character, ['library_character_id' => $libraryId, 'from_campaign_character_id' => $origin?->getKey(), 'sheet_carried' => $carried]);
             $this->audit->emit($campaign->getKey(), 'campaign_character.created', $character, ['campaign_character_id' => $character->getKey(), 'sheet_revision' => 0]);
 
             return [201, $this->presenter->campaignCharacter($character->refresh(), $this->isMaster($actor, $campaign->getKey()))];
@@ -207,6 +227,42 @@ final class CampaignCharacterController extends ApiController
     }
 
     /** @param callable(User, CampaignCharacter): void $action */
+    /** What adapting this character to the campaign's current sheet version would keep and drop. */
+    public function adaptation(Request $request, string $campaignCharacterId, CharacterAdaptation $adaptation): JsonResponse
+    {
+        $character = $this->visibleCharacter($request, $campaignCharacterId);
+        $this->requireOwnerOrMaster($this->actor($request), $character);
+
+        return new JsonResponse($adaptation->preview($character));
+    }
+
+    /** Adapts the character to the campaign's current sheet version (owner or master). */
+    public function adapt(Request $request, string $campaignCharacterId, CharacterAdaptation $adaptation): JsonResponse
+    {
+        $actor = $this->actor($request);
+        $this->visibleCharacter($request, $campaignCharacterId);
+        $data = $this->input($request, ['expected_sheet_revision' => ['required', 'integer', 'min:0']]);
+        [$report, $character] = DB::transaction(function () use ($actor, $campaignCharacterId, $data, $adaptation): array {
+            $character = CampaignCharacter::query()->lockForUpdate()->findOrFail($campaignCharacterId);
+            $this->requireOwnerOrMaster($actor, $character);
+            if ($character->status === CampaignCharacterStatus::Archived) {
+                throw ApiProblem::conflict('character.archived');
+            }
+
+            return [$adaptation->adapt($actor, $character, (int) $data['expected_sheet_revision']), $character->refresh()];
+        });
+
+        return new JsonResponse(['report' => $report, 'character' => $this->presenter->campaignCharacter($character, $this->isMaster($actor, $character->campaign_id))]);
+    }
+
+    private function requireOwnerOrMaster(User $actor, CampaignCharacter $character): void
+    {
+        $owner = ($character->custodian_user_id ?? $character->player_user_id) === $actor->getKey();
+        if (!$owner && !$this->isMaster($actor, $character->campaign_id)) {
+            throw new ApiProblem(403, 'character.not_yours');
+        }
+    }
+
     private function masterAction(Request $request, string $campaignCharacterId, callable $action): JsonResponse
     {
         $actor = $this->actor($request);

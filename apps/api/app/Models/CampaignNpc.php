@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['campaign_id', 'source_npc_id', 'preset_version_id', 'name', 'sheet', 'sheet_revision', 'created_by', 'archived_at'])]
+#[Fillable(['campaign_id', 'source_npc_id', 'preset_version_id', 'name', 'sheet', 'sheet_revision', 'created_by', 'archived_at', 'portrait_image_id'])]
 class CampaignNpc extends Model
 {
     use HasFactory, HasUuids;
